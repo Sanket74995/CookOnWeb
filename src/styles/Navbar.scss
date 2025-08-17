@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Lato:wght@700&display=swap');
+
+:root {
+    --background-color: #FFF8F0;
+    --background-light: #FFF8F0;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --primary-color: #E67E22;
+    --secondary-color: #27AE60;
+    --text-color: #2C3E50;
+    --text-light: #607080;
+    --font-size: 16px;
+    --animation-speed: 1;
+    --accent-color: #F1C40F;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-size: var(--font-size);
+    font-family: "Poppins", sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+.navbar {
+    height: 55px;
+    box-shadow: 0 3px 6px var(--shadow-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .logo {
+        font-size: 1.8em;
+        font-weight: bolder;
+        color: var(--primary-color);
+        text-shadow: 0 2px 4px var(--shadow-color);
+
+        &:hover {
+            color: var(--accent-color);
+        }
+
+        .cook {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .on {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .web {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+        }
+    }
+
+    .navbar-items {
+        a {
+            margin-left: 1em;
+            color: var(--text-light);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+
+            &::before {
+                content: '';
+                display: inline-block;
+                height: 2px;
+                width: 100%;
+                background-color: var(--primary-color);
+                position: absolute;
+                bottom: -3px;
+                left: 0;
+                transform: scaleX(0);
+                transition: transform calc(var(--animation-speed)*0.2s) ease-in-out;
+            }
+
+            &:hover {
+                &::before {
+                    transform: scaleX(1);
+                }
+            }
+
+            &:active {
+                color: var(--accent-color);
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.container {
+    padding-inline: 30px;
+}
