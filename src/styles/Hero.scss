@@ -1,0 +1,145 @@
+.hero {
+    background: linear-gradient(to bottom, #fcefe4, #D35400);
+    /* Gradient background */
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+    border-radius: 8px;
+    margin: 20px;
+    position: relative;
+    overflow: hidden;
+
+    h1 {
+        font-size: 3em;
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 10px;
+        animation: fadeInUp 1s ease;
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .highlight {
+            font-family: 'Pacifico', cursive;
+            color: var(--primary-color);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            position: relative;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    p {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+
+    .hero-button {
+        background-color: white;
+        color: var(--primary-color);
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 50px;
+        /* Rounded-pill style */
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+    }
+
+    /* Floating Food Icons */
+    .floating-icons {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .food-icon {
+        position: absolute;
+        font-size: 2rem;
+        opacity: 0.6;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .icon-1 {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .icon-2 {
+        top: 30%;
+        right: 15%;
+        animation-delay: 1s;
+    }
+
+    .icon-3 {
+        bottom: 30%;
+        left: 20%;
+        animation-delay: 2s;
+    }
+
+    .icon-4 {
+        top: 50%;
+        left: 5%;
+        animation-delay: 3s;
+    }
+
+    .icon-5 {
+        bottom: 20%;
+        right: 10%;
+        animation-delay: 4s;
+    }
+
+    .icon-6 {
+        top: 60%;
+        right: 25%;
+        animation-delay: 5s;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.6;
+        }
+
+        25% {
+            transform: translateY(-10px) rotate(5deg);
+            opacity: 0.8;
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(-5deg);
+            opacity: 1;
+        }
+
+        75% {
+            transform: translateY(-10px) rotate(3deg);
+            opacity: 0.8;
+        }
+
+        100% {
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.6;
+        }
+    }
+}
