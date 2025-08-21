@@ -28,6 +28,11 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems, onNavigate }) => {
         toggleSidebar();
     };
 
+    const handleLoginClick = () => {
+        onNavigate('login');
+        toggleSidebar();
+    };
+
     return (
         <div className={`sidebar ${isOpen ? "active" : ""}`}>
             <div className="sidebar-header">
@@ -58,7 +63,7 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems, onNavigate }) => {
                 ))}
             </ul>
             <div className="sidebar-auth">
-                <button className="sidebar-login-btn">Login</button>
+                <button className="sidebar-login-btn" onClick={handleLoginClick}>Login</button>
                 <button className="sidebar-register-btn" onClick={handleRegisterClick}>Register</button>
             </div>
             <div className="sidebar-footer">

@@ -23,6 +23,13 @@ const Navbar = ({ onNavigate }) => {
         setIsOpen(false);
     };
 
+    const handleLoginClick = () => {
+        if (onNavigate && typeof onNavigate === 'function') {
+            onNavigate('login');
+        }
+        setIsOpen(false);
+    };
+
     const navItems = [
         {
             id: 1,
@@ -50,8 +57,8 @@ const Navbar = ({ onNavigate }) => {
             <div className="navbar container">
                 <a className="logo" href="#" onClick={handleHomeClick}>
                     <span className="cook">Cook</span>
-                    <span className="on">On</span>
-                    <span className="web">Web</span>
+                    <span className="cook">on</span>
+                    <span className="cook">Web</span>
                 </a>
                 <div className="navbar-items">
                     {navItems.map((item) => (
@@ -65,7 +72,7 @@ const Navbar = ({ onNavigate }) => {
                         </a>
                     ))}
                     <div className="auth-buttons">
-                        <button className="login-btn">Login</button>
+                        <button className="login-btn" onClick={handleLoginClick}>Login</button>
                         <button className="register-btn" onClick={handleRegisterClick}>Register</button>
                     </div>
                 </div>

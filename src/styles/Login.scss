@@ -1,0 +1,169 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #FFF8F0 0%, #fcefe4 50%, #D35400 100%);
+    padding: 20px;
+    font-family: 'Lato', sans-serif;
+}
+
+.login-wrapper {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(230, 126, 34, 0.15);
+    padding: 50px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid rgba(230, 126, 34, 0.1);
+
+    h2 {
+        color: #2C3E50;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .login-subtitle {
+        color: #607080;
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 1.1rem;
+    }
+}
+
+.login-form {
+    .form-group {
+        margin-bottom: 25px;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2C3E50;
+            font-size: 0.9rem;
+            font-family: 'Lato', sans-serif;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.3s ease;
+            background-color: #FFF8F0;
+
+            &:focus {
+                outline: none;
+                border-color: #E67E22;
+                box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+                background-color: white;
+            }
+
+            &.error {
+                border-color: #E74C3C;
+                background-color: #fdf2f2;
+            }
+        }
+
+        .error-message {
+            color: #E74C3C;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+            font-family: 'Lato', sans-serif;
+        }
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        font-family: 'Lato', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+            background: linear-gradient(135deg, #D35400 0%, #E67E22 100%);
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: #bdc3c7;
+        }
+    }
+
+    .register-link,
+    .forgot-password {
+        text-align: center;
+        margin-top: 20px;
+        color: #607080;
+        font-family: 'Lato', sans-serif;
+
+        a {
+            color: #E67E22;
+            text-decoration: none;
+            font-weight: 600;
+
+            &:hover {
+                color: #D35400;
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .forgot-password {
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+}
+
+// Add cooking-themed decorative elements
+.login-container::before {
+    content: '👨‍🍳';
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    font-size: 2rem;
+    opacity: 0.3;
+    animation: float 6s ease-in-out infinite;
+}
+
+.login-container::after {
+    content: '🔐';
+    position: absolute;
+    bottom: 20%;
+    right: 20%;
+    font-size: 2rem;
+    opacity: 0.3;
+    animation: float 6s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}

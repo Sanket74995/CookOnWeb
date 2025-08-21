@@ -13,7 +13,7 @@ const Hero = () => {
                 <span className="food-icon icon-6">🍰</span>
             </div>
 
-            <h1>Welcome to <span className="highlight">CookOnWeb</span>🍴🥄</h1>
+            <h1>Welcome to <span className="highlight">CookOnWeb</span></h1>
             <p>Where Recipes Speak to you!</p>
             <button className="hero-button">Get Started</button>
         </div>
