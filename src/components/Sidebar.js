@@ -1,9 +1,12 @@
 import React from "react";
+import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBook, faCog } from '@fortawesome/free-solid-svg-icons';
 import './../styles/Sidebar.scss'
 
-const Sidebar = ({ isOpen, toggleSidebar, navItems, onNavigate }) => {
+const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
+    const location = useLocation();
+
     // Icon mapping for navigation items using FontAwesome
     const getIcon = (label) => {
         switch (label.toLowerCase()) {
@@ -18,21 +21,6 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems, onNavigate }) => {
         }
     };
 
-    const handleRegisterClick = () => {
-        onNavigate('register');
-        toggleSidebar();
-    };
-
-    const handleHomeClick = () => {
-        onNavigate('home');
-        toggleSidebar();
-    };
-
-    const handleLoginClick = () => {
-        onNavigate('login');
-        toggleSidebar();
-    };
-
     return (
         <div className={`sidebar ${isOpen ? "active" : ""}`}>
             <div className="sidebar-header">
@@ -44,27 +32,34 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems, onNavigate }) => {
             <ul className="sidebar-menu">
                 {navItems.map((item) => (
                     <li key={item.id}>
-                        <a
-                            href={item.href}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                if (item.action) {
-                                    item.action();
-                                }
-                                toggleSidebar();
-                            }}
+                        <Link
+                            to={item.href}
+                            className={location.pathname === item.href ? "active" : ""}
+                            onClick={toggleSidebar}
                         >
                             <span className="icon-wrapper">
                                 {getIcon(item.label)}
                             </span>
                             {item.label}
-                        </a>
+                        </Link>
                     </li>
                 ))}
             </ul>
             <div className="sidebar-auth">
-                <button className="sidebar-login-btn" onClick={handleLoginClick}>Login</button>
-                <button className="sidebar-register-btn" onClick={handleRegisterClick}>Register</button>
+                <Link
+                    to="/login"
+                    className="sidebar-login-btn"
+                    onClick={toggleSidebar}
+                >
+                    Login
+                </Link>
+                <Link
+                    to="/register"
+                    className="sidebar-register-btn"
+                    onClick={toggleSidebar}
+                >
+                    Register
+                </Link>
             </div>
             <div className="sidebar-footer">
                 <p>&copy; 2024 CookOnWeb</p>

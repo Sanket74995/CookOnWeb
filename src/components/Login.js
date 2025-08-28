@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Login.scss';
 
-const Login = ({onNavigate}) => {
+const Login = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -9,8 +9,6 @@ const Login = ({onNavigate}) => {
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false)
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -24,13 +22,6 @@ const Login = ({onNavigate}) => {
                 [name]: ''
             }));
         }
-    };
-
-    const handleRegisterClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('register');
-        }
-        setIsOpen(false);
     };
 
     const validateForm = () => {
@@ -53,7 +44,6 @@ const Login = ({onNavigate}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const newErrors = validateForm();
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -61,22 +51,22 @@ const Login = ({onNavigate}) => {
         }
 
         setIsLoading(true);
-
         try {
-            // Simulate API call - replace with actual login endpoint
-            console.log('Login data:', formData);
-
-            // Show success message
-            alert('Login successful! Welcome back to CookOnWeb!');
-
-            // Reset form
-            setFormData({
-                email: '',
-                password: ''
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
 
-            // Redirect to dashboard or home page
-            // window.location.href = '/dashboard';
+            const data = await response.json();
+            if (response.ok) {
+                alert('Login successful! Welcome back to CookOnWeb!');
+                localStorage.setItem('token', data.token);
+            } else {
+                alert(data.message);
+            }
         } catch (error) {
             console.error('Login error:', error);
             alert('Login failed. Please check your credentials and try again.');
@@ -125,7 +115,7 @@ const Login = ({onNavigate}) => {
                     </button>
 
                     <p className="register-link">
-                        Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); handleRegisterClick(); }}>Register here</a>
+                        Don't have an account? <a href="/register">Register here</a>
                     </p>
 
                 </form>

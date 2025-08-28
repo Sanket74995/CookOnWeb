@@ -1,79 +1,65 @@
 import React, { useState } from "react";
+import { Link, useLocation } from 'react-router-dom';
 import './../styles/Navbar.scss'
 import Sidebar from "./Sidebar";
 
-const Navbar = ({ onNavigate }) => {
+const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
+    const location = useLocation();
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
     }
 
-    const handleRegisterClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('register');
-        }
-        setIsOpen(false);
-    };
-
-    const handleHomeClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('home');
-        }
-        setIsOpen(false);
-    };
-
-    const handleLoginClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('login');
-        }
-        setIsOpen(false);
-    };
-
     const navItems = [
         {
             id: 1,
             label: "Home",
-            href: "#",
-            active: true,
-            action: handleHomeClick
+            href: "/",
         },
         {
             id: 2,
             label: "Recipes",
             href: "#",
-            active: false
         },
         {
             id: 3,
             label: "Settings",
             href: "#",
-            active: false
         }
     ]
 
     return (
         <>
             <div className="navbar container">
-                <a className="logo" href="#" onClick={handleHomeClick}>
+                <Link className="logo" to="/">
                     <span className="cook">Cook</span>
                     <span className="cook">on</span>
                     <span className="cook">Web</span>
-                </a>
+                </Link>
                 <div className="navbar-items">
                     {navItems.map((item) => (
-                        <a
+                        <Link
                             key={item.id}
-                            href={item.href}
-                            className={item.active ? "active" : ""}
-                            onClick={item.action || (() => { })}
+                            to={item.href}
+                            className={location.pathname === item.href ? "active" : ""}
                         >
                             {item.label}
-                        </a>
+                        </Link>
                     ))}
                     <div className="auth-buttons">
-                        <button className="login-btn" onClick={handleLoginClick}>Login</button>
-                        <button className="register-btn" onClick={handleRegisterClick}>Register</button>
+                        <Link
+                            to="/login"
+                            className={`login-btn ${location.pathname === '/login' ? 'active' : ''}`}
+                        >
+                            Login
+                        </Link>
+                        <Link
+                            to="/register"
+                            className={`register-btn ${location.pathname === '/register' ? 'active' : ''}`}
+                        >
+                            Register
+                        </Link>
                     </div>
                 </div>
                 <div
@@ -89,7 +75,6 @@ const Navbar = ({ onNavigate }) => {
                 isOpen={isOpen}
                 toggleSidebar={toggleSidebar}
                 navItems={navItems}
-                onNavigate={onNavigate}
             />
             <div
                 className={`sidebar-overlay ${isOpen ? "active" : ""}`}

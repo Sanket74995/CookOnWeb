@@ -1,33 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Register from "./components/Register";
 import Login from "./components/Login";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-
-  const handleNavigate = (page) => {
-    setCurrentPage(page);
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'register':
-        return <Register />;
-      case 'login':
-        return <Login />;
-      case 'home':
-      default:
-        return <Hero />;
-    }
-  };
-
   return (
-    <div className="App">
-      <Navbar onNavigate={handleNavigate} />
-      {renderPage()}
-    </div>
+    <Router>
+      <div className="App">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Hero />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

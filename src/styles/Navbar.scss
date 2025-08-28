@@ -129,7 +129,7 @@ a {
                 &:hover {
                     background-color: var(--primary-color);
                     color: white;
-                    transform: translateY(-2px);
+                    transform: translateY(-2px) scaleX();
                     box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3);
                 }
             }
