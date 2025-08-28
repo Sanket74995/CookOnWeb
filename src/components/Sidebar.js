@@ -2,10 +2,12 @@ import React from "react";
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBook, faCog } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 import './../styles/Sidebar.scss'
 
 const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
     const location = useLocation();
+    const { t } = useTranslation();
 
     // Icon mapping for navigation items using FontAwesome
     const getIcon = (label) => {
@@ -24,7 +26,7 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
     return (
         <div className={`sidebar ${isOpen ? "active" : ""}`}>
             <div className="sidebar-header">
-                <h2>Menu</h2>
+                <h2>{t('menu')}</h2>
                 <button className="close-btn" onClick={toggleSidebar}>
                     &times;
                 </button>
@@ -51,14 +53,14 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                     className="sidebar-login-btn"
                     onClick={toggleSidebar}
                 >
-                    Login
+                    {t('login')}
                 </Link>
                 <Link
                     to="/register"
                     className="sidebar-register-btn"
                     onClick={toggleSidebar}
                 >
-                    Register
+                    {t('register')}
                 </Link>
             </div>
             <div className="sidebar-footer">

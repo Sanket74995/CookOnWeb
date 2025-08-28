@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import '../styles/Login.scss';
 
 const Login = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -28,15 +30,15 @@ const Login = () => {
         const newErrors = {};
 
         if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
+            newErrors.email = t('email_required');
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
+            newErrors.email = t('email_invalid');
         }
 
         if (!formData.password) {
-            newErrors.password = 'Password is required';
+            newErrors.password = t('password_required');
         } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+            newErrors.password = t('password_length');
         }
 
         return newErrors;
@@ -62,14 +64,14 @@ const Login = () => {
 
             const data = await response.json();
             if (response.ok) {
-                alert('Login successful! Welcome back to CookOnWeb!');
+                alert(t('login_success'));
                 localStorage.setItem('token', data.token);
             } else {
                 alert(data.message);
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('Login failed. Please check your credentials and try again.');
+            alert(t('login_failed'));
         } finally {
             setIsLoading(false);
         }
@@ -78,12 +80,12 @@ const Login = () => {
     return (
         <div className="login-container">
             <div className="login-wrapper">
-                <h2>Welcome Back</h2>
-                <p className="login-subtitle">Login to your cooking account</p>
+                <h2>{t('welcome')}</h2>
+                <p className="login-subtitle">{t('login_subtitle')}</p>
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="email">Email Address *</label>
+                        <label htmlFor="email">{t('email_address')} *</label>
                         <input
                             type="email"
                             id="email"
@@ -91,13 +93,13 @@ const Login = () => {
                             value={formData.email}
                             onChange={handleChange}
                             className={errors.email ? 'error' : ''}
-                            placeholder="Enter your email"
+                            placeholder={t('enter_email')}
                         />
                         {errors.email && <span className="error-message">{errors.email}</span>}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Password *</label>
+                        <label htmlFor="password">{t('password')} *</label>
                         <input
                             type="password"
                             id="password"
@@ -105,17 +107,17 @@ const Login = () => {
                             value={formData.password}
                             onChange={handleChange}
                             className={errors.password ? 'error' : ''}
-                            placeholder="Enter your password"
+                            placeholder={t('enter_password')}
                         />
                         {errors.password && <span className="error-message">{errors.password}</span>}
                     </div>
 
                     <button type="submit" className="login-button" disabled={isLoading}>
-                        {isLoading ? 'Login...' : 'Login'}
+                        {isLoading ? t('logging_in') : t('login')}
                     </button>
 
                     <p className="register-link">
-                        Don't have an account? <a href="/register">Register here</a>
+                        {t('no_account')} <a href="/register">{t('register_here')}</a>
                     </p>
 
                 </form>

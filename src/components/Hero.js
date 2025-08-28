@@ -1,7 +1,12 @@
 import React from 'react';
 import './../styles/Hero.scss';
+import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Hero = () => {
+    const location = useLocation();
+    const { t } = useTranslation();
+
     return (
         <div className="hero">
             <div className="floating-icons">
@@ -13,9 +18,11 @@ const Hero = () => {
                 <span className="food-icon icon-6">🍰</span>
             </div>
 
-            <h1>Welcome to <span className="highlight">CookOnWeb</span></h1>
-            <p>Where Recipes Speak to you!</p>
-            <button className="hero-button">Get Started</button>
+            <h1>{t('welcome')} <span className="highlight">CookOnWeb</span></h1>
+            <p>{t('where_recipes_speak')}</p>
+            <Link to="/register" className={`hero-button ${location.pathname === '/register' ? 'active' : ''}`}>
+                {t('get_started')}
+            </Link>
         </div>
     );
 };

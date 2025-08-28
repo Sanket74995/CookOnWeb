@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import './../styles/Navbar.scss'
 import Sidebar from "./Sidebar";
 
 const Navbar = () => {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
+    const { t, i18n } = useTranslation();
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
@@ -14,17 +16,17 @@ const Navbar = () => {
     const navItems = [
         {
             id: 1,
-            label: "Home",
+            label: t('home'),
             href: "/",
         },
         {
             id: 2,
-            label: "Recipes",
+            label: t('recipes'),
             href: "#",
         },
         {
             id: 3,
-            label: "Settings",
+            label: t('settings'),
             href: "#",
         }
     ]
@@ -48,17 +50,28 @@ const Navbar = () => {
                         </Link>
                     ))}
                     <div className="auth-buttons">
+                        <div className="language-selector">
+                            <select
+                                value={i18n.language}
+                                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                                className="language-dropdown"
+                            >
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="hi">हिंदी</option>
+                            </select>
+                        </div>
                         <Link
                             to="/login"
                             className={`login-btn ${location.pathname === '/login' ? 'active' : ''}`}
                         >
-                            Login
+                            {t('login')}
                         </Link>
                         <Link
                             to="/register"
                             className={`register-btn ${location.pathname === '/register' ? 'active' : ''}`}
                         >
-                            Register
+                            {t('register')}
                         </Link>
                     </div>
                 </div>
