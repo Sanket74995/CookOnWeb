@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
     try {
-        await mongoose.connect("mongodb:localhost:27017/cookonweb", {
+        await mongoose.connect("mongodb://localhost:27017/cookonweb", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

@@ -6,6 +6,8 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Register from "./components/Register";
 import Login from "./components/Login";
+import Recipes from "./components/Recipes";
+import RecipeDetail from "./components/RecipeDetail";
 import Chatbot from "./components/Chatbot";
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
             <Route path="/" element={<Hero />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/recipes" element={<Recipes />} />
+            <Route path="/recipe/:id" element={<RecipeDetail />} />
           </Routes>
           <Chatbot />
         </div>

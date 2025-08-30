@@ -29,16 +29,20 @@ const Login = () => {
     const validateForm = () => {
         const newErrors = {};
 
+        // Email: standard regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email.trim()) {
             newErrors.email = t('email_required');
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        } else if (!emailRegex.test(formData.email)) {
             newErrors.email = t('email_invalid');
         }
 
+        // Password: min 8 chars, at least one uppercase, one lowercase, one number, one special char
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!formData.password) {
             newErrors.password = t('password_required');
-        } else if (formData.password.length < 6) {
-            newErrors.password = t('password_length');
+        } else if (!passwordRegex.test(formData.password)) {
+            newErrors.password = t('password_strength');
         }
 
         return newErrors;
@@ -54,7 +58,7 @@ const Login = () => {
 
         setIsLoading(true);
         try {
-            const response = await fetch('/login', {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,10 +68,14 @@ const Login = () => {
 
             const data = await response.json();
             if (response.ok) {
-                alert(t('login_success'));
+                // Store token and user data
                 localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                // Navigate directly to home page after successful login
+                window.location.href = '/';
             } else {
-                alert(data.message);
+                alert(data.message || t('login_failed'));
             }
         } catch (error) {
             console.error('Login error:', error);

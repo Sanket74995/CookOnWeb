@@ -1,0 +1,25 @@
+.recipe-cards-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 40px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+// Responsive design
+@media (max-width: 1024px) {
+    .recipe-cards-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 30px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .recipe-cards-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 30px 16px;
+    }
+}

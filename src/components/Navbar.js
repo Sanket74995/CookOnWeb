@@ -1,16 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle, faEdit, faThumbsUp, faLock, faQuestionCircle, faSignOutAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 import './../styles/Navbar.scss'
 import Sidebar from "./Sidebar";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [user, setUser] = useState(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const { t, i18n } = useTranslation();
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        if (token && userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+
+    useEffect(() => {
+        // Close dropdown if clicked outside
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        setDropdownOpen(false);
+        navigate('/');
+    };
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
+    }
+
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
     }
 
     const navItems = [
@@ -22,11 +62,6 @@ const Navbar = () => {
         {
             id: 2,
             label: t('recipes'),
-            href: "#",
-        },
-        {
-            id: 3,
-            label: t('settings'),
             href: "#",
         }
     ]
@@ -57,22 +92,58 @@ const Navbar = () => {
                                 className="language-dropdown"
                             >
                                 <option value="en">English</option>
-                                <option value="es">Español</option>
                                 <option value="hi">हिंदी</option>
                             </select>
                         </div>
-                        <Link
-                            to="/login"
-                            className={`login-btn ${location.pathname === '/login' ? 'active' : ''}`}
-                        >
-                            {t('login')}
-                        </Link>
-                        <Link
-                            to="/register"
-                            className={`register-btn ${location.pathname === '/register' ? 'active' : ''}`}
-                        >
-                            {t('register')}
-                        </Link>
+                        {user ? (
+                            <div className="profile-container" ref={dropdownRef}>
+                                <FontAwesomeIcon
+                                    icon={faUserCircle}
+                                    size="2x"
+                                    className="profile-icon"
+                                    onClick={toggleDropdown}
+                                />
+                                {dropdownOpen && (
+                                    <div className="profile-dropdown">
+                                        <div className="profile-header">
+                                            <FontAwesomeIcon icon={faUserCircle} size="3x" className="profile-image" />
+                                            <div className="profile-info">
+                                                <div className="profile-name">{user.firstName} {user.lastName}</div>
+                                                <div className="profile-email">{user.email}</div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <ul className="profile-menu">
+                                            <li><FontAwesomeIcon icon={faEdit} /> {t('edit_profile')}</li>
+                                            <li><FontAwesomeIcon icon={faThumbsUp} /> {t('subscription')}</li>
+                                            <li><FontAwesomeIcon icon={faLock} /> {t('change_password')}</li>
+                                            <li><FontAwesomeIcon icon={faCog} /> {t('settings')}</li>
+                                        </ul>
+                                        <div className="profile-footer">
+                                            <span className="help-center">{t('help_center')}</span> |{' '}
+                                            <span className="signout" onClick={handleLogout}>
+                                                <FontAwesomeIcon icon={faSignOutAlt} /> {t('signout')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/login"
+                                    className={`login-btn ${location.pathname === '/login' ? 'active' : ''}`}
+                                >
+                                    {t('login')}
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className={`register-btn ${location.pathname === '/register' ? 'active' : ''}`}
+                                >
+                                    {t('register')}
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
                 <div

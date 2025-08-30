@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faBook, faCog } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +8,16 @@ import './../styles/Sidebar.scss'
 const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
     const location = useLocation();
     const { t } = useTranslation();
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        if (token && userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
 
     // Icon mapping for navigation items using FontAwesome
     const getIcon = (label) => {
@@ -46,23 +56,37 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                         </Link>
                     </li>
                 ))}
+                <li key="settings">
+                    <Link
+                        to="/settings"
+                        className={location.pathname === "/settings" ? "active" : ""}
+                        onClick={toggleSidebar}
+                    >
+                        <span className="icon-wrapper">
+                            <FontAwesomeIcon icon={faCog} />
+                        </span>
+                        {t('settings')}
+                    </Link>
+                </li>
             </ul>
-            <div className="sidebar-auth">
-                <Link
-                    to="/login"
-                    className="sidebar-login-btn"
-                    onClick={toggleSidebar}
-                >
-                    {t('login')}
-                </Link>
-                <Link
-                    to="/register"
-                    className="sidebar-register-btn"
-                    onClick={toggleSidebar}
-                >
-                    {t('register')}
-                </Link>
-            </div>
+            {!user && (
+                <div className="sidebar-auth">
+                    <Link
+                        to="/login"
+                        className="sidebar-login-btn"
+                        onClick={toggleSidebar}
+                    >
+                        {t('login')}
+                    </Link>
+                    <Link
+                        to="/register"
+                        className="sidebar-register-btn"
+                        onClick={toggleSidebar}
+                    >
+                        {t('register')}
+                    </Link>
+                </div>
+            )}
             <div className="sidebar-footer">
                 <p>&copy; 2024 CookOnWeb</p>
             </div>

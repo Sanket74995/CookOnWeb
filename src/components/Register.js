@@ -34,34 +34,46 @@ const Register = () => {
     const validateForm = () => {
         const newErrors = {};
 
+        // Username: alphanumeric, 3-15 chars
+        const usernameRegex = /^[a-zA-Z0-9]{3,15}$/;
         if (!formData.username.trim()) {
             newErrors.username = t('username_required');
-        } else if (formData.username.length < 3) {
-            newErrors.username = t('username_length');
+        } else if (!usernameRegex.test(formData.username)) {
+            newErrors.username = t('username_invalid');
         }
 
+        // Email: standard regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email.trim()) {
             newErrors.email = t('email_required');
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        } else if (!emailRegex.test(formData.email)) {
             newErrors.email = t('email_invalid');
         }
 
+        // Password: min 8 chars, at least one uppercase, one lowercase, one number, one special char
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!formData.password) {
             newErrors.password = t('password_required');
-        } else if (formData.password.length < 6) {
-            newErrors.password = t('password_length');
+        } else if (!passwordRegex.test(formData.password)) {
+            newErrors.password = t('password_strength');
         }
 
         if (formData.password !== formData.confirmPassword) {
             newErrors.confirmPassword = t('password_mismatch');
         }
 
+        // First and last name: only letters, min 2 chars
+        const nameRegex = /^[A-Za-z]{2,}$/;
         if (!formData.firstName.trim()) {
             newErrors.firstName = t('first_name_required');
+        } else if (!nameRegex.test(formData.firstName)) {
+            newErrors.firstName = t('first_name_invalid');
         }
 
         if (!formData.lastName.trim()) {
             newErrors.lastName = t('last_name_required');
+        } else if (!nameRegex.test(formData.lastName)) {
+            newErrors.lastName = t('last_name_invalid');
         }
 
         return newErrors;
@@ -79,21 +91,39 @@ const Register = () => {
         setIsLoading(true);
 
         try {
-            // Simulate API call - replace with actual registration endpoint
-            console.log('Registration data:', formData);
-
-            // Show success message
-            alert(t('registration_success'));
-
-            // Reset form
-            setFormData({
-                username: '',
-                email: '',
-                password: '',
-                confirmPassword: '',
-                firstName: '',
-                lastName: ''
+            // Call backend registration endpoint
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    email: formData.email,
+                    password: formData.password,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName
+                }),
             });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Reset form
+                setFormData({
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    firstName: '',
+                    lastName: ''
+                });
+
+                // Navigate directly to login page after successful registration
+                window.location.href = '/login';
+            } else {
+                alert(data.message || t('registration_failed'));
+            }
         } catch (error) {
             console.error('Registration error:', error);
             alert(t('registration_failed'));
