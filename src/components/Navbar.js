@@ -62,7 +62,7 @@ const Navbar = () => {
         {
             id: 2,
             label: t('recipes'),
-            href: "#",
+            href: "/recipes",
         }
     ]
 
