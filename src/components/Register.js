@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import '../styles/Register.scss';
 
 const Register = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -32,34 +34,46 @@ const Register = () => {
     const validateForm = () => {
         const newErrors = {};
 
+        // Username: alphanumeric, 3-15 chars
+        const usernameRegex = /^[a-zA-Z0-9]{3,15}$/;
         if (!formData.username.trim()) {
-            newErrors.username = 'Username is required';
-        } else if (formData.username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters';
+            newErrors.username = t('username_required');
+        } else if (!usernameRegex.test(formData.username)) {
+            newErrors.username = t('username_invalid');
         }
 
+        // Email: standard regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
+            newErrors.email = t('email_required');
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email = t('email_invalid');
         }
 
+        // Password: min 8 chars, at least one uppercase, one lowercase, one number, one special char
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+            newErrors.password = t('password_required');
+        } else if (!passwordRegex.test(formData.password)) {
+            newErrors.password = t('password_strength');
         }
 
         if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
+            newErrors.confirmPassword = t('password_mismatch');
         }
 
+        // First and last name: only letters, min 2 chars
+        const nameRegex = /^[A-Za-z]{2,}$/;
         if (!formData.firstName.trim()) {
-            newErrors.firstName = 'First name is required';
+            newErrors.firstName = t('first_name_required');
+        } else if (!nameRegex.test(formData.firstName)) {
+            newErrors.firstName = t('first_name_invalid');
         }
 
         if (!formData.lastName.trim()) {
-            newErrors.lastName = 'Last name is required';
+            newErrors.lastName = t('last_name_required');
+        } else if (!nameRegex.test(formData.lastName)) {
+            newErrors.lastName = t('last_name_invalid');
         }
 
         return newErrors;
@@ -77,24 +91,42 @@ const Register = () => {
         setIsLoading(true);
 
         try {
-            // Simulate API call - replace with actual registration endpoint
-            console.log('Registration data:', formData);
-
-            // Show success message
-            alert('Registration successful! Please check your email to verify your account.');
-
-            // Reset form
-            setFormData({
-                username: '',
-                email: '',
-                password: '',
-                confirmPassword: '',
-                firstName: '',
-                lastName: ''
+            // Call backend registration endpoint
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    email: formData.email,
+                    password: formData.password,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName
+                }),
             });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Reset form
+                setFormData({
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    firstName: '',
+                    lastName: ''
+                });
+
+                // Navigate directly to login page after successful registration
+                window.location.href = '/login';
+            } else {
+                alert(data.message || t('registration_failed'));
+            }
         } catch (error) {
             console.error('Registration error:', error);
-            alert('Registration failed. Please try again.');
+            alert(t('registration_failed'));
         } finally {
             setIsLoading(false);
         }
@@ -103,13 +135,13 @@ const Register = () => {
     return (
         <div className="register-container">
             <div className="register-wrapper">
-                <h2>Create Your Account</h2>
-                <p className="register-subtitle">Join our cooking community today!</p>
+                <h2>{t('create_account')}</h2>
+                <p className="register-subtitle">{t('join_community')}</p>
 
                 <form onSubmit={handleSubmit} className="register-form">
                     <div className="form-row">
                         <div className="form-group">
-                            <label htmlFor="firstName">First Name *</label>
+                            <label htmlFor="firstName">{t('first_name')} *</label>
                             <input
                                 type="text"
                                 id="firstName"
@@ -117,13 +149,13 @@ const Register = () => {
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 className={errors.firstName ? 'error' : ''}
-                                placeholder="Enter your first name"
+                                placeholder={t('enter_first_name')}
                             />
                             {errors.firstName && <span className="error-message">{errors.firstName}</span>}
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="lastName">Last Name *</label>
+                            <label htmlFor="lastName">{t('last_name')} *</label>
                             <input
                                 type="text"
                                 id="lastName"
@@ -131,14 +163,14 @@ const Register = () => {
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 className={errors.lastName ? 'error' : ''}
-                                placeholder="Enter your last name"
+                                placeholder={t('enter_last_name')}
                             />
                             {errors.lastName && <span className="error-message">{errors.lastName}</span>}
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="username">Username *</label>
+                        <label htmlFor="username">{t('username')} *</label>
                         <input
                             type="text"
                             id="username"
@@ -146,13 +178,13 @@ const Register = () => {
                             value={formData.username}
                             onChange={handleChange}
                             className={errors.username ? 'error' : ''}
-                            placeholder="Choose a username"
+                            placeholder={t('choose_username')}
                         />
                         {errors.username && <span className="error-message">{errors.username}</span>}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="email">Email Address *</label>
+                        <label htmlFor="email">{t('email_address')} *</label>
                         <input
                             type="email"
                             id="email"
@@ -160,14 +192,14 @@ const Register = () => {
                             value={formData.email}
                             onChange={handleChange}
                             className={errors.email ? 'error' : ''}
-                            placeholder="Enter your email"
+                            placeholder={t('enter_email')}
                         />
                         {errors.email && <span className="error-message">{errors.email}</span>}
                     </div>
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label htmlFor="password">Password *</label>
+                            <label htmlFor="password">{t('password')} *</label>
                             <input
                                 type="password"
                                 id="password"
@@ -175,13 +207,13 @@ const Register = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className={errors.password ? 'error' : ''}
-                                placeholder="Create a password"
+                                placeholder={t('create_password')}
                             />
                             {errors.password && <span className="error-message">{errors.password}</span>}
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="confirmPassword">Confirm Password *</label>
+                            <label htmlFor="confirmPassword">{t('confirm_password')} *</label>
                             <input
                                 type="password"
                                 id="confirmPassword"
@@ -189,18 +221,18 @@ const Register = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 className={errors.confirmPassword ? 'error' : ''}
-                                placeholder="Confirm your password"
+                                placeholder={t('confirm_your_password')}
                             />
                             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
                         </div>
                     </div>
 
                     <button type="submit" className="register-button" disabled={isLoading}>
-                        {isLoading ? 'Creating Account...' : 'Create Account'}
+                        {isLoading ? t('creating_account') : t('create_account')}
                     </button>
 
                     <p className="login-link">
-                        Already have an account? <a href="/login">Login here</a>
+                        {t('already_have_account')} <a href="/login">{t('login_here')}</a>
                     </p>
                 </form>
             </div>

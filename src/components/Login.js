@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import '../styles/Login.scss';
 
-const Login = ({onNavigate}) => {
+const Login = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -9,8 +11,6 @@ const Login = ({onNavigate}) => {
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false)
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -26,26 +26,23 @@ const Login = ({onNavigate}) => {
         }
     };
 
-    const handleRegisterClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('register');
-        }
-        setIsOpen(false);
-    };
-
     const validateForm = () => {
         const newErrors = {};
 
+        // Email: standard regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
+            newErrors.email = t('email_required');
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email = t('email_invalid');
         }
 
+        // Password: min 8 chars, at least one uppercase, one lowercase, one number, one special char
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+            newErrors.password = t('password_required');
+        } else if (!passwordRegex.test(formData.password)) {
+            newErrors.password = t('password_strength');
         }
 
         return newErrors;
@@ -53,7 +50,6 @@ const Login = ({onNavigate}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const newErrors = validateForm();
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -61,25 +57,29 @@ const Login = ({onNavigate}) => {
         }
 
         setIsLoading(true);
-
         try {
-            // Simulate API call - replace with actual login endpoint
-            console.log('Login data:', formData);
-
-            // Show success message
-            alert('Login successful! Welcome back to CookOnWeb!');
-
-            // Reset form
-            setFormData({
-                email: '',
-                password: ''
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
 
-            // Redirect to dashboard or home page
-            // window.location.href = '/dashboard';
+            const data = await response.json();
+            if (response.ok) {
+                // Store token and user data
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                // Navigate directly to home page after successful login
+                window.location.href = '/';
+            } else {
+                alert(data.message || t('login_failed'));
+            }
         } catch (error) {
             console.error('Login error:', error);
-            alert('Login failed. Please check your credentials and try again.');
+            alert(t('login_failed'));
         } finally {
             setIsLoading(false);
         }
@@ -88,12 +88,12 @@ const Login = ({onNavigate}) => {
     return (
         <div className="login-container">
             <div className="login-wrapper">
-                <h2>Welcome Back</h2>
-                <p className="login-subtitle">Login to your cooking account</p>
+                <h2>{t('welcome')}</h2>
+                <p className="login-subtitle">{t('login_subtitle')}</p>
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="email">Email Address *</label>
+                        <label htmlFor="email">{t('email_address')} *</label>
                         <input
                             type="email"
                             id="email"
@@ -101,13 +101,13 @@ const Login = ({onNavigate}) => {
                             value={formData.email}
                             onChange={handleChange}
                             className={errors.email ? 'error' : ''}
-                            placeholder="Enter your email"
+                            placeholder={t('enter_email')}
                         />
                         {errors.email && <span className="error-message">{errors.email}</span>}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Password *</label>
+                        <label htmlFor="password">{t('password')} *</label>
                         <input
                             type="password"
                             id="password"
@@ -115,17 +115,17 @@ const Login = ({onNavigate}) => {
                             value={formData.password}
                             onChange={handleChange}
                             className={errors.password ? 'error' : ''}
-                            placeholder="Enter your password"
+                            placeholder={t('enter_password')}
                         />
                         {errors.password && <span className="error-message">{errors.password}</span>}
                     </div>
 
                     <button type="submit" className="login-button" disabled={isLoading}>
-                        {isLoading ? 'Login...' : 'Login'}
+                        {isLoading ? t('logging_in') : t('login')}
                     </button>
 
                     <p className="register-link">
-                        Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); handleRegisterClick(); }}>Register here</a>
+                        {t('no_account')} <a href="/register">{t('register_here')}</a>
                     </p>
 
                 </form>

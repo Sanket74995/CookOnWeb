@@ -1,79 +1,149 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle, faEdit, faThumbsUp, faLock, faQuestionCircle, faSignOutAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 import './../styles/Navbar.scss'
 import Sidebar from "./Sidebar";
 
-const Navbar = ({ onNavigate }) => {
-    const [isOpen, setIsOpen] = useState(false)
+const Navbar = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [user, setUser] = useState(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        if (token && userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+
+    useEffect(() => {
+        // Close dropdown if clicked outside
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        setDropdownOpen(false);
+        navigate('/');
+    };
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
     }
 
-    const handleRegisterClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('register');
-        }
-        setIsOpen(false);
-    };
-
-    const handleHomeClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('home');
-        }
-        setIsOpen(false);
-    };
-
-    const handleLoginClick = () => {
-        if (onNavigate && typeof onNavigate === 'function') {
-            onNavigate('login');
-        }
-        setIsOpen(false);
-    };
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    }
 
     const navItems = [
         {
             id: 1,
-            label: "Home",
-            href: "#",
-            active: true,
-            action: handleHomeClick
+            label: t('home'),
+            href: "/",
         },
         {
             id: 2,
-            label: "Recipes",
+            label: t('recipes'),
             href: "#",
-            active: false
-        },
-        {
-            id: 3,
-            label: "Settings",
-            href: "#",
-            active: false
         }
     ]
 
     return (
         <>
             <div className="navbar container">
-                <a className="logo" href="#" onClick={handleHomeClick}>
+                <Link className="logo" to="/">
                     <span className="cook">Cook</span>
                     <span className="cook">on</span>
                     <span className="cook">Web</span>
-                </a>
+                </Link>
                 <div className="navbar-items">
                     {navItems.map((item) => (
-                        <a
+                        <Link
                             key={item.id}
-                            href={item.href}
-                            className={item.active ? "active" : ""}
-                            onClick={item.action || (() => { })}
+                            to={item.href}
+                            className={location.pathname === item.href ? "active" : ""}
                         >
                             {item.label}
-                        </a>
+                        </Link>
                     ))}
                     <div className="auth-buttons">
-                        <button className="login-btn" onClick={handleLoginClick}>Login</button>
-                        <button className="register-btn" onClick={handleRegisterClick}>Register</button>
+                        <div className="language-selector">
+                            <select
+                                value={i18n.language}
+                                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                                className="language-dropdown"
+                            >
+                                <option value="en">English</option>
+                                <option value="hi">हिंदी</option>
+                            </select>
+                        </div>
+                        {user ? (
+                            <div className="profile-container" ref={dropdownRef}>
+                                <FontAwesomeIcon
+                                    icon={faUserCircle}
+                                    size="2x"
+                                    className="profile-icon"
+                                    onClick={toggleDropdown}
+                                />
+                                {dropdownOpen && (
+                                    <div className="profile-dropdown">
+                                        <div className="profile-header">
+                                            <FontAwesomeIcon icon={faUserCircle} size="3x" className="profile-image" />
+                                            <div className="profile-info">
+                                                <div className="profile-name">{user.firstName} {user.lastName}</div>
+                                                <div className="profile-email">{user.email}</div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <ul className="profile-menu">
+                                            <li><FontAwesomeIcon icon={faEdit} /> {t('edit_profile')}</li>
+                                            <li><FontAwesomeIcon icon={faThumbsUp} /> {t('subscription')}</li>
+                                            <li><FontAwesomeIcon icon={faLock} /> {t('change_password')}</li>
+                                            <li><FontAwesomeIcon icon={faCog} /> {t('settings')}</li>
+                                        </ul>
+                                        <div className="profile-footer">
+                                            <span className="help-center">{t('help_center')}</span> |{' '}
+                                            <span className="signout" onClick={handleLogout}>
+                                                <FontAwesomeIcon icon={faSignOutAlt} /> {t('signout')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/login"
+                                    className={`login-btn ${location.pathname === '/login' ? 'active' : ''}`}
+                                >
+                                    {t('login')}
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className={`register-btn ${location.pathname === '/register' ? 'active' : ''}`}
+                                >
+                                    {t('register')}
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
                 <div
@@ -89,7 +159,6 @@ const Navbar = ({ onNavigate }) => {
                 isOpen={isOpen}
                 toggleSidebar={toggleSidebar}
                 navItems={navItems}
-                onNavigate={onNavigate}
             />
             <div
                 className={`sidebar-overlay ${isOpen ? "active" : ""}`}

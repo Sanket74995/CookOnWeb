@@ -1,33 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n'; // Import the i18n configuration
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Register from "./components/Register";
 import Login from "./components/Login";
+import Recipes from "./components/Recipes";
+import RecipeDetail from "./components/RecipeDetail";
+import Chatbot from "./components/Chatbot";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-
-  const handleNavigate = (page) => {
-    setCurrentPage(page);
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'register':
-        return <Register />;
-      case 'login':
-        return <Login />;
-      case 'home':
-      default:
-        return <Hero />;
-    }
-  };
-
   return (
-    <div className="App">
-      <Navbar onNavigate={handleNavigate} />
-      {renderPage()}
-    </div>
+    <I18nextProvider i18n={i18n}>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Hero />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/recipes" element={<Recipes />} />
+            <Route path="/recipe/:id" element={<RecipeDetail />} />
+          </Routes>
+          <Chatbot />
+        </div>
+      </Router>
+    </I18nextProvider>
   );
 }
 
