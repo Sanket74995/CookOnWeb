@@ -49,5 +49,10 @@
     "chatbot_specific_recipe": "बढ़िया विकल्प! मैं उस सामग्री के साथ कुछ अद्भुत व्यंजन सुझा सकता हूं। आप कौन सा विशिष्ट व्यंजन ढूंढ रहे हैं?",
     "chatbot_default_response": "मैं आपको व्यंजन खोजने में मदद करने के लिए यहां हूं। आप मुझसे सामग्री या नाम से व्यंजनों के बारे में पूछ सकते हैं।",
     "chatbot_placeholder": "व्यंजनों के बारे में पूछें...",
-    "chatbot_send": "भेजें"
+    "chatbot_send": "भेजें",
+    "footer_home": "घर",
+    "footer_recipes": "व्यंजन",
+    "footer_about": "हमारे बारे में",
+    "footer_contact": "संपर्क",
+    "footer_copyright": "© 2023 CookOnWeb. सभी अधिकार सुरक्षित।"
 }
