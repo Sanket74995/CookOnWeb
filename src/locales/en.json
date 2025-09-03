@@ -49,5 +49,10 @@
     "chatbot_specific_recipe": "Great choice! I can suggest some amazing recipes with that ingredient. What specific dish are you looking for?",
     "chatbot_default_response": "I'm here to help you find recipes. You can ask me about recipes by ingredients or by name.",
     "chatbot_placeholder": "Ask about recipes...",
-    "chatbot_send": "Send"
+    "chatbot_send": "Send",
+    "footer_home": "Home",
+    "footer_recipes": "Recipes",
+    "footer_about": "About",
+    "footer_contact": "Contact",
+    "footer_copyright": "© 2023 CookOnWeb. All rights reserved."
 }

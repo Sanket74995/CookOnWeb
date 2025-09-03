@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import Recipes from "./components/Recipes";
 import RecipeDetail from "./components/RecipeDetail";
 import Chatbot from "./components/Chatbot";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/recipe/:id" element={<RecipeDetail />} />
           </Routes>
           <Chatbot />
+          <Footer />
         </div>
       </Router>
     </I18nextProvider>
