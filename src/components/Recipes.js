@@ -5,7 +5,14 @@ import RecipeCard from './RecipeCard';
 
 const Recipes = () => {
     const [recipes, setRecipes] = useState([]);
+    const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedCuisines, setSelectedCuisines] = useState([]);
+    const [selectedDiet, setSelectedDiet] = useState('All');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [cuisines, setCuisines] = useState([]);
+    const [isCuisineDropdownOpen, setIsCuisineDropdownOpen] = useState(false);
+    const [isDietDropdownOpen , setIsDietDropdownOpen]= useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -15,6 +22,10 @@ const Recipes = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setRecipes(data);
+                    setFilteredRecipes(data);
+                    // Extract unique cuisines
+                    const uniqueCuisines = [...new Set(data.map(recipe => recipe.cuisine))].sort();
+                    setCuisines(uniqueCuisines);
                 } else {
                     console.error('Failed to fetch recipes');
                 }
@@ -27,9 +38,37 @@ const Recipes = () => {
         fetchRecipes();
     }, []);
 
+    useEffect(() => {
+        let filtered = recipes;
+
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(recipe =>
+                recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Filter by selected cuisines
+        if (selectedCuisines.length > 0 && !selectedCuisines.includes('All')) {
+            filtered = filtered.filter(recipe => selectedCuisines.includes(recipe.cuisine));
+        }
+
+        // Filter by diet
+        if (selectedDiet === 'Vegetarian') {
+            filtered = filtered.filter(recipe => recipe.tags && recipe.tags.includes('vegetarian'));
+        } else if (selectedDiet === 'Non-Vegetarian') {
+            filtered = filtered.filter(recipe => !recipe.tags || !recipe.tags.includes('vegetarian'));
+        }
+
+        setFilteredRecipes(filtered);
+    }, [recipes, searchTerm, selectedCuisines, selectedDiet]);
+
     const handleRecipeClick = (recipeId) => {
         navigate(`/recipe/${recipeId}`);
     };
+
+
 
     if (loading) {
         return <div className="recipes-loading">Loading recipes...</div>;
@@ -42,8 +81,111 @@ const Recipes = () => {
                 <p>Discover amazing recipes from around the world</p>
             </div>
 
+            <div className="filters-section">
+                <div className="filter-item">
+                    <label htmlFor="search">Search:</label>
+                    <input
+                        type="text"
+                        id="search"
+                        placeholder="Search recipes..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <div className="filter-item">
+                    <label>Cuisine:</label>
+                    <div className="custom-dropdown">
+                        <button
+                            className="dropdown-button"
+                            onClick={() => setIsCuisineDropdownOpen(!isCuisineDropdownOpen)}
+                        >
+                            {selectedCuisines.length === 0 ? 'Select Cuisines' : selectedCuisines.includes('All') ? 'All' : selectedCuisines.join(', ')}
+                        </button>
+                        {isCuisineDropdownOpen && (
+                            <div className="dropdown-options">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedCuisines.includes('All')}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedCuisines(['All']);
+                                            } else {
+                                                setSelectedCuisines([]);
+                                            }
+                                        }}
+                                    />
+                                    All
+                                </label>
+                                {cuisines.map(cuisine => (
+                                    <label key={cuisine}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCuisines.includes(cuisine)}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setSelectedCuisines(prev => [...prev.filter(c => c !== 'All'), cuisine]);
+                                                } else {
+                                                    setSelectedCuisines(prev => prev.filter(c => c !== cuisine));
+                                                }
+                                            }}
+                                        />
+                                        {cuisine}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="filter-item">
+                    <label>Diet:</label>
+                    <div className="custom-dropdown">
+                        <button
+                            className="dropdown-button"
+                            onClick={() => setIsDietDropdownOpen(!isDietDropdownOpen)}
+                        >
+                            {selectedDiet}
+                        </button>
+                        {isDietDropdownOpen && (
+                            <div className="dropdown-options">
+                                {['All', 'Vegetarian', 'Non-Vegetarian'].map(diet => (
+                                    <label key={diet}>
+                                        <input
+                                            type="radio"
+                                            name="diet"
+                                            value={diet}
+                                            checked={selectedDiet === diet}
+                                            onChange={(e) => {
+                                                setSelectedDiet(e.target.value);
+                                                setIsDietDropdownOpen(false);
+                                            }}
+                                        />
+                                        {diet}
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="filter-item">
+                    <button
+                        className="reset-button"
+                        onClick={() => {
+                            setSelectedCuisines([]);
+                            setSelectedDiet('All');
+                            setSearchTerm('');
+                        }}
+                    >
+                        Reset Filters
+                    </button>
+                </div>
+            </div>
+
             <div className="recipes-grid">
-                {recipes.map(recipe => (
+                {filteredRecipes.map(recipe => (
                     <div key={recipe._id} onClick={() => handleRecipeClick(recipe._id)}>
                         <RecipeCard recipe={recipe} />
                     </div>
