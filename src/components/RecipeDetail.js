@@ -7,6 +7,14 @@ const RecipeDetail = () => {
     const navigate = useNavigate();
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isReading, setIsReading] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const [speechSynthesis, setSpeechSynthesis] = useState(null);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [waitingForContinue, setWaitingForContinue] = useState(false);
+    const [timerActive, setTimerActive] = useState(false);
+    const [timerSeconds, setTimerSeconds] = useState(0);
+    const [timerInterval, setTimerInterval] = useState(null);
 
     useEffect(() => {
         const fetchRecipe = async () => {
@@ -27,6 +35,164 @@ const RecipeDetail = () => {
         };
         fetchRecipe();
     }, [id]);
+
+    useEffect(() => {
+        if ('speechSynthesis' in window) {
+            setSpeechSynthesis(window.speechSynthesis);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (timerActive && timerSeconds > 0) {
+            const interval = setInterval(() => {
+                setTimerSeconds(prev => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        setTimerActive(false);
+                        setWaitingForContinue(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+            setTimerInterval(interval);
+            return () => clearInterval(interval);
+        }
+    }, [timerActive, timerSeconds]);
+
+    const parseTimeFromText = (text) => {
+        const timeRegex = /(\d+)\s*(minute|min|second|sec)s?/gi;
+        const matches = text.match(timeRegex);
+        if (matches) {
+            let totalSeconds = 0;
+            matches.forEach(match => {
+                const num = parseInt(match.match(/\d+/)[0]);
+                const unit = match.toLowerCase().includes('minute') || match.toLowerCase().includes('min') ? 60 : 1;
+                totalSeconds += num * unit;
+            });
+            return totalSeconds;
+        }
+        return 0;
+    };
+
+    const skipTimer = () => {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+        setTimerActive(false);
+        setTimerSeconds(0);
+        setWaitingForContinue(true);
+    };
+
+    const generateRecipeText = () => {
+        if (!recipe) return '';
+
+        // Only read recipe name, ingredients, and steps
+        let text = `Recipe: ${recipe.title}. `;
+
+        text += 'Ingredients: ';
+        recipe.ingredients.forEach(ingredient => {
+            text += `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}. `;
+        });
+
+        text += 'Instructions: ';
+        recipe.instructions.forEach(instruction => {
+            text += `Step ${instruction.step}: ${instruction.description}. `;
+        });
+
+        return text;
+    };
+
+    const startReading = () => {
+        if (!speechSynthesis) {
+            alert('Speech synthesis is not supported in your browser.');
+            return;
+        }
+
+        if (waitingForContinue) {
+            setWaitingForContinue(false);
+            setIsReading(true);
+            speakNextInstruction();
+            return;
+        }
+
+        setCurrentStep(0);
+        speakTitleAndIngredients();
+    };
+
+    const speakTitleAndIngredients = () => {
+        if (!recipe) return;
+
+        let text = `Recipe: ${recipe.title}. Ingredients: `;
+        recipe.ingredients.forEach(ingredient => {
+            text += `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}. `;
+        });
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => {
+            setCurrentStep(0);
+            speakNextInstruction();
+        };
+        utterance.onerror = () => {
+            setIsReading(false);
+            setWaitingForContinue(false);
+        };
+
+        speechSynthesis.speak(utterance);
+        setIsReading(true);
+    };
+
+    const speakNextInstruction = () => {
+        if (!recipe || currentStep >= recipe.instructions.length) {
+            setIsReading(false);
+            setWaitingForContinue(false);
+            return;
+        }
+
+        const instruction = recipe.instructions[currentStep];
+        const text = `Step ${instruction.step}: ${instruction.description}.`;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => {
+            setIsReading(false);
+            const time = parseTimeFromText(instruction.description);
+            if (time > 0) {
+                setTimerSeconds(time);
+                setTimerActive(true);
+            } else {
+                setWaitingForContinue(true);
+            }
+            setCurrentStep(currentStep + 1);
+        };
+        utterance.onerror = () => {
+            setIsReading(false);
+            setWaitingForContinue(false);
+        };
+
+        speechSynthesis.speak(utterance);
+        setIsReading(true);
+    };
+
+    const pauseReading = () => {
+        if (speechSynthesis && isReading) {
+            speechSynthesis.pause();
+            setIsReading(false);
+        }
+    };
+
+    const resumeReading = () => {
+        if (speechSynthesis && speechSynthesis.paused) {
+            speechSynthesis.resume();
+            setIsReading(true);
+        }
+    };
+
+    const stopReading = () => {
+        if (speechSynthesis) {
+            speechSynthesis.cancel();
+            setIsReading(false);
+        }
+    };
 
     if (loading) {
         return <div className="recipe-detail-loading">Loading recipe...</div>;
@@ -69,6 +235,45 @@ const RecipeDetail = () => {
                 <div className="recipe-info">
                     <h1>{recipe.title}</h1>
                     <p className="recipe-description">{recipe.description}</p>
+
+                    <div className="reading-controls">
+                        {!isReading && !speechSynthesis?.paused && !waitingForContinue && !timerActive && (
+                            <button className="read-recipe-button" onClick={startReading}>
+                                Read Recipe Aloud
+                            </button>
+                        )}
+                        {(isReading || speechSynthesis?.paused) && (
+                            <>
+                                {isReading ? (
+                                    <button className="read-recipe-button" onClick={pauseReading}>
+                                        Pause
+                                    </button>
+                                ) : (
+                                    <button className="read-recipe-button" onClick={resumeReading}>
+                                        Resume
+                                    </button>
+                                )}
+                                <button className="read-recipe-button stop-button" onClick={stopReading}>
+                                    Stop
+                                </button>
+                            </>
+                        )}
+                        {waitingForContinue && (
+                            <button className="read-recipe-button" onClick={startReading}>
+                                Next Step
+                            </button>
+                        )}
+                        {timerActive && (
+                            <div className="timer-display">
+                                <div className="timer-text">
+                                    Timer: {Math.floor(timerSeconds / 60)}:{(timerSeconds % 60).toString().padStart(2, '0')}
+                                </div>
+                                <button className="read-recipe-button skip-timer-button" onClick={skipTimer}>
+                                    Skip Timer
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="recipe-meta-detail">
                         <div className="meta-item">

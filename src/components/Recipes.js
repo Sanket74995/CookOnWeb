@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Recipes.scss';
 import RecipeCard from './RecipeCard';
@@ -8,11 +8,11 @@ const Recipes = () => {
     const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCuisines, setSelectedCuisines] = useState([]);
+    const [cuisines, setCuisines] = useState([]);
     const [selectedDiet, setSelectedDiet] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
-    const [cuisines, setCuisines] = useState([]);
     const [isCuisineDropdownOpen, setIsCuisineDropdownOpen] = useState(false);
-    const [isDietDropdownOpen , setIsDietDropdownOpen]= useState(false);
+    const [isDietDropdownOpen, setIsDietDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -68,7 +68,17 @@ const Recipes = () => {
         navigate(`/recipe/${recipeId}`);
     };
 
-
+    // Group filtered recipes by cuisine
+    const recipesByCuisine = useMemo(() => {
+        const grouped = {};
+        filteredRecipes.forEach(recipe => {
+            if (!grouped[recipe.cuisine]) {
+                grouped[recipe.cuisine] = [];
+            }
+            grouped[recipe.cuisine].push(recipe);
+        });
+        return grouped;
+    }, [filteredRecipes]);
 
     if (loading) {
         return <div className="recipes-loading">Loading recipes...</div>;
@@ -184,13 +194,18 @@ const Recipes = () => {
                 </div>
             </div>
 
-            <div className="recipes-grid">
-                {filteredRecipes.map(recipe => (
-                    <div key={recipe._id} onClick={() => handleRecipeClick(recipe._id)}>
-                        <RecipeCard recipe={recipe} />
+            {Object.entries(recipesByCuisine).sort(([, a], [, b]) => b.length - a.length).map(([cuisine, recipes]) => (
+                <section key={cuisine} className="cuisine-section">
+                    <h2>{cuisine}</h2>
+                    <div className="cuisine-recipes" >
+                        {recipes.map(recipe => (
+                            <div key={recipe._id} onClick={() => handleRecipeClick(recipe._id)} className="recipe-card-wrapper">
+                                <RecipeCard recipe={recipe} />
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </section>
+            ))}
         </div>
     );
 };
