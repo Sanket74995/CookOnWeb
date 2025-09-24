@@ -11,8 +11,11 @@ const Recipes = () => {
     const [cuisines, setCuisines] = useState([]);
     const [selectedDiet, setSelectedDiet] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [availableTags, setAvailableTags] = useState([]);
     const [isCuisineDropdownOpen, setIsCuisineDropdownOpen] = useState(false);
     const [isDietDropdownOpen, setIsDietDropdownOpen] = useState(false);
+    const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,6 +29,11 @@ const Recipes = () => {
                     // Extract unique cuisines
                     const uniqueCuisines = [...new Set(data.map(recipe => recipe.cuisine))].sort();
                     setCuisines(uniqueCuisines);
+
+                    // Extract unique tags
+                    const allTags = data.flatMap(recipe => recipe.tags || []);
+                    const uniqueTags = [...new Set(allTags)].sort();
+                    setAvailableTags(uniqueTags);
                 } else {
                     console.error('Failed to fetch recipes');
                 }
@@ -45,7 +53,8 @@ const Recipes = () => {
         if (searchTerm) {
             filtered = filtered.filter(recipe =>
                 recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
+                recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
             );
         }
 
@@ -61,11 +70,26 @@ const Recipes = () => {
             filtered = filtered.filter(recipe => !recipe.tags || !recipe.tags.includes('vegetarian'));
         }
 
+        // Filter by selected tags
+        if (selectedTags.length > 0) {
+            filtered = filtered.filter(recipe =>
+                recipe.tags && selectedTags.every(tag => recipe.tags.includes(tag))
+            );
+        }
+
         setFilteredRecipes(filtered);
-    }, [recipes, searchTerm, selectedCuisines, selectedDiet]);
+    }, [recipes, searchTerm, selectedCuisines, selectedDiet, selectedTags]);
 
     const handleRecipeClick = (recipeId) => {
-        navigate(`/recipe/${recipeId}`);
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (token) {
+            // User is logged in, navigate to recipe detail page
+            navigate(`/recipe/${recipeId}`);
+        } else {
+            // User is not logged in, navigate to register page
+            navigate('/register');
+        }
     };
 
     // Group filtered recipes by cuisine
@@ -97,7 +121,7 @@ const Recipes = () => {
                     <input
                         type="text"
                         id="search"
-                        placeholder="Search recipes..."
+                        placeholder="Search recipes, tags, or ingredients..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -180,6 +204,8 @@ const Recipes = () => {
                     </div>
                 </div>
 
+
+
                 <div className="filter-item">
                     <button
                         className="reset-button"
@@ -187,6 +213,7 @@ const Recipes = () => {
                             setSelectedCuisines([]);
                             setSelectedDiet('All');
                             setSearchTerm('');
+                            setSelectedTags([]);
                         }}
                     >
                         Reset Filters

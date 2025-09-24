@@ -209,112 +209,116 @@ const RecipeDetail = () => {
             </button>
 
             <div className="recipe-detail">
-                <div className="recipe-image-large">
-                    <img src={recipe.image} alt={recipe.title} />
+                <div className="recipe-left-section">
+                    <div className="recipe-image-large">
+                        <img src={recipe.image} alt={recipe.title} />
+                    </div>
+
+                    <div className="recipe-info-section">
+                        <h1>{recipe.title}</h1>
+                        <p className="recipe-description">{recipe.description}</p>
+
+                        <div className="reading-controls">
+                            {!isReading && !speechSynthesis?.paused && !waitingForContinue && !timerActive && (
+                                <button className="read-recipe-button" onClick={startReading}>
+                                    Read Recipe Aloud
+                                </button>
+                            )}
+                            {(isReading || speechSynthesis?.paused) && (
+                                <>
+                                    {isReading ? (
+                                        <button className="read-recipe-button" onClick={pauseReading}>
+                                            Pause
+                                        </button>
+                                    ) : (
+                                        <button className="read-recipe-button" onClick={resumeReading}>
+                                            Resume
+                                        </button>
+                                    )}
+                                    <button className="read-recipe-button stop-button" onClick={stopReading}>
+                                        Stop
+                                    </button>
+                                </>
+                            )}
+                            {waitingForContinue && (
+                                <button className="read-recipe-button" onClick={startReading}>
+                                    Next Step
+                                </button>
+                            )}
+                            {timerActive && (
+                                <div className="timer-display">
+                                    <div className="timer-text">
+                                        Timer: {Math.floor(timerSeconds / 60)}:{(timerSeconds % 60).toString().padStart(2, '0')}
+                                    </div>
+                                    <button className="read-recipe-button skip-timer-button" onClick={skipTimer}>
+                                        Skip Timer
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="recipe-meta-detail">
+                            <div className="meta-item">
+                                <span className="meta-label">Cuisine:</span>
+                                <span className="meta-value">{recipe.cuisine}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Category:</span>
+                                <span className="meta-value">{recipe.category}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Difficulty:</span>
+                                <span className="meta-value">{recipe.difficulty}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Prep Time:</span>
+                                <span className="meta-value">{recipe.prepTime} min</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Cook Time:</span>
+                                <span className="meta-value">{recipe.cookTime} min</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Servings:</span>
+                                <span className="meta-value">{recipe.servings}</span>
+                            </div>
+                        </div>
+
+                        <div className="ingredients-section">
+                            <h2>Ingredients</h2>
+                            <ul className="ingredients-list">
+                                {recipe.ingredients.map((ingredient, index) => (
+                                    <li key={index}>
+                                        <span className="ingredient-quantity">
+                                            {ingredient.quantity} {ingredient.unit}
+                                        </span>
+                                        <span className="ingredient-name">{ingredient.name}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
-                {recipe.video && (
-                    <div className="recipe-video-section">
-                        <h2>Video Tutorial</h2>
-                        <div className="video-container">
-                            <iframe
-                                width="100%"
-                                height="400"
-                                src={recipe.video.startsWith('https://www.youtube.com/embed/') ? recipe.video : `https://www.youtube.com/embed/${recipe.video}`}
-                                title={`${recipe.title} video tutorial`}
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay; encrypted-media"
-                                allowFullScreen
-                            >
-                                Sorry, your browser does not support embedded videos.
-                            </iframe>
-                        </div>
-                    </div>
-                )}
-
-                <div className="recipe-info">
-                    <h1>{recipe.title}</h1>
-                    <p className="recipe-description">{recipe.description}</p>
-
-                    <div className="reading-controls">
-                        {!isReading && !speechSynthesis?.paused && !waitingForContinue && !timerActive && (
-                            <button className="read-recipe-button" onClick={startReading}>
-                                Read Recipe Aloud
-                            </button>
-                        )}
-                        {(isReading || speechSynthesis?.paused) && (
-                            <>
-                                {isReading ? (
-                                    <button className="read-recipe-button" onClick={pauseReading}>
-                                        Pause
-                                    </button>
-                                ) : (
-                                    <button className="read-recipe-button" onClick={resumeReading}>
-                                        Resume
-                                    </button>
-                                )}
-                                <button className="read-recipe-button stop-button" onClick={stopReading}>
-                                    Stop
-                                </button>
-                            </>
-                        )}
-                        {waitingForContinue && (
-                            <button className="read-recipe-button" onClick={startReading}>
-                                Next Step
-                            </button>
-                        )}
-                        {timerActive && (
-                            <div className="timer-display">
-                                <div className="timer-text">
-                                    Timer: {Math.floor(timerSeconds / 60)}:{(timerSeconds % 60).toString().padStart(2, '0')}
-                                </div>
-                                <button className="read-recipe-button skip-timer-button" onClick={skipTimer}>
-                                    Skip Timer
-                                </button>
+                <div className="recipe-right-section">
+                    {recipe.video && (
+                        <div className="recipe-video-section">
+                            <h2>Video Tutorial</h2>
+                            <div className="video-container">
+                                <iframe
+                                    width="100%"
+                                    height="400"
+                                    src={recipe.video.startsWith('https://www.youtube.com/embed/') ? recipe.video : `https://www.youtube.com/embed/${recipe.video}`}
+                                    title={`${recipe.title} video tutorial`}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay; encrypted-media"
+                                    allowFullScreen
+                                >
+                                    Sorry, your browser does not support embedded videos.
+                                </iframe>
                             </div>
-                        )}
-                    </div>
-
-                    <div className="recipe-meta-detail">
-                        <div className="meta-item">
-                            <span className="meta-label">Cuisine:</span>
-                            <span className="meta-value">{recipe.cuisine}</span>
                         </div>
-                        <div className="meta-item">
-                            <span className="meta-label">Category:</span>
-                            <span className="meta-value">{recipe.category}</span>
-                        </div>
-                        <div className="meta-item">
-                            <span className="meta-label">Difficulty:</span>
-                            <span className="meta-value">{recipe.difficulty}</span>
-                        </div>
-                        <div className="meta-item">
-                            <span className="meta-label">Prep Time:</span>
-                            <span className="meta-value">{recipe.prepTime} min</span>
-                        </div>
-                        <div className="meta-item">
-                            <span className="meta-label">Cook Time:</span>
-                            <span className="meta-value">{recipe.cookTime} min</span>
-                        </div>
-                        <div className="meta-item">
-                            <span className="meta-label">Servings:</span>
-                            <span className="meta-value">{recipe.servings}</span>
-                        </div>
-                    </div>
-
-                    <div className="ingredients-section">
-                        <h2>Ingredients</h2>
-                        <ul className="ingredients-list">
-                            {recipe.ingredients.map((ingredient, index) => (
-                                <li key={index}>
-                                    <span className="ingredient-quantity">
-                                        {ingredient.quantity} {ingredient.unit}
-                                    </span>
-                                    <span className="ingredient-name">{ingredient.name}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    )}
 
                     <div className="instructions-section">
                         <h2>Instructions</h2>
