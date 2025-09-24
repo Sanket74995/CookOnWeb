@@ -145,7 +145,7 @@ const deleteRecipe = async (req, res) => {
 // Search recipes
 const searchRecipes = async (req, res) => {
     try {
-        const { query, cuisine, category, difficulty } = req.query;
+        const { query, cuisine, category, difficulty, tags } = req.query;
         let searchCriteria = {};
 
         if (query) {
@@ -159,6 +159,11 @@ const searchRecipes = async (req, res) => {
         }
         if (difficulty) {
             searchCriteria.difficulty = difficulty;
+        }
+        if (tags) {
+            // Tags should be a comma-separated string, convert to array
+            const tagArray = tags.split(',').map(tag => tag.trim());
+            searchCriteria.tags = { $in: tagArray };
         }
 
         const recipes = await Recipe.find(searchCriteria)
