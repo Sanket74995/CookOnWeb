@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
+const chatbotRoutes = require('./routes/chatbot');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
