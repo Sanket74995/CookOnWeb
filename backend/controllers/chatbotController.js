@@ -55,6 +55,7 @@ const processQuery = async (req, res) => {
     }
 };
 
+// Parse user query to determine intent
 const parseUserQuery = (query) => {
     // Check for ingredient-based queries
     const ingredientKeywords = ['with', 'using', 'made with', 'containing', 'have'];
