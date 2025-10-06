@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/RecipeDetail.scss';
 
 const RecipeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { i18n } = useTranslation();
+    const currentLang = i18n.language || 'en';
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isReading, setIsReading] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
     const [speechSynthesis, setSpeechSynthesis] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [waitingForContinue, setWaitingForContinue] = useState(false);
@@ -84,24 +86,7 @@ const RecipeDetail = () => {
         setWaitingForContinue(true);
     };
 
-    const generateRecipeText = () => {
-        if (!recipe) return '';
 
-        // Only read recipe name, ingredients, and steps
-        let text = `Recipe: ${recipe.title}. `;
-
-        text += 'Ingredients: ';
-        recipe.ingredients.forEach(ingredient => {
-            text += `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}. `;
-        });
-
-        text += 'Instructions: ';
-        recipe.instructions.forEach(instruction => {
-            text += `Step ${instruction.step}: ${instruction.description}. `;
-        });
-
-        return text;
-    };
 
     const startReading = () => {
         if (!speechSynthesis) {
@@ -123,8 +108,13 @@ const RecipeDetail = () => {
     const speakTitleAndIngredients = () => {
         if (!recipe) return;
 
-        let text = `Recipe: ${recipe.title}. Ingredients: `;
-        recipe.ingredients.forEach(ingredient => {
+        // Determine title for speech synthesis
+        const title = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].title
+            ? recipe.translations[currentLang].title
+            : recipe.title;
+
+        let text = `Recipe: ${title}. Ingredients: `;
+        ingredients.forEach(ingredient => {
             text += `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}. `;
         });
 
@@ -143,13 +133,13 @@ const RecipeDetail = () => {
     };
 
     const speakNextInstruction = () => {
-        if (!recipe || currentStep >= recipe.instructions.length) {
+        if (!recipe || currentStep >= instructions.length) {
             setIsReading(false);
             setWaitingForContinue(false);
             return;
         }
 
-        const instruction = recipe.instructions[currentStep];
+        const instruction = instructions[currentStep];
         const text = `Step ${instruction.step}: ${instruction.description}.`;
 
         const utterance = new SpeechSynthesisUtterance(text);
@@ -202,6 +192,23 @@ const RecipeDetail = () => {
         return <div className="recipe-detail-error">Recipe not found</div>;
     }
 
+    // Determine title, description, ingredients, and instructions based on current language and translations
+    const title = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].title
+        ? recipe.translations[currentLang].title
+        : recipe.title;
+
+    const description = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].description
+        ? recipe.translations[currentLang].description
+        : recipe.description;
+
+    const ingredients = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].ingredients
+        ? recipe.translations[currentLang].ingredients
+        : recipe.ingredients;
+
+    const instructions = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].instructions
+        ? recipe.translations[currentLang].instructions
+        : recipe.instructions;
+
     return (
         <div className="recipe-detail-container">
             <button className="back-button" onClick={() => navigate(-1)}>
@@ -211,12 +218,12 @@ const RecipeDetail = () => {
             <div className="recipe-detail">
                 <div className="recipe-left-section">
                     <div className="recipe-image-large">
-                        <img src={recipe.image} alt={recipe.title} />
+                        <img src={recipe.image} alt={title} />
                     </div>
 
                     <div className="recipe-info-section">
-                        <h1>{recipe.title}</h1>
-                        <p className="recipe-description">{recipe.description}</p>
+                        <h1>{title}</h1>
+                        <p className="recipe-description">{description}</p>
 
                         <div className="reading-controls">
                             {!isReading && !speechSynthesis?.paused && !waitingForContinue && !timerActive && (
@@ -259,35 +266,35 @@ const RecipeDetail = () => {
 
                         <div className="recipe-meta-detail">
                             <div className="meta-item">
-                                <span className="meta-label">Cuisine:</span>
-                                <span className="meta-value">{recipe.cuisine}</span>
+                                <span className="meta-label">{i18n.t('cuisine')}:</span>
+                                <span className="meta-value">{i18n.t(recipe.cuisine.toLowerCase()) || recipe.cuisine}</span>
                             </div>
                             <div className="meta-item">
-                                <span className="meta-label">Category:</span>
-                                <span className="meta-value">{recipe.category}</span>
+                                <span className="meta-label">{i18n.t('category')}:</span>
+                                <span className="meta-value">{i18n.t(recipe.category.toLowerCase()) || recipe.category}</span>
                             </div>
                             <div className="meta-item">
-                                <span className="meta-label">Difficulty:</span>
-                                <span className="meta-value">{recipe.difficulty}</span>
+                                <span className="meta-label">{i18n.t('difficulty')}:</span>
+                                <span className="meta-value">{i18n.t(recipe.difficulty.toLowerCase()) || recipe.difficulty}</span>
                             </div>
                             <div className="meta-item">
-                                <span className="meta-label">Prep Time:</span>
-                                <span className="meta-value">{recipe.prepTime} min</span>
+                                <span className="meta-label">{i18n.t('prep_time')}:</span>
+                                <span className="meta-value">{recipe.prepTime} {i18n.t('minutes') || 'min'}</span>
                             </div>
                             <div className="meta-item">
-                                <span className="meta-label">Cook Time:</span>
-                                <span className="meta-value">{recipe.cookTime} min</span>
+                                <span className="meta-label">{i18n.t('cook_time')}:</span>
+                                <span className="meta-value">{recipe.cookTime} {i18n.t('minutes') || 'min'}</span>
                             </div>
                             <div className="meta-item">
-                                <span className="meta-label">Servings:</span>
+                                <span className="meta-label">{i18n.t('servings')}:</span>
                                 <span className="meta-value">{recipe.servings}</span>
                             </div>
                         </div>
 
                         <div className="ingredients-section">
-                            <h2>Ingredients</h2>
+                            <h2>{i18n.t('ingredients')}</h2>
                             <ul className="ingredients-list">
-                                {recipe.ingredients.map((ingredient, index) => (
+                                {ingredients.map((ingredient, index) => (
                                     <li key={index}>
                                         <span className="ingredient-quantity">
                                             {ingredient.quantity} {ingredient.unit}
@@ -309,7 +316,7 @@ const RecipeDetail = () => {
                                     width="100%"
                                     height="400"
                                     src={recipe.video.startsWith('https://www.youtube.com/embed/') ? recipe.video : `https://www.youtube.com/embed/${recipe.video}`}
-                                    title={`${recipe.title} video tutorial`}
+                                    title={`${title} video tutorial`}
                                     frameBorder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay; encrypted-media"
                                     allowFullScreen
@@ -321,9 +328,9 @@ const RecipeDetail = () => {
                     )}
 
                     <div className="instructions-section">
-                        <h2>Instructions</h2>
+                        <h2>{i18n.t('instructions')}</h2>
                         <ol className="instructions-list">
-                            {recipe.instructions.map((instruction, index) => (
+                            {instructions.map((instruction, index) => (
                                 <li key={index}>
                                     <span className="instruction-step">{instruction.step}.</span>
                                     <span className="instruction-description">{instruction.description}</span>
@@ -333,32 +340,32 @@ const RecipeDetail = () => {
                     </div>
 
                     <div className="nutrition-section">
-                        <h2>Nutrition Information</h2>
+                        <h2>{i18n.t('nutrition_information')}</h2>
                         <div className="nutrition-grid">
                             <div className="nutrition-item">
-                                <span className="nutrition-label">Calories:</span>
+                                <span className="nutrition-label">{i18n.t('calories')}:</span>
                                 <span className="nutrition-value">{recipe.nutrition.calories}</span>
                             </div>
                             <div className="nutrition-item">
-                                <span className="nutrition-label">Protein:</span>
+                                <span className="nutrition-label">{i18n.t('protein')}:</span>
                                 <span className="nutrition-value">{recipe.nutrition.protein}g</span>
                             </div>
                             <div className="nutrition-item">
-                                <span className="nutrition-label">Carbs:</span>
+                                <span className="nutrition-label">{i18n.t('carbs')}:</span>
                                 <span className="nutrition-value">{recipe.nutrition.carbs}g</span>
                             </div>
                             <div className="nutrition-item">
-                                <span className="nutrition-label">Fat:</span>
+                                <span className="nutrition-label">{i18n.t('fat')}:</span>
                                 <span className="nutrition-value">{recipe.nutrition.fat}g</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="tags-section">
-                        <h2>Tags</h2>
+                        <h2>{i18n.t('tags')}</h2>
                         <div className="tags-list">
                             {recipe.tags.map((tag, index) => (
-                                <span key={index} className="recipe-tag">#{tag}</span>
+                                <span key={index} className="recipe-tag">#{i18n.t(tag.toLowerCase()) || tag}</span>
                             ))}
                         </div>
                     </div>
