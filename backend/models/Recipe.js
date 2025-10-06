@@ -12,6 +12,34 @@ const recipeSchema = new mongoose.Schema({
         required: true,
         maxlength: 500
     },
+    translations: {
+        en: {
+            title: { type: String, trim: true, maxlength: 100 },
+            description: { type: String, maxlength: 500 },
+            ingredients: [{
+                name: { type: String, trim: true },
+                quantity: { type: String, trim: true },
+                unit: { type: String, trim: true }
+            }],
+            instructions: [{
+                step: { type: Number, min: 1 },
+                description: { type: String, maxlength: 500 }
+            }]
+        },
+        hi: {
+            title: { type: String, trim: true, maxlength: 100 },
+            description: { type: String, maxlength: 500 },
+            ingredients: [{
+                name: { type: String, trim: true },
+                quantity: { type: String, trim: true },
+                unit: { type: String, trim: true }
+            }],
+            instructions: [{
+                step: { type: Number, min: 1 },
+                description: { type: String, maxlength: 500 }
+            }]
+        }
+    },
     image: {
         type: String,
         required: true

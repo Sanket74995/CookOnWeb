@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle, faEdit, faThumbsUp, faLock, faQuestionCircle, faSignOutAlt, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faEdit, faThumbsUp, faLock, faSignOutAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 import './../styles/Navbar.scss'
 import Sidebar from "./Sidebar";
 

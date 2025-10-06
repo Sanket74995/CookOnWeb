@@ -2,6 +2,30 @@ const sampleRecipes = [
     {
         title: "Classic Margherita Pizza",
         description: "A traditional Italian pizza with fresh tomatoes, mozzarella, and basil",
+        translations: {
+            hi: {
+                title: "क्लासिक मार्गेरिटा पिज़्ज़ा",
+                description: "ताज़े टमाटर, मोज़रेला और तुलसी के साथ एक पारंपरिक इतालवी पिज़्ज़ा",
+                ingredients: [
+                    { name: "पिज़्ज़ा आटा", quantity: "1", unit: "गेंद" },
+                    { name: "सैन मार्ज़ानो टमाटर", quantity: "400", unit: "ग्राम" },
+                    { name: "ताज़ी मोज़रेला", quantity: "250", unit: "ग्राम" },
+                    { name: "ताज़ी तुलसी पत्तियाँ", quantity: "20", unit: "पत्तियाँ" },
+                    { name: "एक्स्ट्रा वर्जिन ऑलिव ऑयल", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "लहसुन", quantity: "2", unit: "कलियाँ" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "ओवन को 250°C (480°F) पर प्रीहीट करें" },
+                    { step: 2, description: "मैदे वाली सतह पर पिज़्ज़ा आटा बेलें" },
+                    { step: 3, description: "टमाटर कुचलें और आटे पर फैलाएं" },
+                    { step: 4, description: "मोज़रेला फाड़ें और समान रूप से बाँटें" },
+                    { step: 5, description: "क्रस्ट सुनहरा होने तक 12-15 मिनट तक बेक करें" },
+                    { step: 6, description: "ताज़ी तुलसी से टॉप करें और ऑलिव ऑयल ड्रिज़ल करें" }
+                ]
+            }
+        },
         image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop",
         video: "https://www.youtube.com/embed/Eim2GpHNQDg",
         cuisine: "Italian",
@@ -39,6 +63,34 @@ const sampleRecipes = [
     {
         title: "Chicken Tikka Masala",
         description: "Creamy and flavorful Indian curry with grilled chicken",
+        translations: {
+            hi: {
+                title: "चिकन टिक्का मसाला",
+                description: "क्रीमी और स्वादिष्ट भारतीय करी ग्रिल्ड चिकन के साथ",
+                ingredients: [
+                    { name: "चिकन ब्रेस्ट", quantity: "500", unit: "g" },
+                    { name: "दही", quantity: "200", unit: "g" },
+                    { name: "हैवी क्रीम", quantity: "200", unit: "ml" },
+                    { name: "टमाटर प्यूरी", quantity: "400", unit: "g" },
+                    { name: "प्याज", quantity: "2", unit: "medium" },
+                    { name: "लहसुन", quantity: "4", unit: "cloves" },
+                    { name: "अदरक", quantity: "2", unit: "tbsp" },
+                    { name: "गरम मसाला", quantity: "2", unit: "tsp" },
+                    { name: "हल्दी", quantity: "1", unit: "tsp" },
+                    { name: "जीरा", quantity: "1", unit: "tsp" },
+                    { name: "धनिया", quantity: "1", unit: "tsp" },
+                    { name: "मक्खन", quantity: "3", unit: "tbsp" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन को दही और मसालों में 30 मिनट के लिए मैरिनेट करें" },
+                    { step: 2, description: "चिकन को तब तक ग्रिल करें जब तक वह पक न जाए" },
+                    { step: 3, description: "मक्खन में प्याज, लहसुन और अदरक को सॉटे करें" },
+                    { step: 4, description: "2 मिनट के लिए मसाले जोड़ें और पकाएं" },
+                    { step: 5, description: "टमाटर प्यूरी जोड़ें और 10 मिनट तक सिमर करें" },
+                    { step: 6, description: "क्रीम और पकाया हुआ चिकन जोड़ें, 5 मिनट तक सिमर करें" }
+                ]
+            }
+        },
         image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
         video: "https://www.youtube.com/embed/qHkpcKmjdeE",
         cuisine: "Indian",
@@ -113,7 +165,32 @@ const sampleRecipes = [
             carbs: 25,
             fat: 8
         },
-        tags: ["cookies", "dessert", "chocolate", "baking"]
+        tags: ["cookies", "dessert", "chocolate", "baking"],
+        translations: {
+            hi: {
+                title: "चॉकलेट चिप कुकीज़",
+                description: "क्लासिक नरम और चबाने वाली चॉकलेट चिप कुकीज़",
+                ingredients: [
+                    { name: "सर्व-उद्देश्यीय आटा", quantity: "2 1/4", unit: "कप" },
+                    { name: "बेकिंग सोडा", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "मक्खन", quantity: "1", unit: "कप" },
+                    { name: "ब्राउन शुगर", quantity: "3/4", unit: "कप" },
+                    { name: "व्हाइट शुगर", quantity: "3/4", unit: "कप" },
+                    { name: "वेनिला एक्सट्रेक्ट", quantity: "2", unit: "टीस्पून" },
+                    { name: "अंडे", quantity: "2", unit: "बड़े" },
+                    { name: "चॉकलेट चिप्स", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "ओवन को 375°F (190°C) पर प्रीहीट करें" },
+                    { step: 2, description: "मक्खन और शुगर को एक साथ क्रीम करें" },
+                    { step: 3, description: "अंडे और वेनिला में बीट करें" },
+                    { step: 4, description: "आटा, बेकिंग सोडा और नमक मिलाएं" },
+                    { step: 5, description: "चॉकलेट चिप्स मिलाएं" },
+                    { step: 6, description: "बेकिंग शीट पर ड्रॉप करें और 9-11 मिनट तक बेक करें" }
+                ]
+            }
+        }
     },
     {
         title: "Fresh Garden Salad",
@@ -149,7 +226,30 @@ const sampleRecipes = [
             carbs: 10,
             fat: 8
         },
-        tags: ["salad", "healthy", "vegetarian", "fresh"]
+        tags: ["salad", "healthy", "vegetarian", "fresh"],
+        translations: {
+            hi: {
+                title: "ताज़ा बाग़ीचा सलाद",
+                description: "मिश्रित ग्रीन्स और सब्जियों के साथ स्वस्थ और ताज़ा सलाद",
+                ingredients: [
+                    { name: "मिश्रित ग्रीन्स", quantity: "200", unit: "ग्राम" },
+                    { name: "चेरी टमाटर", quantity: "150", unit: "ग्राम" },
+                    { name: "खीरा", quantity: "1", unit: "मध्यम" },
+                    { name: "लाल प्याज", quantity: "1/2", unit: "छोटा" },
+                    { name: "बेल पेपर", quantity: "1", unit: "मध्यम" },
+                    { name: "जैतून का तेल", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "नींबू का रस", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "सभी सब्जियों को धोएं और काटें" },
+                    { step: 2, description: "ग्रीन्स, टमाटर, खीरा, प्याज और बेल पेपर को मिलाएं" },
+                    { step: 3, description: "जैतून का तेल, नींबू का रस, नमक और काली मिर्च को एक साथ व्हिस्क करें" },
+                    { step: 4, description: "सलाद को ड्रेसिंग के साथ टॉस करें और तुरंत सर्व करें" }
+                ]
+            }
+        }
     },
     {
         title: "Poha",
@@ -190,7 +290,35 @@ const sampleRecipes = [
             carbs: 35,
             fat: 8
         },
-        tags: ["indian", "breakfast", "vegetarian", "quick"]
+        tags: ["indian", "breakfast", "vegetarian", "quick"],
+        translations: {
+            hi: {
+                title: "पोहा",
+                description: "सब्जियों और मसालों के साथ पकाया गया फुल्फी फ्लैटन राइस",
+                ingredients: [
+                    { name: "फ्लैटन राइस (पोहा)", quantity: "2", unit: "कप" },
+                    { name: "आलू", quantity: "2", unit: "मध्यम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "हरी मिर्च", quantity: "2", unit: "टुकड़े" },
+                    { name: "मूंगफली", quantity: "1/4", unit: "कप" },
+                    { name: "सरसों के बीज", quantity: "1", unit: "टीस्पून" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "नींबू का रस", quantity: "1", unit: "टेबलस्पून" },
+                    { name: "धनिया पत्तियाँ", quantity: "2", unit: "टेबलस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "पोहा को धोएं और 5 मिनट के लिए भिगोएं, फिर निकालें" },
+                    { step: 2, description: "तेल गरम करें और सरसों के बीज डालें, उन्हें चटकने दें" },
+                    { step: 3, description: "मूंगफली डालें और सुनहरे होने तक फ्राई करें" },
+                    { step: 4, description: "कटे हुए प्याज, हरी मिर्च डालें, और प्याज नरम होने तक पकाएं" },
+                    { step: 5, description: "डाइस किए हुए आलू, हल्दी और नमक डालें, आलू नरम होने तक पकाएं" },
+                    { step: 6, description: "भिगोया हुआ पोहा डालें और धीरे से मिलाएं" },
+                    { step: 7, description: "2-3 मिनट तक पकाएं, नींबू का रस और धनिया डालें" }
+                ]
+            }
+        }
     },
     {
         title: "Upma",
@@ -231,7 +359,35 @@ const sampleRecipes = [
             carbs: 40,
             fat: 7
         },
-        tags: ["indian", "breakfast", "vegetarian", "healthy"]
+        tags: ["indian", "breakfast", "vegetarian", "healthy"],
+        translations: {
+            hi: {
+                title: "उपमा",
+                description: "सब्जियों और मसालों के साथ स्वादिष्ट सेमोलिना डिश",
+                ingredients: [
+                    { name: "सेमोलिना (सूजी)", quantity: "1", unit: "कप" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "गाजर", quantity: "1", unit: "मध्यम" },
+                    { name: "हरी मटर", quantity: "1/2", unit: "कप" },
+                    { name: "हरी मिर्च", quantity: "2", unit: "टुकड़े" },
+                    { name: "सरसों के बीज", quantity: "1", unit: "टीस्पून" },
+                    { name: "उरद दाल", quantity: "1", unit: "टीस्पून" },
+                    { name: "करी पत्तियाँ", quantity: "8-10", unit: "पत्तियाँ" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "पानी", quantity: "2", unit: "कप" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "सेमोलिना को हल्का सुनहरा होने तक ड्राई रोस्ट करें, अलग रखें" },
+                    { step: 2, description: "तेल गरम करें, सरसों के बीज और उरद दाल डालें" },
+                    { step: 3, description: "करी पत्तियाँ, कटे हुए प्याज और हरी मिर्च डालें" },
+                    { step: 4, description: "कटे हुए गाजर और मटर डालें, 5 मिनट तक पकाएं" },
+                    { step: 5, description: "पानी और नमक डालें, उबाल लाएं" },
+                    { step: 6, description: "रोस्ट किए हुए सेमोलिना को धीरे धीरे डालें जबकि हिलाते रहें" },
+                    { step: 7, description: "पानी समाप्त होने तक कम आंच पर पकाएं" }
+                ]
+            }
+        }
     },
     {
         title: "Dosa",
@@ -266,11 +422,54 @@ const sampleRecipes = [
             carbs: 30,
             fat: 4
         },
-        tags: ["indian", "breakfast", "vegetarian", "fermented"]
+        tags: ["indian", "breakfast", "vegetarian", "fermented"],
+        translations: {
+            hi: {
+                title: "डोसा",
+                description: "चावल और दाल के घोल से बनी क्रिस्पी फर्मेंटेड क्रेप",
+                ingredients: [
+                    { name: "चावल", quantity: "2", unit: "कप" },
+                    { name: "उरद दाल", quantity: "1/2", unit: "कप" },
+                    { name: "मेथी के बीज", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "आलू भरावन", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "चावल और उरद दाल को अलग अलग 6 घंटे के लिए भिगोएं" },
+                    { step: 2, description: "स्मूथ घोल में पीसें, नमक और मेथी डालें" },
+                    { step: 3, description: "रात भर फर्मेंट करें (8-12 घंटे)" },
+                    { step: 4, description: "ग्रिडल गरम करें, घोल डालें और पतला फैलाएं" },
+                    { step: 5, description: "सुनहरा होने तक पकाएं, जरूरत पड़ने पर तेल डालें" },
+                    { step: 6, description: "आलू भरावन डालें और मोड़ें" }
+                ]
+            }
+        }
     },
     {
         title: "Idli",
         description: "Steamed rice cakes made from fermented batter",
+        translations: {
+            hi: {
+                title: "इडली",
+                description: "किण्वित घोल से बने भाप वाले चावल के केक",
+                ingredients: [
+                    { name: "चावल", quantity: "2", unit: "कप" },
+                    { name: "उरद दाल", quantity: "1/2", unit: "कप" },
+                    { name: "मेथी के बीज", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "चावल और उरद दाल को अलग अलग 6 घंटे के लिए भिगोएं" },
+                    { step: 2, description: "स्मूथ घोल में पीसें, नमक और मेथी डालें" },
+                    { step: 3, description: "रात भर किण्वित करें" },
+                    { step: 4, description: "ग्रीस किए हुए इडली मोल्ड में डालें" },
+                    { step: 5, description: "12-15 मिनट तक भाप दें" },
+                    { step: 6, description: "चटनी और साम्बर के साथ सर्व करें" }
+                ]
+            }
+        },
         image: "https://shwetainthekitchen.com/wp-content/uploads/2022/01/Idli-720x1080.jpg",
         video: "https://www.youtube.com/embed/IMesVgWqrRw",
         cuisine: "Indian",
@@ -305,6 +504,29 @@ const sampleRecipes = [
     {
         title: "Vada",
         description: "Crispy lentil fritters with spices",
+        translations: {
+            hi: {
+                title: "वड़ा",
+                description: "मसालों के साथ क्रिस्पी दाल के फ्रिटर",
+                ingredients: [
+                    { name: "उरद दाल", quantity: "1", unit: "कप" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "हरी मिर्च", quantity: "2", unit: "टुकड़े" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "करी पत्तियाँ", quantity: "10", unit: "पत्तियाँ" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "उरद दाल को 2 घंटे के लिए भिगोएं" },
+                    { step: 2, description: "स्मूथ पेस्ट में पीसें" },
+                    { step: 3, description: "कटे हुए प्याज, मिर्च, अदरक, करी पत्तियाँ और नमक डालें" },
+                    { step: 4, description: "अच्छी तरह मिलाएं और फुल्फी बनाने के लिए बीट करें" },
+                    { step: 5, description: "गोल आकार में बनाएं और सपाट करें" },
+                    { step: 6, description: "सुनहरे भूरे होने तक डीप फ्राई करें" }
+                ]
+            }
+        },
         image: "https://www.vegrecipesofindia.com/wp-content/uploads/2021/07/vada-recipe-1.jpg",
         video: "https://www.youtube.com/embed/Zjm9fQBBHiM",
         cuisine: "Indian",
@@ -378,7 +600,36 @@ const sampleRecipes = [
             carbs: 35,
             fat: 10
         },
-        tags: ["indian", "dal", "vegetarian", "comfort"]
+        tags: ["indian", "dal", "vegetarian", "comfort"],
+        translations: {
+            hi: {
+                title: "दाल तड़का",
+                description: "मसालों के साथ पकाई गई पीली दाल जिसमें घी का तड़का लगाया जाता है",
+                ingredients: [
+                    { name: "पीली दाल (अरहर दाल)", quantity: "1", unit: "कप" },
+                    { name: "टमाटर", quantity: "1", unit: "बड़ा" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "घी", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "सरसों के बीज", quantity: "1", unit: "टीस्पून" },
+                    { name: "सूखी लाल मिर्च", quantity: "2", unit: "टुकड़े" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "दाल को धोकर हल्दी और पानी के साथ प्रेशर कुकर में पकाएं।" },
+                    { step: 2, description: "पकी हुई दाल को मैश करें और अलग रख दें।" },
+                    { step: 3, description: "एक पैन में घी गरम करें, सरसों के बीज और सूखी लाल मिर्च डालें।" },
+                    { step: 4, description: "कटा हुआ प्याज, लहसुन और अदरक डालें और सुनहरा होने तक भूनें।" },
+                    { step: 5, description: "टमाटर, जीरा, धनिया और नमक डालें और कुछ देर पकाएं।" },
+                    { step: 6, description: "अब इसमें मैश की हुई दाल डालें और 10 मिनट तक धीमी आँच पर पकाएं।" },
+                    { step: 7, description: "गरमागरम दाल तड़का चावल या रोटी के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Rajma",
@@ -419,8 +670,37 @@ const sampleRecipes = [
             carbs: 45,
             fat: 8
         },
-        tags: ["indian", "beans", "vegetarian", "spicy"]
+        tags: ["indian", "beans", "vegetarian", "spicy"],
+        translations: {
+            hi: {
+                title: "राजमा",
+                description: "मसालेदार टमाटर की ग्रेवी में पकाई गई स्वादिष्ट राजमा की करी",
+                ingredients: [
+                    { name: "राजमा", quantity: "1", unit: "कप" },
+                    { name: "टमाटर", quantity: "3", unit: "बड़े" },
+                    { name: "प्याज", quantity: "2", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "गरम मसाला", quantity: "1", unit: "टीस्पून" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "राजमा को रातभर भिगो दें और फिर प्रेशर कुकर में नरम होने तक पकाएं।" },
+                    { step: 2, description: "टमाटर, प्याज, लहसुन और अदरक को मिक्सर में पीसकर पेस्ट बना लें।" },
+                    { step: 3, description: "एक कढ़ाई में तेल गरम करें, उसमें जीरा डालें और पेस्ट डालें।" },
+                    { step: 4, description: "पेस्ट को तब तक पकाएं जब तक तेल अलग न हो जाए।" },
+                    { step: 5, description: "अब मसाले और पकी हुई राजमा डालें और मिलाएं।" },
+                    { step: 6, description: "20 मिनट तक धीमी आँच पर पकाएं जब तक ग्रेवी गाढ़ी न हो जाए।" },
+                    { step: 7, description: "गरमागरम राजमा को चावल या नान के साथ परोसें।" }
+                ]
+            }
+        }
     },
+
     {
         title: "Chole",
         description: "Spicy chickpea curry with aromatic spices",
@@ -460,8 +740,37 @@ const sampleRecipes = [
             carbs: 40,
             fat: 9
         },
-        tags: ["indian", "chickpeas", "vegetarian", "street"]
+        tags: ["indian", "chickpeas", "vegetarian", "street"],
+        translations: {
+            hi: {
+                title: "छोले",
+                description: "खुशबूदार मसालों में पके हुए मसालेदार चने की स्वादिष्ट करी",
+                ingredients: [
+                    { name: "काबुली चना (छोले)", quantity: "1", unit: "कप" },
+                    { name: "टी बैग", quantity: "1", unit: "पीस" },
+                    { name: "टमाटर", quantity: "2", unit: "बड़े" },
+                    { name: "प्याज", quantity: "2", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "छोले मसाला", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "काबुली चने को रातभर टी बैग के साथ भिगोकर रखें ताकि रंग और स्वाद अच्छे आएं।" },
+                    { step: 2, description: "भिगोए हुए चनों को प्रेशर कुकर में नरम होने तक पकाएं।" },
+                    { step: 3, description: "टमाटर, प्याज, लहसुन और अदरक को मिक्सर में पीसकर पेस्ट बना लें।" },
+                    { step: 4, description: "एक पैन में तेल गरम करें, उसमें जीरा डालें और फिर पेस्ट डालें।" },
+                    { step: 5, description: "पेस्ट को तब तक पकाएं जब तक तेल अलग न हो जाए, फिर मसाले डालें।" },
+                    { step: 6, description: "पके हुए चने डालें और थोड़ी देर धीमी आँच पर पकाएं ताकि स्वाद मिल जाए।" },
+                    { step: 7, description: "गरमागरम छोले को पुरी या चावल के साथ परोसें।" }
+                ]
+            }
+        }
     },
+
     {
         title: "Palak Paneer",
         description: "Cottage cheese cubes in creamy spinach sauce",
@@ -501,8 +810,37 @@ const sampleRecipes = [
             carbs: 12,
             fat: 25
         },
-        tags: ["indian", "paneer", "vegetarian", "creamy"]
+        tags: ["indian", "paneer", "vegetarian", "creamy"],
+        translations: {
+            hi: {
+                title: "पालक पनीर",
+                description: "मखमली पालक की ग्रेवी में डूबे स्वादिष्ट पनीर के टुकड़े — उत्तर भारतीय व्यंजनों की पहचान।",
+                ingredients: [
+                    { name: "पालक", quantity: "500", unit: "ग्राम" },
+                    { name: "पनीर", quantity: "200", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "टमाटर", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "हरी मिर्च", quantity: "2", unit: "पीस" },
+                    { name: "क्रीम", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "गरम मसाला", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "पालक को उबालकर ठंडे पानी में डालें और फिर मिक्सर में पीसकर प्यूरी बना लें।" },
+                    { step: 2, description: "पनीर को छोटे टुकड़ों में काटें और हल्का सुनहरा होने तक फ्राई करें।" },
+                    { step: 3, description: "प्याज, टमाटर, लहसुन, अदरक और हरी मिर्च को पीसकर पेस्ट तैयार करें।" },
+                    { step: 4, description: "एक पैन में तेल गरम करें, पेस्ट डालें और तब तक पकाएं जब तक तेल अलग न हो जाए।" },
+                    { step: 5, description: "अब पालक की प्यूरी और मसाले डालें, अच्छे से मिलाएं।" },
+                    { step: 6, description: "तले हुए पनीर और क्रीम डालकर मिलाएं।" },
+                    { step: 7, description: "5 मिनट धीमी आँच पर पकाएं और गरमागरम परोसें।" }
+                ]
+            }
+        }
     },
+
     {
         title: "Aloo Gobi",
         description: "Potatoes and cauliflower cooked with spices",
@@ -542,8 +880,37 @@ const sampleRecipes = [
             carbs: 30,
             fat: 8
         },
-        tags: ["indian", "vegetables", "vegetarian", "healthy"]
+        tags: ["indian", "vegetables", "vegetarian", "healthy"],
+        translations: {
+            hi: {
+                title: "आलू गोभी",
+                description: "मसालों के साथ पकाई गई आलू और गोभी की स्वादिष्ट सब्ज़ी — घर का पारंपरिक स्वाद।",
+                ingredients: [
+                    { name: "आलू", quantity: "3", unit: "मध्यम" },
+                    { name: "गोभी", quantity: "1", unit: "मध्यम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "टमाटर", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "आलू और गोभी को धोकर टुकड़ों में काट लें।" },
+                    { step: 2, description: "एक कढ़ाई में तेल गरम करें और उसमें जीरा डालें।" },
+                    { step: 3, description: "अब कटा हुआ प्याज, लहसुन और अदरक डालकर सुनहरा होने तक भूनें।" },
+                    { step: 4, description: "टमाटर और सभी मसाले डालें और तब तक पकाएं जब तक मसाला पक न जाए।" },
+                    { step: 5, description: "अब आलू और गोभी डालें और अच्छे से मिलाएं।" },
+                    { step: 6, description: "ढककर धीमी आँच पर तब तक पकाएं जब तक सब्ज़ियाँ नरम न हो जाएँ।" },
+                    { step: 7, description: "गरमागरम आलू गोभी को रोटी या चावल के साथ परोसें।" }
+                ]
+            }
+        }
     },
+
     {
         title: "Baingan Bharta",
         description: "Smoky mashed eggplant with spices",
@@ -583,8 +950,37 @@ const sampleRecipes = [
             carbs: 15,
             fat: 9
         },
-        tags: ["indian", "eggplant", "vegetarian", "smoky"]
+        tags: ["indian", "eggplant", "vegetarian", "smoky"],
+        translations: {
+            hi: {
+                title: "बैंगन का भरता",
+                description: "धुएँ का स्वाद वाला मसालेदार मैश्ड बैंगन।",
+                ingredients: [
+                    { name: "बैंगन", quantity: "1", unit: "बड़ा" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "टमाटर", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "3", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "हरी मिर्च", quantity: "2", unit: "पिस्से" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "बैंगन को आग पर भूनें जब तक कि वह जलकर चारकोल जैसा न हो जाए।" },
+                    { step: 2, description: "भुने हुए बैंगन का छिलका निकालें और मैश करें।" },
+                    { step: 3, description: "तेल गरम करें और उसमें जीरा डालें।" },
+                    { step: 4, description: "कटा प्याज, लहसुन, अदरक और हरी मिर्च डालकर सुनहरा होने तक भूनें।" },
+                    { step: 5, description: "टमाटर और मसाले डालकर नरम होने तक पकाएँ।" },
+                    { step: 6, description: "मैश किया हुआ बैंगन डालें और 10 मिनट तक पकाएँ।" },
+                    { step: 7, description: "गरमागरम रोटियों या पराठों के साथ परोसें।" }
+                ]
+            }
+        }
     },
+
     {
         title: "Bhindi Masala",
         description: "Spicy stir-fried okra with onions and spices",
@@ -623,8 +1019,36 @@ const sampleRecipes = [
             carbs: 12,
             fat: 7
         },
-        tags: ["indian", "okra", "vegetarian", "stirfry"]
+        tags: ["indian", "okra", "vegetarian", "stirfry"],
+        translations: {
+            hi: {
+                title: "भिंडी मसाला",
+                description: "प्याज और मसालों के साथ मसालेदार भुनी हुई भिंडी।",
+                ingredients: [
+                    { name: "भिंडी", quantity: "500", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "टमाटर", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "भिंडी को धोकर टुकड़ों में काट लें।" },
+                    { step: 2, description: "तेल गरम करें और उसमें जीरा डालें।" },
+                    { step: 3, description: "कटा हुआ प्याज, लहसुन और अदरक डालें और भूनें।" },
+                    { step: 4, description: "टमाटर और मसाले डालें।" },
+                    { step: 5, description: "भिंडी डालकर चलाते हुए भूनें।" },
+                    { step: 6, description: "ढककर तब तक पकाएँ जब तक भिंडी नरम न हो जाए।" },
+                    { step: 7, description: "गरमागरम रोटी या चावल के साथ परोसें।" }
+                ]
+            }
+        }
     },
+
     {
         title: "Kadhi Pakora",
         description: "Yogurt-based curry with crispy fritters",
@@ -662,7 +1086,33 @@ const sampleRecipes = [
             carbs: 25,
             fat: 15
         },
-        tags: ["indian", "yogurt", "vegetarian", "comfort"]
+        tags: ["indian", "yogurt", "vegetarian", "comfort"],
+        translations: {
+            hi: {
+                title: "कढ़ी पकोड़ा",
+                description: "दही आधारित करी जिसमें कुरकुरे पकोड़े होते हैं।",
+                ingredients: [
+                    { name: "दही", quantity: "2", unit: "कप" },
+                    { name: "बेसन", quantity: "1/2", unit: "कप" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "हरी मिर्च", quantity: "2", unit: "पिस्से" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "सरसों के बीज", quantity: "1", unit: "टीस्पून" },
+                    { name: "मेथी के बीज", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "दही को बेसन और पानी के साथ फेंटें।" },
+                    { step: 2, description: "बेसन, प्याज और हरी मिर्च से पकोड़े का घोल तैयार करें।" },
+                    { step: 3, description: "छोटे पकोड़े डीप फ्राई करें।" },
+                    { step: 4, description: "तेल गरम करें और उसमें सरसों और मेथी के बीज डालें।" },
+                    { step: 5, description: "दही का मिश्रण और मसाले डालें।" },
+                    { step: 6, description: "मध्यम आंच पर गाढ़ा होने तक पकाएँ।" },
+                    { step: 7, description: "तले हुए पकोड़े डालें और परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Butter Chicken",
@@ -703,7 +1153,35 @@ const sampleRecipes = [
             carbs: 15,
             fat: 30
         },
-        tags: ["indian", "chicken", "creamy", "rich"]
+        tags: ["indian", "chicken", "creamy", "rich"],
+        translations: {
+            hi: {
+                title: "बटर चिकन",
+                description: "मसालेदार और क्रीमी टमाटर आधारित चिकन करी।",
+                ingredients: [
+                    { name: "चिकन", quantity: "500", unit: "ग्राम" },
+                    { name: "दही", quantity: "1/2", unit: "कप" },
+                    { name: "टमाटर", quantity: "4", unit: "बड़े" },
+                    { name: "प्याज", quantity: "2", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "मक्खन", quantity: "4", unit: "टेबलस्पून" },
+                    { name: "क्रीम", quantity: "1/2", unit: "कप" },
+                    { name: "गरम मसाला", quantity: "1", unit: "टीस्पून" },
+                    { name: "लाल मिर्च पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन को दही और मसालों में मैरिनेट करें।" },
+                    { step: 2, description: "टमाटर, प्याज, लहसुन और अदरक को ब्लेंड करें।" },
+                    { step: 3, description: "चिकन को नरम होने तक पकाएँ।" },
+                    { step: 4, description: "मक्खन गरम करें और टमाटर का पेस्ट पकाएँ।" },
+                    { step: 5, description: "मसाले और पका हुआ चिकन डालें।" },
+                    { step: 6, description: "क्रीम डालें और धीमी आंच पर उबालें।" },
+                    { step: 7, description: "गरमागरम नान या चावल के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Fish Curry",
@@ -744,7 +1222,35 @@ const sampleRecipes = [
             carbs: 12,
             fat: 18
         },
-        tags: ["indian", "fish", "coconut", "spicy"]
+        tags: ["indian", "fish", "coconut", "spicy"],
+        translations: {
+            hi: {
+                title: "फिश करी",
+                description: "नारियल के दूध में मसालेदार और खट्टी-मीठी मछली।",
+                ingredients: [
+                    { name: "मछली की फिले", quantity: "500", unit: "ग्राम" },
+                    { name: "नारियल का दूध", quantity: "1", unit: "कप" },
+                    { name: "टमाटर", quantity: "2", unit: "बड़े" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "1", unit: "इंच" },
+                    { name: "हल्दी", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "लाल मिर्च पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "मछली को साफ करके टुकड़ों में काटें।" },
+                    { step: 2, description: "टमाटर, प्याज, लहसुन और अदरक को ब्लेंड करें।" },
+                    { step: 3, description: "तेल गरम करें और पेस्ट को तब तक पकाएँ जब तक तेल अलग न हो जाए।" },
+                    { step: 4, description: "मसाले और नारियल का दूध डालें।" },
+                    { step: 5, description: "मछली के टुकड़े धीरे-धीरे डालें।" },
+                    { step: 6, description: "मध्यम आंच पर मछली पकने तक उबालें।" },
+                    { step: 7, description: "गरमागरम चावल के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Jeera Rice",
@@ -782,7 +1288,32 @@ const sampleRecipes = [
             carbs: 40,
             fat: 6
         },
-        tags: ["indian", "rice", "side", "fragrant"]
+        tags: ["indian", "rice", "side", "fragrant"],
+        translations: {
+            hi: {
+                title: "जीरा राइस",
+                description: "जीरे के साथ पकाया हुआ खुशबूदार बासमती चावल।",
+                ingredients: [
+                    { name: "बासमती चावल", quantity: "1", unit: "कप" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "घी", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "तेज पत्ता", quantity: "1", unit: "टुकड़ा" },
+                    { name: "लौंग", quantity: "2", unit: "पिस्से" },
+                    { name: "दालचीनी", quantity: "1", unit: "इंच" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "पानी", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "चावल को धोकर 30 मिनट के लिए भिगो दें।" },
+                    { step: 2, description: "घी गरम करें और उसमें जीरा और साबुत मसाले डालें।" },
+                    { step: 3, description: "पानी निकालकर चावल डालें और 2 मिनट भूनें।" },
+                    { step: 4, description: "पानी और नमक डालें।" },
+                    { step: 5, description: "उबाल आने पर ढककर धीमी आंच पर पकाएँ।" },
+                    { step: 6, description: "पानी सोख जाने तक पकाएँ और चावल फुला हुआ हो जाए।" },
+                    { step: 7, description: "गरमागरम करी के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Biryani",
@@ -826,7 +1357,38 @@ const sampleRecipes = [
             carbs: 50,
             fat: 18
         },
-        tags: ["indian", "rice", "chicken", "aromatic"]
+        tags: ["indian", "rice", "chicken", "aromatic"],
+        translations: {
+            hi: {
+                title: "बिरयानी",
+                description: "मसाले और मेरिनेटेड मांस के साथ खुशबूदार परतदार चावल।",
+                ingredients: [
+                    { name: "बासमती चावल", quantity: "2", unit: "कप" },
+                    { name: "चिकन", quantity: "500", unit: "ग्राम" },
+                    { name: "दही", quantity: "1/2", unit: "कप" },
+                    { name: "प्याज", quantity: "3", unit: "बड़े" },
+                    { name: "टमाटर", quantity: "2", unit: "बड़े" },
+                    { name: "लहसुन", quantity: "6", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "2", unit: "इंच" },
+                    { name: "बिरयानी मसाला", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "हल्दी", quantity: "1", unit: "टीस्पून" },
+                    { name: "केसर", quantity: "1/4", unit: "टीस्पून" },
+                    { name: "दूध", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "घी", quantity: "4", unit: "टेबलस्पून" },
+                    { name: "तले हुए प्याज", quantity: "1/2", unit: "कप" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन को दही और मसालों में मेरिनेट करें।" },
+                    { step: 2, description: "साबुत मसालों के साथ बासमती चावल 70% तक पकाएँ।" },
+                    { step: 3, description: "मेरिनेट किया हुआ चिकन प्याज और टमाटर के साथ पकाएँ।" },
+                    { step: 4, description: "चावल और चिकन को बर्तन में परत करें।" },
+                    { step: 5, description: "केसर वाला दूध और घी डालें।" },
+                    { step: 6, description: "ढककर धीमी आंच (दम) पर पकाएँ।" },
+                    { step: 7, description: "रायता और सलाद के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Roti",
@@ -859,7 +1421,27 @@ const sampleRecipes = [
             carbs: 28,
             fat: 2
         },
-        tags: ["indian", "bread", "vegetarian", "daily"]
+        tags: ["indian", "bread", "vegetarian", "daily"],
+        translations: {
+            hi: {
+                title: "रोटी",
+                description: "साबुत गेहूं की तवा रोटी।",
+                ingredients: [
+                    { name: "साबुत गेहूं का आटा", quantity: "2", unit: "कप" },
+                    { name: "पानी", quantity: "3/4", unit: "कप" },
+                    { name: "नमक", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "आटा, नमक और पानी मिलाकर आटा गूंधें।" },
+                    { step: 2, description: "आटे को चिकना होने तक गूंधें और 15 मिनट के लिए आराम दें।" },
+                    { step: 3, description: "आटे की लोइयां बनाकर बेलन से बेलें।" },
+                    { step: 4, description: "तवा गरम करें और रोटी दोनों तरफ सेकें।" },
+                    { step: 5, description: "पकाते समय घी या तेल लगाएँ।" },
+                    { step: 6, description: "गरमागरम करी के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Paratha",
@@ -894,7 +1476,29 @@ const sampleRecipes = [
             carbs: 35,
             fat: 10
         },
-        tags: ["indian", "bread", "layered", "ghee"]
+        tags: ["indian", "bread", "layered", "ghee"],
+        translations: {
+            hi: {
+                title: "पराठा",
+                description: "घी के साथ परतदार रोटी, अक्सर भरवां।",
+                ingredients: [
+                    { name: "साबुत गेहूं का आटा", quantity: "2", unit: "कप" },
+                    { name: "पानी", quantity: "3/4", unit: "कप" },
+                    { name: "नमक", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "घी", quantity: "4", unit: "टेबलस्पून" },
+                    { name: "तेल", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "आटा, पानी और नमक मिलाकर आटा गूंधें।" },
+                    { step: 2, description: "आटे को 15 मिनट के लिए आराम दें।" },
+                    { step: 3, description: "आटे को पतला बेलें, घी लगाएँ और परतों में मोड़ें।" },
+                    { step: 4, description: "फिर से मोटा गोल बेलें।" },
+                    { step: 5, description: "गरम तवे पर घी के साथ सेंकें।" },
+                    { step: 6, description: "स्पैचुला से दबाएँ जब तक सुनहरा न हो जाए।" },
+                    { step: 7, description: "अचार या करी के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Gulab Jamun",
@@ -936,7 +1540,36 @@ const sampleRecipes = [
             carbs: 45,
             fat: 10
         },
-        tags: ["indian", "sweet", "dumplings", "festive"]
+        tags: ["indian", "sweet", "dumplings", "festive"],
+        translations: {
+            hi: {
+                title: "गुलाब जामुन",
+                description: "गुलाब के सिरप में भिगोए हुए मीठे खिलौने जैसे गोल आकार के पकवान।",
+                ingredients: [
+                    { name: "दूध पाउडर", quantity: "1", unit: "कप" },
+                    { name: "मैदा", quantity: "1/4", unit: "कप" },
+                    { name: "बेकिंग सोडा", quantity: "1/4", unit: "टीस्पून" },
+                    { name: "दूध", quantity: "1/4", unit: "कप" },
+                    { name: "घी", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "चीनी", quantity: "2", unit: "कप" },
+                    { name: "पानी", quantity: "2", unit: "कप" },
+                    { name: "गुलाब एसेंस", quantity: "1", unit: "टीस्पून" },
+                    { name: "इलायची", quantity: "4", unit: "पोड्स" },
+                    { name: "तेल", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "दूध पाउडर, मैदा और बेकिंग सोडा मिलाएँ।" },
+                    { step: 2, description: "दूध और घी डालकर नरम आटा तैयार करें।" },
+                    { step: 3, description: "अच्छी तरह गूंधें और 10 मिनट के लिए आराम दें।" },
+                    { step: 4, description: "छोटे गोले बनाएँ, क्रैक न होने दें।" },
+                    { step: 5, description: "तेल गरम करें और गोलों को सुनहरा होने तक तलें।" },
+                    { step: 6, description: "पानी, चीनी और इलायची से चीनी का सिरप तैयार करें।" },
+                    { step: 7, description: "सिरप में गुलाब एसेंस डालें।" },
+                    { step: 8, description: "तले हुए गोलों को 2 घंटे के लिए गर्म सिरप में भिगो दें।" },
+                    { step: 9, description: "गरम या ठंडा परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Kung Pao Chicken",
@@ -979,7 +1612,37 @@ const sampleRecipes = [
             carbs: 15,
             fat: 22
         },
-        tags: ["chinese", "chicken", "spicy", "peanuts", "stirfry"]
+        tags: ["chinese", "chicken", "spicy", "peanuts", "stirfry"],
+        translations: {
+            hi: {
+                title: "कुंग पाओ चिकन",
+                description: "मसालेदार चिकन जिसे मूंगफली, सब्ज़ियों और लाल मिर्च के साथ तला जाता है।",
+                ingredients: [
+                    { name: "चिकन ब्रेस्ट", quantity: "500", unit: "ग्रा" },
+                    { name: "मूंगफली", quantity: "1/2", unit: "कप" },
+                    { name: "शिमला मिर्च", quantity: "2", unit: "मध्यम" },
+                    { name: "ज़ूकीनी", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "4", unit: "कली" },
+                    { name: "अदरक", quantity: "1", unit: "चमच" },
+                    { name: "सोया सॉस", quantity: "3", unit: "चमच" },
+                    { name: "चावल का सिरका", quantity: "2", unit: "चमच" },
+                    { name: "तिल का तेल", quantity: "1", unit: "चमच" },
+                    { name: "कॉर्नस्टार्च", quantity: "2", unit: "चमच" },
+                    { name: "सूखी लाल मिर्च", quantity: "8", unit: "टुकड़े" },
+                    { name: "सिचुआन काली मिर्च", quantity: "1", unit: "चमच" },
+                    { name: "तेल", quantity: "3", unit: "चमच" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन को छोटे टुकड़ों में काटें और सोया सॉस व कॉर्नस्टार्च के साथ मैरीनेट करें।" },
+                    { step: 2, description: "वोक में तेल गरम करें, मूंगफली सुनहरी होने तक भूनें, निकालकर अलग रखें।" },
+                    { step: 3, description: "चिकन को पकने तक भूनें, निकालकर अलग रखें।" },
+                    { step: 4, description: "वोक में लहसुन, अदरक, मिर्च और सिचुआन काली मिर्च डालें।" },
+                    { step: 5, description: "शिमला मिर्च और ज़ूकीनी डालें, 2 मिनट के लिए भूनें।" },
+                    { step: 6, description: "चिकन वापस डालें, सोया सॉस, सिरका और तिल का तेल डालें।" },
+                    { step: 7, description: "मूंगफली वापस डालें, सभी चीज़ों को अच्छी तरह मिलाएँ और गरम परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Pad Thai",
@@ -1022,7 +1685,37 @@ const sampleRecipes = [
             carbs: 45,
             fat: 16
         },
-        tags: ["thai", "noodles", "shrimp", "sweet-sour", "street"]
+        tags: ["thai", "noodles", "shrimp", "sweet-sour", "street"],
+        translations: {
+            hi: {
+                title: "पैड थाई",
+                description: "झींगा, टोफू और इमली की चटनी के साथ तली हुई चावल की नूडल्स।",
+                ingredients: [
+                    { name: "चावल की नूडल्स", quantity: "200", unit: "ग्रा" },
+                    { name: "झींगा", quantity: "200", unit: "ग्रा" },
+                    { name: "टोफू", quantity: "150", unit: "ग्रा" },
+                    { name: "मूंगफली के अंकुर", quantity: "1", unit: "कप" },
+                    { name: "हरी प्याज", quantity: "4", unit: "तनों" },
+                    { name: "लहसुन", quantity: "3", unit: "कली" },
+                    { name: "अंडे", quantity: "2", unit: "बड़े" },
+                    { name: "इमली पेस्ट", quantity: "2", unit: "चमच" },
+                    { name: "फिश सॉस", quantity: "2", unit: "चमच" },
+                    { name: "पाम शुगर", quantity: "1", unit: "चमच" },
+                    { name: "नींबू", quantity: "1", unit: "टुकड़ा" },
+                    { name: "मूंगफली", quantity: "1/4", unit: "कप" },
+                    { name: "तेल", quantity: "3", unit: "चमच" }
+                ],
+                instructions: [
+                    { step: 1, description: "चावल की नूडल्स को 10 मिनट के लिए गुनगुने पानी में भिगोएँ, फिर छान लें।" },
+                    { step: 2, description: "इमली पेस्ट, फिश सॉस, पाम शुगर और नींबू का रस मिलाकर सॉस तैयार करें।" },
+                    { step: 3, description: "तेल गरम करें, लहसुन और झींगा भूनें जब तक झींगा गुलाबी न हो जाए।" },
+                    { step: 4, description: "टोफू और फेंटे हुए अंडे डालें, 1 मिनट पकाएँ।" },
+                    { step: 5, description: "नूडल्स और सॉस डालें, अच्छी तरह मिलाएँ।" },
+                    { step: 6, description: "मूंगफली के अंकुर और हरी प्याज डालें, 2 मिनट पकाएँ।" },
+                    { step: 7, description: "कूटे हुए मूंगफली और नींबू के टुकड़ों के साथ गरम परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Chicken Tacos",
@@ -1068,43 +1761,77 @@ const sampleRecipes = [
         tags: ["mexican", "chicken", "tortillas", "fresh", "quick"]
     },
     {
-        title: "California Roll",
-        description: "Inside-out sushi roll with crab, avocado, and cucumber",
-        image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop",
-        video: "https://www.youtube.com/embed/DoIHH_ZIXmU",
-        cuisine: "Japanese",
-        category: "appetizer",
-        difficulty: "hard",
-        prepTime: 30,
-        cookTime: 0,
+        title: "Chicken Tacos",
+        description: "Soft tortillas filled with seasoned chicken, salsa, and toppings",
+        image: "https://2.bp.blogspot.com/-29m_xlLshDc/XDyqEnK9zUI/AAAAAAAAImQ/J87pQJ2xVcMiMZ_3omspbm2s5-G_UE9ngCEwYBhgL/s1600/Crock%2Bpot%2Bchicken%2Btacos%2Bon%2Bplatter.jpg",
+        video: "https://www.youtube.com/embed/PGklx6OD_MM",
+        cuisine: "Mexican",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 20,
         servings: 4,
         ingredients: [
-            { name: "Sushi rice", quantity: "2", unit: "cups" },
-            { name: "Nori sheets", quantity: "4", unit: "pieces" },
-            { name: "Crab sticks", quantity: "8", unit: "pieces" },
+            { name: "Chicken breast", quantity: "500", unit: "g" },
+            { name: "Corn tortillas", quantity: "8", unit: "pieces" },
+            { name: "Onion", quantity: "1", unit: "medium" },
+            { name: "Tomatoes", quantity: "2", unit: "large" },
             { name: "Avocado", quantity: "1", unit: "piece" },
-            { name: "Cucumber", quantity: "1", unit: "piece" },
-            { name: "Sesame seeds", quantity: "2", unit: "tbsp" },
-            { name: "Rice vinegar", quantity: "3", unit: "tbsp" },
-            { name: "Sugar", quantity: "1", unit: "tbsp" },
-            { name: "Salt", quantity: "1", unit: "tsp" }
+            { name: "Cilantro", quantity: "1/4", unit: "cup" },
+            { name: "Lime", quantity: "2", unit: "pieces" },
+            { name: "Cumin", quantity: "1", unit: "tsp" },
+            { name: "Paprika", quantity: "1", unit: "tsp" },
+            { name: "Garlic powder", quantity: "1", unit: "tsp" },
+            { name: "Olive oil", quantity: "2", unit: "tbsp" },
+            { name: "Salt", quantity: "1", unit: "tsp" },
+            { name: "Black pepper", quantity: "1/2", unit: "tsp" }
         ],
         instructions: [
-            { step: 1, description: "Cook sushi rice and season with vinegar, sugar, and salt" },
-            { step: 2, description: "Cut avocado and cucumber into thin strips" },
-            { step: 3, description: "Place nori on sushi mat, spread rice evenly" },
-            { step: 4, description: "Sprinkle sesame seeds on rice" },
-            { step: 5, description: "Flip nori so rice is down, place fillings in center" },
-            { step: 6, description: "Roll tightly using mat, slice into 8 pieces" },
-            { step: 7, description: "Serve with soy sauce and wasabi" }
+            { step: 1, description: "Season chicken with cumin, paprika, garlic powder, salt, and pepper" },
+            { step: 2, description: "Heat oil and cook chicken until done, then shred" },
+            { step: 3, description: "Dice tomatoes, onion, and avocado for salsa" },
+            { step: 4, description: "Mix vegetables with cilantro and lime juice" },
+            { step: 5, description: "Warm tortillas in a dry pan" },
+            { step: 6, description: "Fill tortillas with chicken and salsa" },
+            { step: 7, description: "Serve with additional lime wedges" }
         ],
         nutrition: {
-            calories: 280,
-            protein: 8,
-            carbs: 50,
-            fat: 6
+            calories: 320,
+            protein: 28,
+            carbs: 25,
+            fat: 12
         },
-        tags: ["japanese", "sushi", "seafood", "rice", "rolls"]
+        tags: ["mexican", "chicken", "tortillas", "fresh", "quick"],
+        translations: {
+            hi: {
+                title: "चिकन टैकोस",
+                description: "मसालेदार चिकन, साल्सा और टॉपिंग्स से भरे हुए नरम टॉर्टिला।",
+                ingredients: [
+                    { name: "चिकन ब्रेस्ट", quantity: "500", unit: "ग्रा" },
+                    { name: "कॉर्न टॉर्टिला", quantity: "8", unit: "टुकड़े" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "टमाटर", quantity: "2", unit: "बड़े" },
+                    { name: "एवोकाडो", quantity: "1", unit: "टुकड़ा" },
+                    { name: "धनिया", quantity: "1/4", unit: "कप" },
+                    { name: "नींबू", quantity: "2", unit: "टुकड़े" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "पप्रिका", quantity: "1", unit: "टीस्पून" },
+                    { name: "लहसुन पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "जैतून का तेल", quantity: "2", unit: "चमच" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन को जीरा, पप्रिका, लहसुन पाउडर, नमक और काली मिर्च के साथ मसाला लगाएँ।" },
+                    { step: 2, description: "तेल गरम करें और चिकन पकाएँ, फिर इसे कटा हुआ कर लें।" },
+                    { step: 3, description: "साल्सा के लिए टमाटर, प्याज और एवोकाडो काट लें।" },
+                    { step: 4, description: "सब्ज़ियों को धनिया और नींबू के रस के साथ मिलाएँ।" },
+                    { step: 5, description: "टॉर्टिला को सूखी पैन में गरम करें।" },
+                    { step: 6, description: "टॉर्टिला में चिकन और साल्सा भरें।" },
+                    { step: 7, description: "अतिरिक्त नींबू के टुकड़ों के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Ratatouille",
@@ -1145,7 +1872,35 @@ const sampleRecipes = [
             carbs: 20,
             fat: 10
         },
-        tags: ["french", "vegetarian", "stew", "mediterranean", "healthy"]
+        tags: ["french", "vegetarian", "stew", "mediterranean", "healthy"],
+        translations: {
+            hi: {
+                title: "रैटाटुइ",
+                description: "बैंगन, ज़ूचिनी और टमाटर के साथ प्रॉवेंस शाकाहारी स्टू।",
+                ingredients: [
+                    { name: "बैंगन", quantity: "1", unit: "बड़ा" },
+                    { name: "ज़ूचिनी", quantity: "2", unit: "मध्यम" },
+                    { name: "शिमला मिर्च", quantity: "2", unit: "मध्यम" },
+                    { name: "टमाटर", quantity: "4", unit: "बड़े" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "4", unit: "कली" },
+                    { name: "थाइम", quantity: "1", unit: "टीस्पून" },
+                    { name: "तुलसी", quantity: "2", unit: "चमच" },
+                    { name: "जैतून का तेल", quantity: "4", unit: "चमच" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "सभी सब्ज़ियों को 1 इंच के टुकड़ों में काटें।" },
+                    { step: 2, description: "तेल गरम करें, प्याज और लहसुन को नरम होने तक भूनें।" },
+                    { step: 3, description: "बैंगन डालें और 5 मिनट तक पकाएँ।" },
+                    { step: 4, description: "ज़ूचिनी और शिमला मिर्च डालें, 5 मिनट तक पकाएँ।" },
+                    { step: 5, description: "टमाटर, थाइम, नमक और काली मिर्च डालें।" },
+                    { step: 6, description: "ढककर 30 मिनट तक धीरे-धीरे पकाएँ, समय-समय पर हिलाएँ।" },
+                    { step: 7, description: "परोसने से पहले ताजा तुलसी मिलाएँ।" }
+                ]
+            }
+        }
     },
     {
         title: "Falafel",
@@ -1186,7 +1941,35 @@ const sampleRecipes = [
             carbs: 25,
             fat: 10
         },
-        tags: ["middle-eastern", "chickpeas", "vegetarian", "fried", "street"]
+        tags: ["middle-eastern", "chickpeas", "vegetarian", "fried", "street"],
+        translations: {
+            hi: {
+                title: "फलाफल",
+                description: "ताहिनी सॉस के साथ परोसे गए गहरे तले हुए चने की गोलियाँ",
+                ingredients: [
+                    { name: "चना", quantity: "1", unit: "कप" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कली" },
+                    { name: "अजवाइन (पार्सले)", quantity: "1/2", unit: "कप" },
+                    { name: "धनिया", quantity: "1/2", unit: "कप" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "आटा", quantity: "2", unit: "चमच" },
+                    { name: "बेकिंग सोडा", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "तेल", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "चना को रात भर भिगोएँ, पानी छानकर धो लें।" },
+                    { step: 2, description: "चना, प्याज, लहसुन, हर्ब्स और मसाले मिलाकर ब्लेंड करें।" },
+                    { step: 3, description: "मिश्रण में आटा और बेकिंग सोडा डालें।" },
+                    { step: 4, description: "छोटे गोल या पैटीज़ बनाएं।" },
+                    { step: 5, description: "तेल गरम करें और गोलियों को सुनहरा भूरा होने तक तलें।" },
+                    { step: 6, description: "कागज़ के तौलिये पर रखें ताकि अतिरिक्त तेल निकल जाए।" },
+                    { step: 7, description: "ताहिनी सॉस और पीटा ब्रेड के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Pasta Carbonara",
@@ -1223,7 +2006,31 @@ const sampleRecipes = [
             carbs: 55,
             fat: 18
         },
-        tags: ["italian", "pasta", "creamy", "bacon", "quick"]
+        tags: ["italian", "pasta", "creamy", "bacon", "quick"],
+        translations: {
+            hi: {
+                title: "पास्ता कार्बोनारा",
+                description: "पैनसेटा, अंडे और परमेसन चीज़ के साथ क्रीमी पास्ता",
+                ingredients: [
+                    { name: "स्पेगेटी", quantity: "400", unit: "ग" },
+                    { name: "पैनसेटा", quantity: "150", unit: "ग" },
+                    { name: "अंडे", quantity: "3", unit: "बड़े" },
+                    { name: "परमेसन चीज़", quantity: "100", unit: "ग" },
+                    { name: "काली मिर्च", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "स्पेगेटी को नमक वाले उबलते पानी में अल डेंटे तक पकाएँ।" },
+                    { step: 2, description: "पैनसेटा को पैन में कुरकुरा होने तक पकाएँ।" },
+                    { step: 3, description: "अंडे को कद्दूकस किया हुआ परमेसन और काली मिर्च के साथ फेंटें।" },
+                    { step: 4, description: "पास्ता का पानी सुरक्षित रखें और स्पेगेटी छान लें।" },
+                    { step: 5, description: "गरम स्पेगेटी को पैनसेटा पैन में डालें।" },
+                    { step: 6, description: "आंच से हटा कर जल्दी से अंडे का मिश्रण मिलाएँ।" },
+                    { step: 7, description: "यदि क्रीमी बनाने की जरूरत हो तो सुरक्षित पास्ता पानी डालें।" },
+                    { step: 8, description: "अतिरिक्त परमेसन के साथ तुरंत परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Tom Yum Soup",
@@ -1265,7 +2072,36 @@ const sampleRecipes = [
             carbs: 8,
             fat: 10
         },
-        tags: ["thai", "soup", "shrimp", "hot-sour", "aromatic"]
+        tags: ["thai", "soup", "shrimp", "hot-sour", "aromatic"],
+        translations: {
+            hi: {
+                title: "टॉम यम सूप",
+                description: "झींगे और मशरूम के साथ तीखा और खट्टा थाई सूप",
+                ingredients: [
+                    { name: "झींगे", quantity: "200", unit: "ग" },
+                    { name: "मशरूम", quantity: "100", unit: "ग" },
+                    { name: "लेमनग्रास", quantity: "2", unit: "स्टॉक्स" },
+                    { name: "गलंगाल", quantity: "1", unit: "इंच" },
+                    { name: "काफिर नींबू के पत्ते", quantity: "4", unit: "टुकड़े" },
+                    { name: "थाई मिर्च", quantity: "3", unit: "टुकड़े" },
+                    { name: "फ़िश सॉस", quantity: "2", unit: "टीस्पून" },
+                    { name: "नींबू का रस", quantity: "3", unit: "टीस्पून" },
+                    { name: "नारियल का दूध", quantity: "1", unit: "कप" },
+                    { name: "धनिया", quantity: "2", unit: "टीस्पून" },
+                    { name: "चिकन स्टॉक", quantity: "4", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "लेमनग्रास और गलंगाल को हल्का कुचलें, नींबू के पत्ते फाड़ें।" },
+                    { step: 2, description: "स्टॉक को सुगंधित सामग्री के साथ उबालें।" },
+                    { step: 3, description: "मशरूम डालें और 3 मिनट तक पकाएँ।" },
+                    { step: 4, description: "झींगे डालें और गुलाबी होने तक पकाएँ।" },
+                    { step: 5, description: "फ़िश सॉस, नींबू का रस और मिर्च डालें।" },
+                    { step: 6, description: "नारियल का दूध मिलाएँ।" },
+                    { step: 7, description: "आंच से हटा कर धनिया से सजाएँ।" },
+                    { step: 8, description: "गरम परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Enchiladas",
@@ -1307,7 +2143,36 @@ const sampleRecipes = [
             carbs: 30,
             fat: 16
         },
-        tags: ["mexican", "chicken", "cheese", "baked", "comfort"]
+        tags: ["mexican", "chicken", "cheese", "baked", "comfort"],
+        translations: {
+            hi: {
+                title: "एनचिलाडास",
+                description: "चिकन और चीज़ से भरी कॉर्न टॉर्टिला, लाल सॉस के साथ ऊपर से",
+                ingredients: [
+                    { name: "कॉर्न टॉर्टिला", quantity: "8", unit: "टुकड़े" },
+                    { name: "चिकन ब्रेस्ट", quantity: "300", unit: "ग" },
+                    { name: "चेडर चीज़", quantity: "200", unit: "ग" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "टमाटर", quantity: "3", unit: "बड़े" },
+                    { name: "लहसुन", quantity: "3", unit: "कली" },
+                    { name: "लाल मिर्च पाउडर", quantity: "1", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "ऑलिव ऑयल", quantity: "2", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन ब्रेस्ट को पकाएँ और कद्दूकस करें।" },
+                    { step: 2, description: "टमाटर, प्याज, लहसुन और मसाले मिलाकर सॉस तैयार करें।" },
+                    { step: 3, description: "तेल में सॉस को 10 मिनट तक पकाएँ।" },
+                    { step: 4, description: "कद्दूकस किया चिकन आधी चीज़ के साथ मिलाएँ।" },
+                    { step: 5, description: "टॉर्टिला में चिकन मिश्रण भरें और रोल करें।" },
+                    { step: 6, description: "बेकिंग डिश में रखें, सॉस और बची हुई चीज़ डालें।" },
+                    { step: 7, description: "375°F पर 15 मिनट तक बेक करें जब तक चीज़ पिघल न जाए।" },
+                    { step: 8, description: "गरम परोसें, साथ में सॉर क्रीम और गुआकामोले के साथ।" }
+                ]
+            }
+        }
     },
     {
         title: "Crème Brûlée",
@@ -1345,7 +2210,32 @@ const sampleRecipes = [
             carbs: 25,
             fat: 22
         },
-        tags: ["french", "custard", "caramel", "elegant", "creamy"]
+        tags: ["french", "custard", "caramel", "elegant", "creamy"],
+        translations: {
+            hi: {
+                title: "क्रेम ब्रूले",
+                description: "कैरेमलाइज्ड शुगर से ढकी रिच कस्टर्ड",
+                ingredients: [
+                    { name: "हेवी क्रीम", quantity: "2", unit: "कप" },
+                    { name: "वनीला बीन", quantity: "1", unit: "टुकड़ा" },
+                    { name: "अंडे की जर्दी", quantity: "6", unit: "बड़े" },
+                    { name: "चीनी", quantity: "1/2", unit: "कप" },
+                    { name: "ब्राउन शुगर", quantity: "1/4", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "ओवन को 325°F (160°C) पर प्रीहीट करें।" },
+                    { step: 2, description: "क्रीम को वनीला बीन के साथ गर्म करें, उबालें नहीं।" },
+                    { step: 3, description: "अंडे की जर्दी को चीनी के साथ हल्का और फूला हुआ तक फेंटें।" },
+                    { step: 4, description: "गरम क्रीम धीरे-धीरे अंडे के मिश्रण में डालें और लगातार फेंटें।" },
+                    { step: 5, description: "मिश्रण को रेमकिन्स में छानें।" },
+                    { step: 6, description: "रेमकिन्स को वॉटर बाथ में रखें।" },
+                    { step: 7, description: "40-45 मिनट तक बेक करें जब तक सेट न हो जाए, पर हल्का जिगली रहे।" },
+                    { step: 8, description: "कम से कम 2 घंटे के लिए ठंडा करें।" },
+                    { step: 9, description: "ऊपर ब्राउन शुगर छिड़कें और टॉर्च से कैरामेलाइज करें।" },
+                    { step: 10, description: "तुरंत परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Ramen",
@@ -1388,7 +2278,37 @@ const sampleRecipes = [
             carbs: 45,
             fat: 25
         },
-        tags: ["japanese", "noodles", "pork", "soup", "rich"]
+        tags: ["japanese", "noodles", "pork", "soup", "rich"],
+        translations: {
+            hi: {
+                title: "रामेन",
+                description: "पोर्क, अंडे और सब्जियों के साथ जापानी नूडल सूप",
+                ingredients: [
+                    { name: "पोर्क बेली", quantity: "500", unit: "ग्रा" },
+                    { name: "रामेन नूडल्स", quantity: "400", unit: "ग्रा" },
+                    { name: "अंडे", quantity: "4", unit: "बड़े" },
+                    { name: "हरी प्याज", quantity: "4", unit: "सिरा" },
+                    { name: "बांस की कलियाँ", quantity: "100", unit: "ग्रा" },
+                    { name: "नोरी शीट्स", quantity: "2", unit: "टुकड़े" },
+                    { name: "सोया सॉस", quantity: "1/2", unit: "कप" },
+                    { name: "मिरिन", quantity: "1/4", unit: "कप" },
+                    { name: "साके", quantity: "1/4", unit: "कप" },
+                    { name: "चिकन स्टॉक", quantity: "8", unit: "कप" },
+                    { name: "अदरक", quantity: "2", unit: "इंच" },
+                    { name: "लहसुन", quantity: "4", unit: "कली" }
+                ],
+                instructions: [
+                    { step: 1, description: "सोया सॉस, मिरिन, साके, अदरक और लहसुन को उबाल कर टारे बनाएं।" },
+                    { step: 2, description: "स्टॉक में पोर्क बेली को 2 घंटे तक नरम होने तक पकाएं।" },
+                    { step: 3, description: "अंडों को 6 मिनट उबालें, ठंडे पानी में ठंडा करें और छील लें।" },
+                    { step: 4, description: "पैकेज अनुसार रामेन नूडल्स पकाएं।" },
+                    { step: 5, description: "पोर्क बेली को पतले टुकड़ों में काटें।" },
+                    { step: 6, description: "बोल में टारे डालें, गरम स्टॉक डालें।" },
+                    { step: 7, description: "नूडल्स, पोर्क, अंडे, बांस की कलियाँ और हरी प्याज डालें।" },
+                    { step: 8, description: "नोरी से ऊपर सजाएँ और तुरंत परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Sweet and Sour Pork",
@@ -1431,7 +2351,37 @@ const sampleRecipes = [
             carbs: 35,
             fat: 18
         },
-        tags: ["chinese", "pork", "sweet-sour", "pineapple", "crispy"]
+        tags: ["chinese", "pork", "sweet-sour", "pineapple", "crispy"],
+        translations: {
+            hi: {
+                title: "स्वीट एंड सौर पोर्क",
+                description: "सब्जियों के साथ खट्टे-पिनेएप्पल सॉस में कुरकुरा पोर्क",
+                ingredients: [
+                    { name: "पोर्क टेंडरलॉइन", quantity: "500", unit: "ग्रा" },
+                    { name: "पाइनएप्पल के टुकड़े", quantity: "1", unit: "कप" },
+                    { name: "शिमला मिर्च", quantity: "2", unit: "मध्यम" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कली" },
+                    { name: "अदरक", quantity: "1", unit: "चम्मच" },
+                    { name: "केचप", quantity: "1/2", unit: "कप" },
+                    { name: "राइस विनेगर", quantity: "1/4", unit: "कप" },
+                    { name: "सोया सॉस", quantity: "2", unit: "चम्मच" },
+                    { name: "कॉर्नस्टार्च", quantity: "3", unit: "चम्मच" },
+                    { name: "अंडा", quantity: "1", unit: "बड़ा" },
+                    { name: "तेल", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "पोर्क को छोटे टुकड़ों में काटें, अंडा और कॉर्नस्टार्च के साथ मैरीनेट करें।" },
+                    { step: 2, description: "पोर्क को डीप फ्राई करें जब तक सुनहरा न हो, फिर अलग रखें।" },
+                    { step: 3, description: "सॉस के लिए केचप, विनेगर और सोया सॉस मिलाएं।" },
+                    { step: 4, description: "लहसुन, अदरक, प्याज और शिमला मिर्च को स्टिर-फ्राई करें।" },
+                    { step: 5, description: "पाइनएप्पल और सॉस मिलाएँ।" },
+                    { step: 6, description: "कॉर्नस्टार्च स्लरी से गाढ़ा करें।" },
+                    { step: 7, description: "डीप फ्राई पोर्क डालें और अच्छे से कोट करें।" },
+                    { step: 8, description: "गरम भाप वाले चावल के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Hummus",
@@ -1469,7 +2419,32 @@ const sampleRecipes = [
             carbs: 18,
             fat: 10
         },
-        tags: ["middle-eastern", "chickpeas", "dip", "vegetarian", "healthy"]
+        tags: ["middle-eastern", "chickpeas", "dip", "vegetarian", "healthy"],
+        translations: {
+            hi: {
+                title: "हुमस",
+                description: "ताहिनी और लहसुन के साथ क्रीमी चने की डिप",
+                ingredients: [
+                    { name: "चना", quantity: "1", unit: "कैन्स" },
+                    { name: "ताहिनी", quantity: "1/4", unit: "कप" },
+                    { name: "नींबू का रस", quantity: "2", unit: "चम्मच" },
+                    { name: "लहसुन", quantity: "2", unit: "कली" },
+                    { name: "जैतून का तेल", quantity: "2", unit: "चम्मच" },
+                    { name: "जीरा", quantity: "1/2", unit: "चम्मच" },
+                    { name: "नमक", quantity: "1/2", unit: "चम्मच" },
+                    { name: "पप्रिका", quantity: "1/2", unit: "चम्मच" }
+                ],
+                instructions: [
+                    { step: 1, description: "चना छानकर धो लें।" },
+                    { step: 2, description: "चना, ताहिनी, नींबू का रस, लहसुन, जीरा और नमक मिलाएँ।" },
+                    { step: 3, description: "ब्लेंड करते समय धीरे-धीरे जैतून का तेल डालें।" },
+                    { step: 4, description: "स्मूद और क्रीमी होने तक ब्लेंड करें।" },
+                    { step: 5, description: "जरूरत पड़ने पर पानी डालकर स्थिरता एडजस्ट करें।" },
+                    { step: 6, description: "बाउल में डालें, ऊपर से जैतून का तेल डालें।" },
+                    { step: 7, description: "पप्रिका छिड़कें और पीटा ब्रेड के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Sushi Rolls",
@@ -1508,7 +2483,33 @@ const sampleRecipes = [
             carbs: 45,
             fat: 8
         },
-        tags: ["japanese", "sushi", "fish", "rice", "fresh"]
+        tags: ["japanese", "sushi", "fish", "rice", "fresh"],
+        translations: {
+            hi: {
+                title: "सुशी रोल्स",
+                description: "ताज़ी मछली और सब्जियां, मसालेदार चावल और नोरी में लिपटी हुई",
+                ingredients: [
+                    { name: "सुशी चावल", quantity: "2", unit: "कप" },
+                    { name: "नोरी शीट्स", quantity: "4", unit: "टुकड़े" },
+                    { name: "ताज़ी सैल्मन", quantity: "200", unit: "ग्रा" },
+                    { name: "खीरा", quantity: "1", unit: "पीस" },
+                    { name: "एवोकाडो", quantity: "1", unit: "पीस" },
+                    { name: "वासाबी", quantity: "1", unit: "चम्मच" },
+                    { name: "सोया सॉस", quantity: "1/4", unit: "कप" },
+                    { name: "चावल का सिरका", quantity: "3", unit: "चम्मच" },
+                    { name: "शुगर", quantity: "1", unit: "चम्मच" },
+                    { name: "नमक", quantity: "1", unit: "चम्मच" }
+                ],
+                instructions: [
+                    { step: 1, description: "सुशी चावल पकाएं और सिरका, शुगर और नमक मिलाकर सीज़न करें।" },
+                    { step: 2, description: "मछली और सब्जियों को पतली स्ट्रिप्स में काटें।" },
+                    { step: 3, description: "नोरी को सुशी मैट पर रखें और चावल फैलाएं।" },
+                    { step: 4, description: "चावल के बीच में फिलिंग रखें।" },
+                    { step: 5, description: "मैट की मदद से कसकर रोल करें और टुकड़ों में काटें।" },
+                    { step: 6, description: "सोया सॉस और वासाबी के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Paella",
@@ -1550,7 +2551,36 @@ const sampleRecipes = [
             carbs: 45,
             fat: 14
         },
-        tags: ["spanish", "rice", "seafood", "chicken", "saffron"]
+        tags: ["spanish", "rice", "seafood", "chicken", "saffron"],
+        translations: {
+            hi: {
+                title: "पाएया",
+                description: "सीफ़ूड, चिकन और केसर से बना स्पेनिश चावल का व्यंजन",
+                ingredients: [
+                    { name: "आर्बोरियो चावल", quantity: "2", unit: "कप" },
+                    { name: "चिकन थाई पीस", quantity: "300", unit: "ग्रा" },
+                    { name: "झींगे", quantity: "200", unit: "ग्रा" },
+                    { name: "मसल्स", quantity: "200", unit: "ग्रा" },
+                    { name: "शिमला मिर्च", quantity: "2", unit: "मीडियम" },
+                    { name: "मटर", quantity: "1", unit: "कप" },
+                    { name: "प्याज़", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "4", unit: "कली" },
+                    { name: "केसर", quantity: "1/4", unit: "चम्मच" },
+                    { name: "चिकन स्टॉक", quantity: "4", unit: "कप" },
+                    { name: "जैतून का तेल", quantity: "3", unit: "चम्मच" },
+                    { name: "पप्रिका", quantity: "1", unit: "चम्मच" }
+                ],
+                instructions: [
+                    { step: 1, description: "पाएया पैन में तेल गर्म करें, चिकन को हल्का भूनकर निकाल लें।" },
+                    { step: 2, description: "प्याज़, लहसुन और शिमला मिर्च को भूनें।" },
+                    { step: 3, description: "चावल और पप्रिका डालकर 2 मिनट चलाएँ।" },
+                    { step: 4, description: "केसर को स्टॉक में मिलाएँ और चावल पर डालें।" },
+                    { step: 5, description: "चिकन को वापस डालें और ऊपर से सीफ़ूड रखें।" },
+                    { step: 6, description: "ढक्कन खोले बिना पकाएँ जब तक चावल मुलायम और सीफ़ूड पक न जाए।" },
+                    { step: 7, description: "5 मिनट तक ढककर रखें और फिर परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Tandoori Chicken",
@@ -1592,7 +2622,36 @@ const sampleRecipes = [
             carbs: 8,
             fat: 12
         },
-        tags: ["indian", "chicken", "tandoor", "spicy", "marinated"]
+        tags: ["indian", "chicken", "tandoor", "spicy", "marinated"],
+        translations: {
+            hi: {
+                title: "तंदूरी चिकन",
+                description: "मसालेदार चिकन जिसे पारंपरिक मिट्टी के तंदूर में पकाया जाता है",
+                ingredients: [
+                    { name: "चिकन पीस", quantity: "800", unit: "ग्रा" },
+                    { name: "दही", quantity: "1", unit: "कप" },
+                    { name: "अदरक-लहसुन पेस्ट", quantity: "2", unit: "चम्मच" },
+                    { name: "नींबू का रस", quantity: "2", unit: "चम्मच" },
+                    { name: "लाल मिर्च पाउडर", quantity: "1", unit: "चम्मच" },
+                    { name: "हल्दी", quantity: "1", unit: "चम्मच" },
+                    { name: "गरम मसाला", quantity: "1", unit: "चम्मच" },
+                    { name: "जीरा", quantity: "1", unit: "चम्मच" },
+                    { name: "धनिया पाउडर", quantity: "1", unit: "चम्मच" },
+                    { name: "कश्मीरी लाल मिर्च", quantity: "1", unit: "चम्मच" },
+                    { name: "तेल", quantity: "2", unit: "चम्मच" },
+                    { name: "नमक", quantity: "1", unit: "चम्मच" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन पीस में गहरे चीरे लगाएँ।" },
+                    { step: 2, description: "सभी मेरिनेशन सामग्री को एक बाउल में मिलाएँ।" },
+                    { step: 3, description: "चिकन को मसाले में अच्छी तरह लपेटें और 2 घंटे मेरिनेट करें।" },
+                    { step: 4, description: "ओवन को 400°F (200°C) पर प्रीहीट करें।" },
+                    { step: 5, description: "चिकन को बेकिंग ट्रे पर रखें।" },
+                    { step: 6, description: "20-25 मिनट तक बेक करें जब तक हल्का चार और पक न जाए।" },
+                    { step: 7, description: "नींबू और प्याज़ रिंग्स के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Greek Salad",
@@ -1632,7 +2691,34 @@ const sampleRecipes = [
             carbs: 12,
             fat: 16
         },
-        tags: ["greek", "salad", "feta", "mediterranean", "fresh"]
+        tags: ["greek", "salad", "feta", "mediterranean", "fresh"],
+        translations: {
+            hi: {
+                title: "ग्रीक सलाद",
+                description: "फेटा चीज़ और जैतून से बनी ताज़गी भरी मेडिटरेनियन सलाद — गर्मियों के लिए एक हल्का और स्वादिष्ट विकल्प।",
+                ingredients: [
+                    { name: "टमाटर", quantity: "4", unit: "बड़े" },
+                    { name: "खीरा", quantity: "1", unit: "बड़ा" },
+                    { name: "लाल प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "फेटा चीज़", quantity: "200", unit: "ग्राम" },
+                    { name: "कैलामाटा ऑलिव्स (जैतून)", quantity: "1/2", unit: "कप" },
+                    { name: "ऑलिव ऑयल", quantity: "1/4", unit: "कप" },
+                    { name: "नींबू का रस", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "ओरिगैनो", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "टमाटरों को वेज आकार में काट लें।" },
+                    { step: 2, description: "खीरे और लाल प्याज को पतले स्लाइस में काटें।" },
+                    { step: 3, description: "फेटा चीज़ को हल्के हाथों से क्रम्बल करें।" },
+                    { step: 4, description: "एक बड़े बाउल में सभी सब्ज़ियाँ और फेटा चीज़ मिलाएं।" },
+                    { step: 5, description: "एक छोटे बाउल में ऑलिव ऑयल, नींबू का रस, ओरिगैनो, नमक और काली मिर्च डालकर फेंटें।" },
+                    { step: 6, description: "ड्रेसिंग को सलाद पर डालें और हल्के हाथों से मिलाएं।" },
+                    { step: 7, description: "परोसने से पहले 10 मिनट के लिए रख दें ताकि स्वाद अच्छी तरह मिल जाए।" }
+                ]
+            }
+        }
     },
     {
         title: "Pho",
@@ -1676,7 +2762,38 @@ const sampleRecipes = [
             carbs: 45,
             fat: 8
         },
-        tags: ["vietnamese", "noodles", "beef", "soup", "aromatic"]
+        tags: ["vietnamese", "noodles", "beef", "soup", "aromatic"],
+        translations: {
+            hi: {
+                title: "फो (वियतनामी नूडल सूप)",
+                description: "बीफ़ और सुगंधित शोरबे से बना वियतनामी नूडल सूप — हल्का, स्वादिष्ट और सुगंधों से भरपूर व्यंजन।",
+                ingredients: [
+                    { name: "बीफ़ की हड्डियाँ", quantity: "2", unit: "किलो" },
+                    { name: "चावल के नूडल्स", quantity: "400", unit: "ग्राम" },
+                    { name: "बीफ़ सिरलॉइन", quantity: "300", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "अदरक", quantity: "2", unit: "इंच" },
+                    { name: "स्टार ऐनीस (चक्र फूल)", quantity: "3", unit: "पीस" },
+                    { name: "दालचीनी स्टिक", quantity: "1", unit: "पीस" },
+                    { name: "लौंग", quantity: "3", unit: "पीस" },
+                    { name: "फिश सॉस", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "बीन स्प्राउट्स", quantity: "2", unit: "कप" },
+                    { name: "थाई बेसिल (तुलसी)", quantity: "1/2", unit: "कप" },
+                    { name: "नींबू", quantity: "2", unit: "पीस" }
+                ],
+                instructions: [
+                    { step: 1, description: "बीफ़ की हड्डियों, प्याज और अदरक को 30 मिनट तक ओवन में भूनें।" },
+                    { step: 2, description: "अब इन्हें मसालों के साथ धीमी आँच पर लगभग 3 घंटे तक उबालें ताकि स्वाद अच्छी तरह निकल आए।" },
+                    { step: 3, description: "शोरबे को छान लें और उसमें फिश सॉस डालकर स्वादानुसार मिलाएं।" },
+                    { step: 4, description: "पैकेट के निर्देशों के अनुसार चावल के नूडल्स उबालें।" },
+                    { step: 5, description: "बीफ़ को बहुत पतले स्लाइस में काट लें।" },
+                    { step: 6, description: "एक कटोरे में पके हुए नूडल्स डालें।" },
+                    { step: 7, description: "ऊपर से कच्चे बीफ़ के स्लाइस रखें।" },
+                    { step: 8, description: "गरम शोरबा ऊपर से डालें ताकि बीफ़ हल्का पक जाए।" },
+                    { step: 9, description: "ऊपर से बीन स्प्राउट्स, तुलसी और नींबू से सजाकर परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Lasagna",
@@ -1719,7 +2836,37 @@ const sampleRecipes = [
             carbs: 35,
             fat: 28
         },
-        tags: ["italian", "pasta", "cheese", "baked", "comfort"]
+        tags: ["italian", "pasta", "cheese", "baked", "comfort"],
+        translations: {
+            hi: {
+                title: "लज़ान्या",
+                description: "मांस के स्वादिष्ट सॉस और पिघले हुए चीज़ की परतों से बनी एक प्रसिद्ध इटालियन पास्ता डिश।",
+                ingredients: [
+                    { name: "लज़ान्या नूडल्स", quantity: "12", unit: "पीस" },
+                    { name: "कीमा बीफ़", quantity: "500", unit: "ग्राम" },
+                    { name: "इटालियन सॉसेज", quantity: "250", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "टमाटर सॉस", quantity: "800", unit: "ग्राम" },
+                    { name: "रिकोटा चीज़", quantity: "500", unit: "ग्राम" },
+                    { name: "मोज़रेला चीज़", quantity: "300", unit: "ग्राम" },
+                    { name: "पार्मेज़ान चीज़", quantity: "100", unit: "ग्राम" },
+                    { name: "अंडा", quantity: "1", unit: "बड़ा" },
+                    { name: "तुलसी (बेसिल)", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "ऑलिव ऑयल", quantity: "2", unit: "टेबलस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "पैकेट के निर्देशों के अनुसार लज़ान्या नूडल्स को उबाल लें।" },
+                    { step: 2, description: "एक पैन में कीमा बीफ़, प्याज और लहसुन डालकर भूनें जब तक मांस भूरा न हो जाए।" },
+                    { step: 3, description: "टमाटर सॉस डालें और लगभग 20 मिनट तक धीमी आँच पर पकाएं।" },
+                    { step: 4, description: "रिकोटा चीज़ में अंडा और तुलसी मिलाकर एक मिश्रण तैयार करें।" },
+                    { step: 5, description: "एक बेकिंग डिश में पहले सॉस, फिर नूडल्स, फिर रिकोटा मिश्रण और फिर मोज़रेला चीज़ की परत लगाएँ।" },
+                    { step: 6, description: "इसी तरह परतें दोहराएँ और सबसे ऊपर पार्मेज़ान चीज़ डालें।" },
+                    { step: 7, description: "375°F (190°C) पर 25 मिनट तक बेक करें जब तक ऊपर से सुनहरी और बबली न हो जाए।" },
+                    { step: 8, description: "परोसने से पहले 15 मिनट तक ठंडा होने दें ताकि परतें सेट हो जाएँ।" }
+                ]
+            }
+        }
     },
     {
         title: "Kimchi Fried Rice",
@@ -1762,7 +2909,37 @@ const sampleRecipes = [
             carbs: 50,
             fat: 14
         },
-        tags: ["korean", "rice", "kimchi", "spicy", "quick"]
+        tags: ["korean", "rice", "kimchi", "spicy", "quick"],
+        translations: {
+            hi: {
+                title: "किम्ची फ्राइड राइस",
+                description: "फर्मेंटेड सब्ज़ियों और मसालेदार स्वाद से बना एक लोकप्रिय कोरियाई चावल व्यंजन — तीखा, सुगंधित और बेहद स्वादिष्ट।",
+                ingredients: [
+                    { name: "पके हुए चावल", quantity: "4", unit: "कप" },
+                    { name: "किम्ची", quantity: "1", unit: "कप" },
+                    { name: "किम्ची जूस", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "3", unit: "कलियाँ" },
+                    { name: "गाजर", quantity: "1", unit: "मध्यम" },
+                    { name: "हरा प्याज", quantity: "3", unit: "डंठल" },
+                    { name: "तिल का तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "सोया सॉस", quantity: "1", unit: "टेबलस्पून" },
+                    { name: "गोचुजांग (कोरियाई तीखा पेस्ट)", quantity: "1", unit: "टेबलस्पून" },
+                    { name: "अंडे", quantity: "4", unit: "बड़े" },
+                    { name: "मक्खन", quantity: "2", unit: "टेबलस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "किम्ची, प्याज, गाजर और हरे प्याज को बारीक काट लें।" },
+                    { step: 2, description: "एक बड़ी कढ़ाई में मक्खन और तिल का तेल गरम करें।" },
+                    { step: 3, description: "प्याज, लहसुन और गाजर डालकर 3 मिनट तक भूनें।" },
+                    { step: 4, description: "अब किम्ची डालें और 2 मिनट तक पकाएं।" },
+                    { step: 5, description: "पके हुए चावल डालें और किसी भी गांठ को तोड़कर मिलाएं।" },
+                    { step: 6, description: "किम्ची जूस, सोया सॉस और गोचुजांग डालें और अच्छे से मिलाएं।" },
+                    { step: 7, description: "चावल को किनारे करें और बीच में अंडे डालकर हल्का स्क्रैम्बल करें।" },
+                    { step: 8, description: "सब कुछ मिलाकर गरमागरम परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Shakshuka",
@@ -1805,7 +2982,37 @@ const sampleRecipes = [
             carbs: 15,
             fat: 14
         },
-        tags: ["middle-eastern", "eggs", "tomatoes", "spicy", "breakfast"]
+        tags: ["middle-eastern", "eggs", "tomatoes", "spicy", "breakfast"],
+        translations: {
+            hi: {
+                title: "शकशुका",
+                description: "मसालेदार टमाटर की ग्रेवी में पोच किए हुए अंडों से बना एक लोकप्रिय उत्तर अफ्रीकी व्यंजन।",
+                ingredients: [
+                    { name: "अंडे", quantity: "6", unit: "बड़े" },
+                    { name: "टमाटर", quantity: "6", unit: "बड़े" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "शिमला मिर्च", quantity: "1", unit: "मध्यम" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "पपरिका", quantity: "1", unit: "टीस्पून" },
+                    { name: "कायेन पेपर (लाल मिर्च पाउडर)", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "ऑलिव ऑयल", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "ताज़ा धनिया पत्ती", quantity: "2", unit: "टेबलस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "टमाटर, प्याज और शिमला मिर्च को बारीक काट लें।" },
+                    { step: 2, description: "एक बड़ी कड़ाही में ऑलिव ऑयल गरम करें।" },
+                    { step: 3, description: "प्याज और शिमला मिर्च डालकर 5 मिनट तक भूनें।" },
+                    { step: 4, description: "अब लहसुन और सारे मसाले डालकर 1 मिनट तक पकाएं।" },
+                    { step: 5, description: "टमाटर डालें और 10 मिनट तक धीमी आँच पर पकाएं जब तक सॉस गाढ़ा न हो जाए।" },
+                    { step: 6, description: "सॉस में 6 जगह जगह हल्के गड्ढे बनाएं और उनमें अंडे तोड़ें।" },
+                    { step: 7, description: "ढककर तब तक पकाएं जब तक अंडे सेट न हो जाएं।" },
+                    { step: 8, description: "ऊपर से धनिया पत्ती से सजाएं और ब्रेड के साथ गरमागरम परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Quiche Lorraine",
@@ -1847,7 +3054,36 @@ const sampleRecipes = [
             carbs: 20,
             fat: 30
         },
-        tags: ["french", "quiche", "bacon", "cheese", "savory"]
+        tags: ["french", "quiche", "bacon", "cheese", "savory"],
+        translations: {
+            hi: {
+                title: "कीश लोरेन",
+                description: "बेकन और चीज़ से बनी एक स्वादिष्ट फ्रेंच नमकीन पाई — हल्के अंडे और क्रीम के मिश्रण से तैयार की गई।",
+                ingredients: [
+                    { name: "पाई क्रस्ट", quantity: "1", unit: "पीस" },
+                    { name: "बेकन", quantity: "200", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "1", unit: "मध्यम" },
+                    { name: "अंडे", quantity: "4", unit: "बड़े" },
+                    { name: "हेवी क्रीम", quantity: "1", unit: "कप" },
+                    { name: "ग्रुईएर चीज़", quantity: "150", unit: "ग्राम" },
+                    { name: "नमक", quantity: "1/2", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1/4", unit: "टीस्पून" },
+                    { name: "जायफल पाउडर", quantity: "1/8", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "ओवन को 375°F (190°C) पर पहले से गरम करें।" },
+                    { step: 2, description: "बेकन को कुरकुरा होने तक पकाएं और फिर टुकड़ों में काट लें।" },
+                    { step: 3, description: "एक पैन में प्याज को नरम होने तक भूनें।" },
+                    { step: 4, description: "एक बाउल में अंडे, क्रीम, नमक, काली मिर्च और जायफल मिलाकर फेंटें।" },
+                    { step: 5, description: "पाई क्रस्ट में सबसे पहले बेकन और प्याज की परत बिछाएं।" },
+                    { step: 6, description: "फिलिंग के ऊपर आधा चीज़ छिड़कें।" },
+                    { step: 7, description: "अब अंडे और क्रीम का मिश्रण फिलिंग के ऊपर डालें।" },
+                    { step: 8, description: "ऊपर से बचा हुआ चीज़ डालें।" },
+                    { step: 9, description: "35–40 मिनट तक बेक करें जब तक मिश्रण सेट और ऊपर से सुनहरा न हो जाए।" },
+                    { step: 10, description: "परोसने से पहले 10 मिनट ठंडा होने दें।" }
+                ]
+            }
+        }
     },
     {
         title: "Sauerbraten",
@@ -1891,7 +3127,38 @@ const sampleRecipes = [
             carbs: 15,
             fat: 22
         },
-        tags: ["german", "beef", "marinated", "pot-roast", "traditional"]
+        tags: ["german", "beef", "marinated", "pot-roast", "traditional"],
+        translations: {
+            hi: {
+                title: "सावरब्राटन",
+                description: "जर्मनी की पारंपरिक डिश जिसमें बीफ को वाइन और सिरके में कई दिनों तक मेरिनेट किया जाता है, और अदरक वाले ग्रेवी के साथ परोसा जाता है।",
+                ingredients: [
+                    { name: "बीफ रोस्ट", quantity: "2", unit: "किलो" },
+                    { name: "रेड वाइन सिरका", quantity: "2", unit: "कप" },
+                    { name: "रेड वाइन", quantity: "2", unit: "कप" },
+                    { name: "प्याज", quantity: "2", unit: "बड़े" },
+                    { name: "गाजर", quantity: "3", unit: "मध्यम" },
+                    { name: "सेलेरी", quantity: "2", unit: "डंठल" },
+                    { name: "तेज पत्ते", quantity: "3", unit: "पीस" },
+                    { name: "लौंग", quantity: "6", unit: "पीस" },
+                    { name: "काली मिर्च के दाने", quantity: "10", unit: "पीस" },
+                    { name: "जिंजर स्नैप कुकीज़", quantity: "8", unit: "पीस" },
+                    { name: "चीनी", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "मक्खन", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "मैदा", quantity: "2", unit: "टेबलस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "बीफ को सिरका, वाइन और मसालों में 3–4 दिन तक मेरिनेट करें।" },
+                    { step: 2, description: "बीफ को मेरिनेड से निकालें और तरल को छान लें।" },
+                    { step: 3, description: "बीफ को मक्खन में सुनहरा भूरा होने तक भूनें और निकाल लें।" },
+                    { step: 4, description: "उसी पैन में सब्ज़ियों को भूनें।" },
+                    { step: 5, description: "अब बीफ और छना हुआ मेरिनेड डालें।" },
+                    { step: 6, description: "ढककर धीमी आँच पर लगभग 2.5 घंटे तक पकाएँ जब तक मांस नरम न हो जाए।" },
+                    { step: 7, description: "बीफ को निकालें और ग्रेवी में जिंजर स्नैप का पेस्ट डालकर गाढ़ा करें।" },
+                    { step: 8, description: "बीफ को स्लाइस करें और गरम ग्रेवी के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Feijoada",
@@ -1933,7 +3200,36 @@ const sampleRecipes = [
             carbs: 45,
             fat: 22
         },
-        tags: ["brazilian", "beans", "pork", "stew", "traditional"]
+        tags: ["brazilian", "beans", "pork", "stew", "traditional"],
+        translations: {
+            hi: {
+                title: "फेज़ोआदा",
+                description: "ब्राज़ील की मशहूर डिश — काले बीन्स, सूअर के मांस और सॉसेज से बनी गाढ़ी स्वादिष्ट स्ट्यू, जो चावल और साग के साथ परोसी जाती है।",
+                ingredients: [
+                    { name: "काले बीन्स", quantity: "1", unit: "किलो" },
+                    { name: "पोर्क रिब्स", quantity: "500", unit: "ग्राम" },
+                    { name: "बेकन", quantity: "200", unit: "ग्राम" },
+                    { name: "पोर्क सॉसेज", quantity: "300", unit: "ग्राम" },
+                    { name: "पोर्क शोल्डर", quantity: "500", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "2", unit: "बड़े" },
+                    { name: "लहसुन", quantity: "6", unit: "कली" },
+                    { name: "तेज पत्ते", quantity: "3", unit: "पीस" },
+                    { name: "संतरा", quantity: "1", unit: "पीस" },
+                    { name: "धनिया पत्ता", quantity: "1/2", unit: "कप" },
+                    { name: "चावल", quantity: "2", unit: "कप" },
+                    { name: "कॉलेर्ड ग्रीन्स", quantity: "1", unit: "गुच्छा" }
+                ],
+                instructions: [
+                    { step: 1, description: "बीन्स को रात भर भिगोकर रखें और फिर पानी निकाल दें।" },
+                    { step: 2, description: "बीन्स को तेज पत्ता और संतरे के साथ 1 घंटे तक उबालें।" },
+                    { step: 3, description: "सभी पोर्क मीट को अलग-अलग सुनहरा भूरा करें।" },
+                    { step: 4, description: "प्याज और लहसुन को सुनहरा होने तक भूनें।" },
+                    { step: 5, description: "भुना हुआ मीट बीन्स में डालें।" },
+                    { step: 6, description: "धीमी आँच पर 1 घंटे तक पकाएँ जब तक सब कुछ अच्छी तरह मिल न जाए।" },
+                    { step: 7, description: "गरमागरम परोसें — चावल, साग और फराफा (भुना हुआ कसावा आटा) के साथ।" }
+                ]
+            }
+        }
     },
     {
         title: "Chicken Tagine",
@@ -1978,11 +3274,73 @@ const sampleRecipes = [
             carbs: 20,
             fat: 18
         },
-        tags: ["moroccan", "chicken", "tagine", "spiced", "sweet-sour"]
+        tags: ["moroccan", "chicken", "tagine", "spiced", "sweet-sour"],
+        translations: {
+            hi: {
+                title: "चिकन टैगाइन",
+                description: "एप्रिकॉट और बादाम के साथ मोरक्कन मसालेदार चिकन स्टू",
+                ingredients: [
+                    { name: "चिकन थाईज", quantity: "1", unit: "किलोग्राम" },
+                    { name: "प्याज", quantity: "2", unit: "बड़े" },
+                    { name: "लहसुन", quantity: "4", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "दालचीनी", quantity: "1", unit: "टीस्पून" },
+                    { name: "जीरा", quantity: "1", unit: "टीस्पून" },
+                    { name: "हल्दी", quantity: "1", unit: "टीस्पून" },
+                    { name: "केसर", quantity: "1/4", unit: "टीस्पून" },
+                    { name: "चिकन स्टॉक", quantity: "2", unit: "कप" },
+                    { name: "सूखे एप्रिकॉट", quantity: "1/2", unit: "कप" },
+                    { name: "बादाम", quantity: "1/4", unit: "कप" },
+                    { name: "शहद", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नींबू", quantity: "1", unit: "टुकड़ा" },
+                    { name: "धनिया", quantity: "1/4", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "टैगाइन या पॉट में चिकन टुकड़े भूनें" },
+                    { step: 2, description: "प्याज, लहसुन और अदरक सॉटे करें" },
+                    { step: 3, description: "मसाले डालें और 1 मिनट तक पकाएं" },
+                    { step: 4, description: "चिकन वापस डालें, स्टॉक और केसर डालें" },
+                    { step: 5, description: "ढककर 30 मिनट तक सिमर करें" },
+                    { step: 6, description: "एप्रिकॉट, बादाम, शहद और नींबू डालें" },
+                    { step: 7, description: "15 मिनट तक बिना ढके पकाएं" },
+                    { step: 8, description: "धनिया से गार्निश करें और कूसकूस के साथ सर्व करें" }
+                ]
+            }
+        }
     },
     {
         title: "Doro Wat",
         description: "Ethiopian spicy chicken stew with hard-boiled eggs",
+        translations: {
+            hi: {
+                title: "डोरो वाट",
+                description: "हार्ड-बॉइल्ड अंडों के साथ इथियोपियाई मसालेदार चिकन स्टू",
+                ingredients: [
+                    { name: "चिकन टुकड़े", quantity: "1", unit: "किलोग्राम" },
+                    { name: "प्याज", quantity: "3", unit: "बड़े" },
+                    { name: "लहसुन", quantity: "6", unit: "कलियाँ" },
+                    { name: "अदरक", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "बर्बेरे मसाला", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "नाइटर किबेह", quantity: "4", unit: "टेबलस्पून" },
+                    { name: "टमाटर पेस्ट", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "चिकन स्टॉक", quantity: "2", unit: "कप" },
+                    { name: "हार्ड-बॉइल्ड अंडे", quantity: "6", unit: "टुकड़े" },
+                    { name: "नींबू का रस", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "प्याज को बारीक काटें और 30 मिनट तक धीरे धीरे पकाएं" },
+                    { step: 2, description: "लहसुन, अदरक और बर्बेरे मसाला डालें" },
+                    { step: 3, description: "सुगंधित होने तक 10 मिनट तक पकाएं" },
+                    { step: 4, description: "टमाटर पेस्ट डालें और 5 मिनट तक पकाएं" },
+                    { step: 5, description: "चिकन टुकड़े डालें और भूनें" },
+                    { step: 6, description: "स्टॉक डालें और 45 मिनट तक सिमर करें" },
+                    { step: 7, description: "छिलके हुए अंडे और नींबू का रस डालें" },
+                    { step: 8, description: "10 मिनट और सिमर करें" },
+                    { step: 9, description: "इंजेरा ब्रेड के साथ सर्व करें" }
+                ]
+            }
+        },
         image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
         video: "https://www.youtube.com/embed/KmDSCTrH0Hg",
         cuisine: "Ethiopian",
@@ -2065,7 +3423,38 @@ const sampleRecipes = [
             carbs: 8,
             fat: 16
         },
-        tags: ["jamaican", "chicken", "grilled", "spicy", "marinated"]
+        tags: ["jamaican", "chicken", "grilled", "spicy", "marinated"],
+        translations: {
+            hi: {
+                title: "जर्क चिकन",
+                description: "जमैका की मसालेदार मैरिनेटेड ग्रिल्ड चिकन ऑलस्पाइस के साथ",
+                ingredients: [
+                    { name: "चिकन के टुकड़े", quantity: "1.5", unit: "किलो" },
+                    { name: "ऑलस्पाइस", quantity: "1", unit: "टेबलस्पून" },
+                    { name: "स्कॉच बोनट मिर्च", quantity: "2", unit: "पीस" },
+                    { name: "सोया सॉस", quantity: "1/4", unit: "कप" },
+                    { name: "ब्राउन शुगर", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "थाइम", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "लहसुन", quantity: "6", unit: "कली" },
+                    { name: "अदरक", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "हरी प्याज", quantity: "6", unit: "डंठल" },
+                    { name: "जैतून का तेल", quantity: "1/4", unit: "कप" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1", unit: "टीस्पून" },
+                    { name: "जायफल", quantity: "1/2", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "सभी मैरिनेड सामग्री को पेस्ट बनने तक ब्लेंड करें।" },
+                    { step: 2, description: "चिकन के टुकड़ों पर कट लगाएँ और 4-24 घंटे के लिए मेरिनेट करें।" },
+                    { step: 3, description: "ग्रिल को मध्यम-उच्च तापमान पर पहले से गर्म करें।" },
+                    { step: 4, description: "चिकन को मैरिनेड से निकालें।" },
+                    { step: 5, description: "चिकन को प्रत्येक तरफ 6-8 मिनट तक ग्रिल करें।" },
+                    { step: 6, description: "ग्रिलिंग के दौरान बची हुई मैरिनेड लगाएं।" },
+                    { step: 7, description: "परोसने से पहले 5 मिनट के लिए आराम दें।" },
+                    { step: 8, description: "फेस्टिवल ब्रेड और कोलस्लॉ के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Ceviche",
@@ -2107,7 +3496,36 @@ const sampleRecipes = [
             carbs: 15,
             fat: 4
         },
-        tags: ["peruvian", "fish", "citrus", "fresh", "no-cook"]
+        tags: ["peruvian", "fish", "citrus", "fresh", "no-cook"],
+        translations: {
+            hi: {
+                title: "सेविचे",
+                description: "पेरू की ताज़ा मछली जिसे नींबू के रस में प्याज़ और धनिया के साथ मेरिनेट किया गया है",
+                ingredients: [
+                    { name: "ताज़ी सफ़ेद मछली", quantity: "500", unit: "ग्राम" },
+                    { name: "नींबू का रस", quantity: "1", unit: "कप" },
+                    { name: "लाल प्याज़", quantity: "1", unit: "बड़ा" },
+                    { name: "धनिया", quantity: "1/2", unit: "कप" },
+                    { name: "अजी अमेरिलो", quantity: "1", unit: "टेबलस्पून" },
+                    { name: "लहसुन", quantity: "2", unit: "कली" },
+                    { name: "अदरक", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" },
+                    { name: "शकरकंद", quantity: "1", unit: "बड़ा" },
+                    { name: "भुट्टा", quantity: "1", unit: "भुट्टे का डंठल" },
+                    { name: "सलाद के पत्ते", quantity: "6", unit: "पीस" }
+                ],
+                instructions: [
+                    { step: 1, description: "मछली को 1 इंच के टुकड़ों में काटें।" },
+                    { step: 2, description: "मछली को नींबू के रस में 20-30 मिनट के लिए मेरिनेट करें।" },
+                    { step: 3, description: "लाल प्याज़ को पतला काटें और ठंडे पानी में भिगोएँ।" },
+                    { step: 4, description: "शकरकंद और भुट्टा को नरम होने तक उबालें।" },
+                    { step: 5, description: "प्याज़ का पानी निकालें और मछली के साथ मिलाएँ।" },
+                    { step: 6, description: "धनिया, अजी अमेरिलो, लहसुन, अदरक और नमक डालें।" },
+                    { step: 7, description: "धीरे से मिलाएँ और 10 मिनट के लिए छोड़ दें।" },
+                    { step: 8, description: "सलाद के पत्तों पर शकरकंद और भुट्टे के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Doner Kebab",
@@ -2152,7 +3570,39 @@ const sampleRecipes = [
             carbs: 25,
             fat: 24
         },
-        tags: ["turkish", "kebab", "lamb", "beef", "street-food"]
+        tags: ["turkish", "kebab", "lamb", "beef", "street-food"],
+        translations: {
+            hi: {
+                title: "डोनेर कबाब",
+                description: "तुर्की का मसालेदार मांस जिसे वर्टिकल स्पिट पर रोस्ट किया जाता है और ब्रेड में परोसा जाता है।",
+                ingredients: [
+                    { name: "ग्राउंड लैम्ब", quantity: "500", unit: "ग्राम" },
+                    { name: "ग्राउंड बीफ", quantity: "500", unit: "ग्राम" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "4", unit: "कली" },
+                    { name: "जीरा", quantity: "2", unit: "टीस्पून" },
+                    { name: "पाप्रिका", quantity: "2", unit: "टीस्पून" },
+                    { name: "अजवायन", quantity: "1", unit: "टीस्पून" },
+                    { name: "नमक", quantity: "2", unit: "टीस्पून" },
+                    { name: "काली मिर्च", quantity: "1", unit: "टीस्पून" },
+                    { name: "जैतून का तेल", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "पीटा ब्रेड", quantity: "6", unit: "पीस" },
+                    { name: "टमाटर", quantity: "2", unit: "बड़ा" },
+                    { name: "प्याज", quantity: "2", unit: "मध्यम" },
+                    { name: "सलाद", quantity: "1", unit: "सिर" },
+                    { name: "दही", quantity: "1", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "ग्राउंड मीट्स को कद्दूकस किया प्याज और लहसुन के साथ मिलाएँ।" },
+                    { step: 2, description: "सभी मसाले और जैतून का तेल डालें।" },
+                    { step: 3, description: "मिक्सचर को 10 मिनट तक गूँथें जब तक यह चिपचिपा न हो जाए।" },
+                    { step: 4, description: "लोफ का आकार दें और 30 मिनट के लिए फ्रिज में रखें।" },
+                    { step: 5, description: "200°C ओवन में 45-60 मिनट तक रोस्ट करें।" },
+                    { step: 6, description: "पकते समय पतला-पतला काटें।" },
+                    { step: 7, description: "पीटा ब्रेड में टमाटर, प्याज, सलाद और दही के साथ परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Nasi Goreng",
@@ -2196,8 +3646,40 @@ const sampleRecipes = [
             carbs: 50,
             fat: 14
         },
-        tags: ["indonesian", "rice", "fried", "sweet-salty", "quick"]
+        tags: ["indonesian", "rice", "fried", "sweet-salty", "quick"],
+        translations: {
+            hi: {
+                title: "नासी गोरेंग",
+                description: "इंडोनेशियाई तली हुई चावल की डिश जिसमें मीठी सोया सॉस और सब्ज़ियाँ शामिल हैं।",
+                ingredients: [
+                    { name: "पके हुए चावल", quantity: "4", unit: "कप" },
+                    { name: "चिकन ब्रेस्ट", quantity: "200", unit: "ग्राम" },
+                    { name: "झींगा", quantity: "150", unit: "ग्राम" },
+                    { name: "अंडे", quantity: "3", unit: "बड़े" },
+                    { name: "प्याज", quantity: "1", unit: "बड़ा" },
+                    { name: "लहसुन", quantity: "4", unit: "कली" },
+                    { name: "गाजर", quantity: "1", unit: "मध्यम" },
+                    { name: "हरी प्याज़", quantity: "4", unit: "डंठल" },
+                    { name: "मीठी सोया सॉस", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "सोया सॉस", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "चिली सॉस", quantity: "1", unit: "टेबलस्पून" },
+                    { name: "तेल", quantity: "3", unit: "टेबलस्पून" },
+                    { name: "नमक", quantity: "1", unit: "टीस्पून" }
+                ],
+                instructions: [
+                    { step: 1, description: "चिकन और झींगे को छोटे टुकड़ों में काटें।" },
+                    { step: 2, description: "तेल गर्म करें और अंडे को भूनकर अलग रख दें।" },
+                    { step: 3, description: "प्याज, लहसुन और गाजर को भूनें।" },
+                    { step: 4, description: "चिकन और झींगे डालें, पकने तक पकाएँ।" },
+                    { step: 5, description: "चावल डालें और गुठलियों को तोड़ें।" },
+                    { step: 6, description: "सभी सॉस और मसाले मिलाएँ।" },
+                    { step: 7, description: "भुने हुए अंडे और हरी प्याज़ डालें।" },
+                    { step: 8, description: "ऊपर से तला हुआ अंडा डालकर गरम परोसें।" }
+                ]
+            }
+        }
     }
+
 ];
 
 module.exports = sampleRecipes;
