@@ -148,4 +148,47 @@
             background-color: #d35400;
         }
     }
+
+    .quick-queries {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 10px;
+        gap: 8px;
+        border-top: 1px solid #ddd;
+        background-color: #fafafa;
+        justify-content: center;
+    }
+
+    .quick-query-btn {
+        background-color: #E67E22;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease;
+        white-space: nowrap;
+
+        &:hover {
+            background-color: #d35400;
+        }
+    }
+
+    .clickable-recipe {
+        cursor: pointer;
+        text-decoration: underline;
+        color: #E67E22;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: #d35400;
+        }
+    }
+
+    .typing-indicator {
+        font-style: italic;
+        opacity: 0.7;
+    }
 }
