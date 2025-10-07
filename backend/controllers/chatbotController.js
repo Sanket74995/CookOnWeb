@@ -64,18 +64,27 @@ const parseUserQuery = (query) => {
     const normalizedQuery = query.toLowerCase().trim();
 
     // Check for ingredient-based queries with more keywords
-    const ingredientKeywords = ['with', 'using', 'made with', 'containing', 'have', 'i have', 'using only', 'recipes with', 'cook with', 'make with'];
-    for (const keyword of ingredientKeywords) {
-        if (normalizedQuery.includes(keyword)) {
-            const parts = normalizedQuery.split(keyword);
-            if (parts.length > 1) {
-                const ingredients = parts[1].trim().split(/[,&\sand]+/).map(i => i.trim()).filter(i => i.length > 0 && i.length > 1);
-                if (ingredients.length > 0) {
-                    return { type: 'ingredients', ingredients };
-                }
+    // Check for ingredient-based queries with improved multi-ingredient parsing
+const ingredientKeywords = ['with', 'using', 'made with', 'containing', 'have', 'i have', 'using only', 'recipes with', 'cook with', 'make with'];
+for (const keyword of ingredientKeywords) {
+    if (normalizedQuery.includes(keyword)) {
+        const parts = normalizedQuery.split(keyword);
+        if (parts.length > 1) {
+            const ingredientPart = parts[1].trim();
+
+            // Split on commas, 'and', or 'or'
+            const ingredients = ingredientPart
+                .split(/\s*(?:,|and|or|\&)\s*/)
+                .map(i => i.trim())
+                .filter(i => i.length > 0 && i.length > 1);
+
+            if (ingredients.length > 0) {
+                return { type: 'ingredients', ingredients };
             }
         }
     }
+}
+
 
     // Expanded common ingredients
     const commonIngredients = ['potato', 'rice', 'chicken', 'paneer', 'tomato', 'onion', 'garlic', 'carrot', 'beans', 'peas', 'corn', 'spinach', 'mushroom', 'beef', 'pork', 'fish', 'egg', 'cheese', 'milk', 'flour', 'sugar', 'butter', 'oil', 'salt', 'pepper', 'bread', 'pasta', 'noodle'];
@@ -128,19 +137,32 @@ const parseUserQuery = (query) => {
 // Search recipes by ingredients
 const searchByIngredients = async (ingredients) => {
     try {
-        const ingredientRegex = ingredients.map(ing => new RegExp(ing, 'i'));
-        const recipes = await Recipe.find({
-            $or: ingredientRegex.map(regex => ({
-                'ingredients.name': { $regex: regex }
-            }))
-        }).limit(10);
+        // Create a case-insensitive regex for each ingredient
+        const regexArray = ingredients.map(ing => ({
+            'ingredients.name': { $regex: new RegExp(ing, 'i') }
+        }));
 
-        return recipes;
+        // Step 1: Find recipes that match ANY of the ingredients
+        const recipes = await Recipe.find({ $or: regexArray }).limit(20);
+
+        // Step 2: Rank recipes by number of matched ingredients
+        const rankedRecipes = recipes
+            .map(recipe => {
+                const matchCount = ingredients.filter(ing =>
+                    recipe.ingredients.some(rIng => new RegExp(ing, 'i').test(rIng.name))
+                ).length;
+                return { recipe, matchCount };
+            })
+            .sort((a, b) => b.matchCount - a.matchCount)
+            .map(item => item.recipe);
+
+        return rankedRecipes.slice(0, 10); // top 10 ranked results
     } catch (error) {
         console.error('Search by ingredients error:', error);
         return [];
     }
 };
+
 
 // Search recipes by cuisine
 const searchByCuisine = async (cuisine) => {
@@ -235,8 +257,9 @@ const generateIngredientResponse = (recipes, ingredients) => {
         return `I couldn't find any recipes with ${ingredients.join(' or ')}. Try different ingredients or be more specific!`;
     }
 
-    const ingredientStr = ingredients.join(' and ');
-    let message = `Here are some delicious recipes using ${ingredientStr}:\n\n`;
+    const ingredientStr = ingredients.join(', ').replace(/, ([^,]*)$/, ' and $1');
+let message = `Here are some recipes that use ${ingredientStr}:\n\n`;
+
 
     recipes.slice(0, 3).forEach((recipe, index) => {
         message += `${index + 1}. ${recipe.title} (${recipe.cuisine})\n`;
