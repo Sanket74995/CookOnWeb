@@ -46,6 +46,12 @@ const Recipes = () => {
         fetchRecipes();
     }, []);
 
+    // Helper function to check if recipe contains meat
+    const hasMeat = (recipe) => {
+        const meatKeywords = /meat|chicken|beef|pork|fish|seafood|lamb|turkey|duck|goat|venison/i;
+        return recipe.ingredients && recipe.ingredients.some(ing => meatKeywords.test(ing.name));
+    };
+
     useEffect(() => {
         let filtered = recipes;
 
@@ -65,9 +71,9 @@ const Recipes = () => {
 
         // Filter by diet
         if (selectedDiet === 'Vegetarian') {
-            filtered = filtered.filter(recipe => recipe.tags && recipe.tags.includes('vegetarian'));
+            filtered = filtered.filter(recipe => !hasMeat(recipe));
         } else if (selectedDiet === 'Non-Vegetarian') {
-            filtered = filtered.filter(recipe => !recipe.tags || !recipe.tags.includes('vegetarian'));
+            filtered = filtered.filter(recipe => hasMeat(recipe));
         }
 
         // Filter by selected tags

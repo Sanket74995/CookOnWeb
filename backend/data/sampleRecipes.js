@@ -894,7 +894,7 @@ const sampleRecipes = [
             carbs: 35,
             fat: 10
         },
-        tags: ["indian", "bread", "layered", "ghee"]
+        tags: ["indian", "bread", "vegetarian", "ghee"]
     },
     {
         title: "Gulab Jamun",
@@ -936,7 +936,7 @@ const sampleRecipes = [
             carbs: 45,
             fat: 10
         },
-        tags: ["indian", "sweet", "dumplings", "festive"]
+        tags: ["indian", "sweet", "vegetarian", "festive"]
     },
     {
         title: "Kung Pao Chicken",
