@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/Recipes.scss';
 import RecipeCard from './RecipeCard';
 
 const Recipes = () => {
+    const { t } = useTranslation();
     const [recipes, setRecipes] = useState([]);
     const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -12,10 +14,8 @@ const Recipes = () => {
     const [selectedDiet, setSelectedDiet] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
-    const [availableTags, setAvailableTags] = useState([]);
     const [isCuisineDropdownOpen, setIsCuisineDropdownOpen] = useState(false);
     const [isDietDropdownOpen, setIsDietDropdownOpen] = useState(false);
-    const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,10 +30,7 @@ const Recipes = () => {
                     const uniqueCuisines = [...new Set(data.map(recipe => recipe.cuisine))].sort();
                     setCuisines(uniqueCuisines);
 
-                    // Extract unique tags
-                    const allTags = data.flatMap(recipe => recipe.tags || []);
-                    const uniqueTags = [...new Set(allTags)].sort();
-                    setAvailableTags(uniqueTags);
+
                 } else {
                     console.error('Failed to fetch recipes');
                 }
@@ -111,36 +108,36 @@ const Recipes = () => {
     }, [filteredRecipes]);
 
     if (loading) {
-        return <div className="recipes-loading">Loading recipes...</div>;
+        return <div className="recipes-loading">{t('loading_recipes')}</div>;
     }
 
     return (
         <div className="recipes-container">
             <div className="recipes-header">
-                <h1>All Recipes</h1>
-                <p>Discover amazing recipes from around the world</p>
+                <h1>{t('all_recipes')}</h1>
+                <p>{t('discover_recipes')}</p>
             </div>
 
             <div className="filters-section">
                 <div className="filter-item">
-                    <label htmlFor="search">Search:</label>
+                    <label htmlFor="search">{t('search')}:</label>
                     <input
                         type="text"
                         id="search"
-                        placeholder="Search recipes, tags, or ingredients..."
+                        placeholder={t('search_placeholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
                 <div className="filter-item">
-                    <label>Cuisine:</label>
+                    <label>{t('cuisine')}:</label>
                     <div className="custom-dropdown">
                         <button
                             className="dropdown-button"
                             onClick={() => setIsCuisineDropdownOpen(!isCuisineDropdownOpen)}
                         >
-                            {selectedCuisines.length === 0 ? 'Select Cuisines' : selectedCuisines.includes('All') ? 'All' : selectedCuisines.join(', ')}
+                            {selectedCuisines.length === 0 ? t('select_cuisines') : selectedCuisines.includes('All') ? t('all') : selectedCuisines.map(c => t(c.toLowerCase()) || c).join(', ')}
                         </button>
                         {isCuisineDropdownOpen && (
                             <div className="dropdown-options">
@@ -156,7 +153,7 @@ const Recipes = () => {
                                             }
                                         }}
                                     />
-                                    All
+                                    {t('all')}
                                 </label>
                                 {cuisines.map(cuisine => (
                                     <label key={cuisine}>
@@ -171,7 +168,7 @@ const Recipes = () => {
                                                 }
                                             }}
                                         />
-                                        {cuisine}
+                                        {t(cuisine.toLowerCase()) || cuisine}
                                     </label>
                                 ))}
                             </div>
@@ -180,13 +177,13 @@ const Recipes = () => {
                 </div>
 
                 <div className="filter-item">
-                    <label>Diet:</label>
+                    <label>{t('diet')}:</label>
                     <div className="custom-dropdown">
                         <button
                             className="dropdown-button"
                             onClick={() => setIsDietDropdownOpen(!isDietDropdownOpen)}
                         >
-                            {selectedDiet}
+                            {t(selectedDiet.toLowerCase()) || selectedDiet}
                         </button>
                         {isDietDropdownOpen && (
                             <div className="dropdown-options">
@@ -202,7 +199,7 @@ const Recipes = () => {
                                                 setIsDietDropdownOpen(false);
                                             }}
                                         />
-                                        {diet}
+                                        {t(diet.toLowerCase()) || diet}
                                     </label>
                                 ))}
                             </div>
@@ -217,19 +214,19 @@ const Recipes = () => {
                         className="reset-button"
                         onClick={() => {
                             setSelectedCuisines([]);
-                            setSelectedDiet('All');
+                            setSelectedDiet(t('all'));
                             setSearchTerm('');
                             setSelectedTags([]);
                         }}
                     >
-                        Reset Filters
+                        {t('reset_filters')}
                     </button>
                 </div>
             </div>
 
             {Object.entries(recipesByCuisine).sort(([, a], [, b]) => b.length - a.length).map(([cuisine, recipes]) => (
                 <section key={cuisine} className="cuisine-section">
-                    <h2>{cuisine}</h2>
+                    <h2>{t(cuisine.toLowerCase()) || cuisine}</h2>
                     <div className="cuisine-recipes" >
                         {recipes.map(recipe => (
                             <div key={recipe._id} onClick={() => handleRecipeClick(recipe._id)} className="recipe-card-wrapper">

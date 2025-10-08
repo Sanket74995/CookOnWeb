@@ -104,7 +104,7 @@ const Hero = () => {
             <div className="hero-recipes-container">
                 {Object.entries(recipesByCuisine).map(([cuisine, cuisineRecipes]) => (
                     <section key={cuisine} className="cuisine-section">
-                        <h2>{cuisine}</h2>
+                        <h2>{t(cuisine.toLowerCase()) || cuisine}</h2>
                         <div className="cuisine-recipes">
                             {cuisineRecipes.map(recipe => (
                                 <div
@@ -125,10 +125,10 @@ const Hero = () => {
                         className="see-more-button"
                         onClick={() => navigate('/recipes')}
                     >
-                        <span className="see-more-text">See All Recipes</span>
+                        <span className="see-more-text">{t('see_all_recipes')}</span>
                         <span className="see-more-arrow">→</span>
                     </button>
-                    <p className="see-more-subtitle">Discover thousands of recipes from around the world</p>
+                    <p className="see-more-subtitle">{t('discover_recipes')}</p>
                 </div>
             </div>
         </>

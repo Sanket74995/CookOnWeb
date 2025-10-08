@@ -250,6 +250,8 @@
             box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: absolute;
+            top: 17.8vw;
 
             &:hover {
                 transform: translateY(-2px);
