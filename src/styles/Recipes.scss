@@ -1,35 +1,45 @@
 .recipes-container {
     max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 20px;
+    margin: 3px auto;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #fff 100%);
+    min-height: 100vh;
 }
 
 .recipes-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
 
     h1 {
-        font-size: 2.5rem;
-        color: #2d3436;
-        margin-bottom: 10px;
+        font-size: 3rem;
+        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 12px;
+        font-weight: 800;
+        letter-spacing: -1px;
     }
 
     p {
-        font-size: 1.1rem;
-        color: #636e72;
+        font-size: 1.2rem;
+        color: #718096;
+        font-weight: 400;
     }
 }
 
 .filters-section {
     display: flex;
     flex-wrap: nowrap;
-    gap: 40px;
-    margin-bottom: 40px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 24px;
+    margin-bottom: 50px;
+    padding: 32px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
     align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
 
     .filter-item {
         display: flex;
@@ -37,35 +47,58 @@
         min-width: 200px;
 
         label {
-            font-weight: 600;
-            color: #2d3436;
-            margin-bottom: 8px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input[type="text"] {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             font-size: 1rem;
             width: 250px;
+            transition: all 0.3s ease;
+            background-color: white;
+
+            &:focus {
+                outline: none;
+                border-color: #e67e22;
+                box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+            }
+
+            &::placeholder {
+                color: #a0aec0;
+            }
         }
 
         select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             font-size: 1rem;
             min-height: 120px;
+            transition: all 0.3s ease;
+            background-color: white;
+
+            &:focus {
+                outline: none;
+                border-color: #e67e22;
+                box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+            }
         }
 
         .custom-dropdown {
             position: relative;
 
             .dropdown-button {
-                padding: 8px 12px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                background-color: white;
+                padding: 12px 16px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
                 cursor: pointer;
                 font-size: 1rem;
                 width: 250px;
@@ -73,38 +106,59 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                transition: all 0.3s ease;
+                font-weight: 500;
+
+                &:hover {
+                    border-color: #e67e22;
+                    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.15);
+                }
 
                 &:after {
                     content: '▼';
-                    font-size: 0.8rem;
+                    font-size: 0.7rem;
+                    color: #e67e22;
+                    transition: transform 0.3s ease;
+                }
+
+                &.open:after {
+                    transform: rotate(180deg);
                 }
             }
 
             .dropdown-options {
                 position: absolute;
-                top: 100%;
+                top: calc(100% + 8px);
                 left: 0;
                 right: 0;
                 background-color: white;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                max-height: 200px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                max-height: 250px;
                 overflow-y: auto;
                 z-index: 10;
+                animation: slideDown 0.2s ease;
 
                 label {
                     display: block;
-                    padding: 8px 12px;
+                    padding: 12px 16px;
                     cursor: pointer;
-                    font-weight: normal;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    margin-bottom: 0;
+                    text-transform: none;
+                    letter-spacing: normal;
 
                     &:hover {
-                        background-color: #f8f9fa;
+                        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+                        color: white;
                     }
 
                     input[type="checkbox"] {
-                        margin-right: 8px;
+                        margin-right: 10px;
+                        cursor: pointer;
+                        accent-color: #e67e22;
                     }
                 }
             }
@@ -114,10 +168,10 @@
             position: relative;
 
             .dropdown-button {
-                padding: 8px 12px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                background-color: white;
+                padding: 12px 16px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
                 cursor: pointer;
                 font-size: 1rem;
                 width: 250px;
@@ -125,112 +179,206 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                transition: all 0.3s ease;
+                font-weight: 500;
+
+                &:hover {
+                    border-color: #e67e22;
+                    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.15);
+                }
 
                 &:after {
                     content: '▼';
-                    font-size: 0.8rem;
+                    font-size: 0.7rem;
+                    color: #e67e22;
+                    transition: transform 0.3s ease;
+                }
+
+                &.open:after {
+                    transform: rotate(180deg);
                 }
             }
 
             .dropdown-options {
                 position: absolute;
-                top: 100%;
+                top: calc(100% + 8px);
                 left: 0;
                 right: 0;
                 background-color: white;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                max-height: 200px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                max-height: 250px;
                 overflow-y: auto;
                 z-index: 10;
+                animation: slideDown 0.2s ease;
 
                 label {
                     display: block;
-                    padding: 8px 12px;
+                    padding: 12px 16px;
                     cursor: pointer;
-                    font-weight: normal;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    margin-bottom: 0;
+                    text-transform: none;
+                    letter-spacing: normal;
 
                     &:hover {
-                        background-color: #f8f9fa;
+                        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+                        color: white;
                     }
 
                     input[type="radio"] {
-                        margin-right: 8px;
+                        margin-right: 10px;
+                        cursor: pointer;
+                        accent-color: #e67e22;
                     }
                 }
             }
         }
 
         .reset-button {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #e67e22, #d35400);
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
             color: white;
             border: none;
-            border-radius: 20vw;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             position: absolute;
             top: 17.8vw;
 
             &:hover {
-                background-color: #5a6268;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+            }
+
+            &:active {
+                transform: translateY(0);
             }
         }
     }
 }
 
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .cuisine-section {
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .cuisine-section h2 {
-    margin-bottom: 10px;
-    font-size: 1.5rem;
-    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2d3748;
+    position: relative;
+    padding-bottom: 12px;
+
+    &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        border-radius: 2px;
+    }
 }
 
 .cuisine-recipes {
     display: flex;
     overflow-x: auto;
-    gap: 16px;
-    padding-bottom: 8px;
+    gap: 20px;
+    padding-bottom: 12px;
     scroll-behavior: smooth;
 }
 
 .cuisine-recipes::-webkit-scrollbar {
-    height: 8px;
+    height: 10px;
+}
+
+.cuisine-recipes::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 10px;
 }
 
 .cuisine-recipes::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.cuisine-recipes::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #d35400 0%, #e67e22 100%);
 }
 
 .recipe-card-wrapper {
-    flex: 0 0 calc((100% - 48px) / 4);
-    /* 4 cards per view with 16px gap */
-    max-width: calc((100% - 48px) / 4);
+    flex: 0 0 calc((100% - 60px) / 4);
+    max-width: calc((100% - 60px) / 4);
     cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: translateY(-8px);
+    }
 }
 
 .recipes-loading {
     text-align: center;
-    padding: 60px 20px;
-    font-size: 1.2rem;
-    color: #636e72;
+    padding: 80px 20px;
+    font-size: 1.3rem;
+    color: #718096;
+    font-weight: 500;
+
+    &:before {
+        content: '';
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top-color: #e67e22;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 20px;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 // Responsive design
 @media (max-width: 768px) {
     .recipes-container {
-        padding: 20px 16px;
+        padding: 30px 16px;
     }
 
     .recipes-header {
+        margin-bottom: 30px;
+
         h1 {
-            font-size: 2rem;
+            font-size: 2.25rem;
         }
 
         p {
@@ -240,20 +388,36 @@
 
     .filters-section {
         flex-direction: column;
-        gap: 16px;
+        gap: 20px;
+        padding: 24px;
 
         .filter-item {
             min-width: auto;
+
+            input[type="text"],
+            .custom-dropdown .dropdown-button,
+            .diet-options .dropdown-button {
+                width: 100%;
+            }
+        }
+    }
+
+    .cuisine-section {
+        padding: 16px;
+        margin-bottom: 30px;
+
+        h2 {
+            font-size: 1.5rem;
         }
     }
 
     .cuisine-recipes {
-        gap: 12px;
-        padding-bottom: 6px;
+        gap: 16px;
+        padding-bottom: 8px;
     }
 
     .recipe-card-wrapper {
-        flex: 0 0 calc((100% - 36px) / 2);
-        max-width: calc((100% - 36px) / 2);
+        flex: 0 0 calc((100% - 16px) / 2);
+        max-width: calc((100% - 16px) / 2);
     }
 }

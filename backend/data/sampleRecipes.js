@@ -1476,29 +1476,7 @@ const sampleRecipes = [
             carbs: 35,
             fat: 10
         },
-        tags: ["indian", "bread", "layered", "ghee"],
-        translations: {
-            hi: {
-                title: "पराठा",
-                description: "घी के साथ परतदार रोटी, अक्सर भरवां।",
-                ingredients: [
-                    { name: "साबुत गेहूं का आटा", quantity: "2", unit: "कप" },
-                    { name: "पानी", quantity: "3/4", unit: "कप" },
-                    { name: "नमक", quantity: "1/2", unit: "टीस्पून" },
-                    { name: "घी", quantity: "4", unit: "टेबलस्पून" },
-                    { name: "तेल", quantity: "1", unit: "टीस्पून" }
-                ],
-                instructions: [
-                    { step: 1, description: "आटा, पानी और नमक मिलाकर आटा गूंधें।" },
-                    { step: 2, description: "आटे को 15 मिनट के लिए आराम दें।" },
-                    { step: 3, description: "आटे को पतला बेलें, घी लगाएँ और परतों में मोड़ें।" },
-                    { step: 4, description: "फिर से मोटा गोल बेलें।" },
-                    { step: 5, description: "गरम तवे पर घी के साथ सेंकें।" },
-                    { step: 6, description: "स्पैचुला से दबाएँ जब तक सुनहरा न हो जाए।" },
-                    { step: 7, description: "अचार या करी के साथ परोसें।" }
-                ]
-            }
-        }
+        tags: ["indian", "bread", "vegetarian", "ghee"]
     },
     {
         title: "Gulab Jamun",
@@ -1540,36 +1518,7 @@ const sampleRecipes = [
             carbs: 45,
             fat: 10
         },
-        tags: ["indian", "sweet", "dumplings", "festive"],
-        translations: {
-            hi: {
-                title: "गुलाब जामुन",
-                description: "गुलाब के सिरप में भिगोए हुए मीठे खिलौने जैसे गोल आकार के पकवान।",
-                ingredients: [
-                    { name: "दूध पाउडर", quantity: "1", unit: "कप" },
-                    { name: "मैदा", quantity: "1/4", unit: "कप" },
-                    { name: "बेकिंग सोडा", quantity: "1/4", unit: "टीस्पून" },
-                    { name: "दूध", quantity: "1/4", unit: "कप" },
-                    { name: "घी", quantity: "2", unit: "टेबलस्पून" },
-                    { name: "चीनी", quantity: "2", unit: "कप" },
-                    { name: "पानी", quantity: "2", unit: "कप" },
-                    { name: "गुलाब एसेंस", quantity: "1", unit: "टीस्पून" },
-                    { name: "इलायची", quantity: "4", unit: "पोड्स" },
-                    { name: "तेल", quantity: "2", unit: "कप" }
-                ],
-                instructions: [
-                    { step: 1, description: "दूध पाउडर, मैदा और बेकिंग सोडा मिलाएँ।" },
-                    { step: 2, description: "दूध और घी डालकर नरम आटा तैयार करें।" },
-                    { step: 3, description: "अच्छी तरह गूंधें और 10 मिनट के लिए आराम दें।" },
-                    { step: 4, description: "छोटे गोले बनाएँ, क्रैक न होने दें।" },
-                    { step: 5, description: "तेल गरम करें और गोलों को सुनहरा होने तक तलें।" },
-                    { step: 6, description: "पानी, चीनी और इलायची से चीनी का सिरप तैयार करें।" },
-                    { step: 7, description: "सिरप में गुलाब एसेंस डालें।" },
-                    { step: 8, description: "तले हुए गोलों को 2 घंटे के लिए गर्म सिरप में भिगो दें।" },
-                    { step: 9, description: "गरम या ठंडा परोसें।" }
-                ]
-            }
-        }
+        tags: ["indian", "sweet", "vegetarian", "festive"]
     },
     {
         title: "Kung Pao Chicken",
