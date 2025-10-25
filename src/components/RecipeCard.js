@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/RecipeCard.scss';
 
-const RecipeCard = ({ recipe }) => {
+const RecipeCard = ({ recipe, isFavorited = false, onToggleFavorite }) => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language || 'en';
@@ -51,9 +51,22 @@ const RecipeCard = ({ recipe }) => {
                         <span key={index} className="recipe-tag">#{tag}</span>
                     ))}
                 </div>
-                <button onClick={handleViewRecipe} className="recipe-view-btn">
-                    {t('view_recipe')}
-                </button>
+                <div className="recipe-actions">
+                    {onToggleFavorite && (
+                        <button
+                            className="favorite-btn"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleFavorite(recipe._id);
+                            }}
+                        >
+                            {isFavorited ? '❤️' : '🤍'}
+                        </button>
+                    )}
+                    <button onClick={handleViewRecipe} className="recipe-view-btn">
+                        {t('view_recipe')}
+                    </button>
+                </div>
             </div>
         </div>
     );

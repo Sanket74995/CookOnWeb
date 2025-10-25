@@ -105,6 +105,25 @@
             }
         }
 
+        .recipe-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+
+            .favorite-btn {
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+
+                &:hover {
+                    transform: scale(1.1);
+                }
+            }
+        }
+
         .recipe-view-btn {
             display: inline-block;
             background: linear-gradient(135deg, #e67e22, #d35400);

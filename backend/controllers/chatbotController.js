@@ -60,78 +60,106 @@ const processQuery = async (req, res) => {
 
 // Parse user query to determine intent
 const parseUserQuery = (query) => {
-    // Normalize query
     const normalizedQuery = query.toLowerCase().trim();
+    let parsedQuery = { type: 'unknown' };
 
-    // Check for ingredient-based queries with more keywords
-    // Check for ingredient-based queries with improved multi-ingredient parsing
-const ingredientKeywords = ['with', 'using', 'made with', 'containing', 'have', 'i have', 'using only', 'recipes with', 'cook with', 'make with'];
-for (const keyword of ingredientKeywords) {
-    if (normalizedQuery.includes(keyword)) {
-        const parts = normalizedQuery.split(keyword);
-        if (parts.length > 1) {
-            const ingredientPart = parts[1].trim();
-
-            // Split on commas, 'and', or 'or'
-            const ingredients = ingredientPart
-                .split(/\s*(?:,|and|or|\&)\s*/)
-                .map(i => i.trim())
-                .filter(i => i.length > 0 && i.length > 1);
-
-            if (ingredients.length > 0) {
-                return { type: 'ingredients', ingredients };
+    // Check for ingredient-based queries with keywords
+    const ingredientKeywords = ['with', 'using', 'made with', 'containing', 'have', 'i have', 'using only', 'recipes with', 'cook with', 'make with'];
+    for (const keyword of ingredientKeywords) {
+        if (normalizedQuery.includes(keyword)) {
+            const parts = normalizedQuery.split(keyword);
+            if (parts.length > 1) {
+                const ingredientPart = parts[1].trim();
+                const ingredients = ingredientPart
+                    .split(/\s*(?:,|and|or|\&)\s*/)
+                    .map(i => i.trim())
+                    .filter(i => i.length > 0 && i.length > 1);
+                if (ingredients.length > 0) {
+                    parsedQuery = { type: 'ingredients', ingredients };
+                    break;
+                }
             }
         }
     }
-}
 
-
-    // Expanded common ingredients
-    const commonIngredients = ['potato', 'rice', 'chicken', 'paneer', 'tomato', 'onion', 'garlic', 'carrot', 'beans', 'peas', 'corn', 'spinach', 'mushroom', 'beef', 'pork', 'fish', 'egg', 'cheese', 'milk', 'flour', 'sugar', 'butter', 'oil', 'salt', 'pepper', 'bread', 'pasta', 'noodle'];
-    for (const ingredient of commonIngredients) {
-        if (normalizedQuery.includes(ingredient)) {
-            return { type: 'ingredients', ingredients: [ingredient] };
+    // Check for multi-ingredients without keywords (e.g., "chicken, tomato")
+    if (parsedQuery.type === 'unknown') {
+        if (normalizedQuery.includes(',') || normalizedQuery.includes(' and ')) {
+            const commonIngredients = ['potato', 'rice', 'chicken', 'paneer', 'tomato', 'onion', 'garlic', 'carrot', 'beans', 'peas', 'corn', 'spinach', 'mushroom', 'beef', 'pork', 'fish', 'egg', 'cheese', 'milk', 'flour', 'sugar', 'butter', 'oil', 'salt', 'pepper', 'bread', 'pasta', 'noodle'];
+            const potentialIngredients = normalizedQuery
+                .split(/\s*(?:,|and|or|\&)\s*/)
+                .map(i => i.trim())
+                .filter(i => i.length > 1);
+            const ingredients = potentialIngredients.filter(i => commonIngredients.includes(i));
+            if (ingredients.length > 1) {
+                parsedQuery = { type: 'ingredients', ingredients };
+            }
         }
     }
 
     // Check for dietary preferences
-    const dietaryKeywords = ['vegetarian', 'vegan', 'gluten free', 'dairy free', 'keto', 'low carb', 'healthy'];
-    for (const diet of dietaryKeywords) {
-        if (normalizedQuery.includes(diet.replace(' ', ''))) {
-            return { type: 'dietary', dietary: diet };
+    if (parsedQuery.type === 'unknown') {
+        const dietaryKeywords = ['vegetarian', 'vegan', 'gluten free', 'dairy free', 'keto', 'low carb', 'healthy'];
+        for (const diet of dietaryKeywords) {
+            if (normalizedQuery.includes(diet.replace(' ', ''))) {
+                parsedQuery = { type: 'dietary', dietary: diet };
+                break;
+            }
         }
     }
 
-    // Check for cuisine queries with more options
-    const cuisines = ['italian', 'indian', 'chinese', 'mexican', 'thai', 'japanese', 'french', 'greek', 'spanish', 'american', 'mediterranean', 'korean', 'vietnamese', 'turkish', 'lebanese'];
-    for (const cuisine of cuisines) {
-        if (normalizedQuery.includes(cuisine)) {
-            return { type: 'cuisine', cuisine };
+    // Check for cuisine queries
+    if (parsedQuery.type === 'unknown') {
+        const cuisines = ['italian', 'indian', 'chinese', 'mexican', 'thai', 'japanese', 'french', 'greek', 'spanish', 'american', 'mediterranean', 'korean', 'vietnamese', 'turkish', 'lebanese'];
+        for (const cuisine of cuisines) {
+            if (normalizedQuery.includes(cuisine)) {
+                parsedQuery = { type: 'cuisine', cuisine };
+                break;
+            }
         }
     }
 
-    // Check for category queries with more options
-    const categories = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert', 'appetizer', 'main course', 'salad', 'soup', 'starter', 'side dish'];
-    for (const category of categories) {
-        if (normalizedQuery.includes(category)) {
-            return { type: 'category', category };
+    // Check for category queries
+    if (parsedQuery.type === 'unknown') {
+        const categories = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert', 'appetizer', 'main course', 'salad', 'soup', 'starter', 'side dish'];
+        for (const category of categories) {
+            if (normalizedQuery.includes(category)) {
+                parsedQuery = { type: 'category', category };
+                break;
+            }
         }
     }
 
-    // Check for specific recipe names with more options
-    const recipeNames = ['pizza', 'pasta', 'curry', 'chicken', 'beef', 'fish', 'salad', 'soup', 'cake', 'cookies', 'bread', 'burger', 'sandwich', 'stir fry', 'roast', 'grill', 'bake'];
-    for (const recipeName of recipeNames) {
-        if (normalizedQuery.includes(recipeName)) {
-            return { type: 'specific_recipe', recipeName };
+    // Check for specific recipe names
+    if (parsedQuery.type === 'unknown') {
+        const recipeNames = ['pizza', 'pasta', 'curry', 'chicken', 'beef', 'fish', 'salad', 'soup', 'cake', 'cookies', 'bread', 'burger', 'sandwich', 'stir fry', 'roast', 'grill', 'bake'];
+        for (const recipeName of recipeNames) {
+            if (normalizedQuery.includes(recipeName)) {
+                parsedQuery = { type: 'specific_recipe', recipeName };
+                break;
+            }
         }
     }
 
     // Check for general recipe requests
-    if (normalizedQuery.includes('recipe') || normalizedQuery.includes('cook') || normalizedQuery.includes('food') || normalizedQuery.includes('dish') || normalizedQuery.includes('something') || normalizedQuery.includes('suggest')) {
-        return { type: 'random' };
+    if (parsedQuery.type === 'unknown') {
+        if (normalizedQuery.includes('recipe') || normalizedQuery.includes('cook') || normalizedQuery.includes('food') || normalizedQuery.includes('dish') || normalizedQuery.includes('something') || normalizedQuery.includes('suggest')) {
+            parsedQuery = { type: 'random' };
+        }
     }
 
-    return { type: 'unknown' };
+    // Finally, check for single common ingredients if still unknown
+    if (parsedQuery.type === 'unknown') {
+        const commonIngredients = ['potato', 'rice', 'chicken', 'paneer', 'tomato', 'onion', 'garlic', 'carrot', 'beans', 'peas', 'corn', 'spinach', 'mushroom', 'beef', 'pork', 'fish', 'egg', 'cheese', 'milk', 'flour', 'sugar', 'butter', 'oil', 'salt', 'pepper', 'bread', 'pasta', 'noodle'];
+        for (const ingredient of commonIngredients) {
+            if (normalizedQuery.includes(ingredient)) {
+                parsedQuery = { type: 'ingredients', ingredients: [ingredient] };
+                break;
+            }
+        }
+    }
+
+    return parsedQuery;
 };
 
 // Search recipes by ingredients
@@ -258,7 +286,7 @@ const generateIngredientResponse = (recipes, ingredients) => {
     }
 
     const ingredientStr = ingredients.join(', ').replace(/, ([^,]*)$/, ' and $1');
-let message = `Here are some recipes that use ${ingredientStr}:\n\n`;
+    let message = `Here are some recipes that use ${ingredientStr}:\n\n`;
 
 
     recipes.slice(0, 3).forEach((recipe, index) => {

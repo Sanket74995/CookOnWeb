@@ -1476,7 +1476,29 @@ const sampleRecipes = [
             carbs: 35,
             fat: 10
         },
-        tags: ["indian", "bread", "vegetarian", "ghee"]
+        tags: ["indian", "bread", "vegetarian", "ghee"],
+        translations: {
+            hi: {
+                title: "पराठा",
+                description: "घी से बना परतदार भारतीय रोटी, जिसे कभी-कभी आलू या पनीर जैसी भराई से भरा जाता है।",
+                ingredients: [
+                    { name: "गेहूं का आटा", quantity: "2", unit: "कप" },
+                    { name: "पानी", quantity: "3/4", unit: "कप" },
+                    { name: "नमक", quantity: "1/2", unit: "चम्मच" },
+                    { name: "घी", quantity: "4", unit: "टेबलस्पून" },
+                    { name: "तेल", quantity: "1", unit: "चम्मच" }
+                ],
+                instructions: [
+                    { step: 1, description: "आटे, पानी और नमक से मुलायम आटा गूंध लें।" },
+                    { step: 2, description: "आटे को 15 मिनट के लिए ढककर रख दें।" },
+                    { step: 3, description: "आटे की लोई बेलें, उस पर घी लगाएँ और परत बनाते हुए मोड़ें।" },
+                    { step: 4, description: "फिर से गोल आकार में बेलें, थोड़ा मोटा रखें।" },
+                    { step: 5, description: "गरम तवे पर घी डालकर पराठा सेंकें।" },
+                    { step: 6, description: "स्पैचुला से दबाते हुए दोनों तरफ से सुनहरा भूरा होने तक पकाएँ।" },
+                    { step: 7, description: "अचार या करी के साथ गरमागरम परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Gulab Jamun",
@@ -1518,7 +1540,36 @@ const sampleRecipes = [
             carbs: 45,
             fat: 10
         },
-        tags: ["indian", "sweet", "vegetarian", "festive"]
+        tags: ["indian", "sweet", "vegetarian", "festive"],
+        translations: {
+            hi: {
+                title: "गुलाब जामुन",
+                description: "मिल्क पाउडर से बने मुलायम गोल लड्डू, जिन्हें गुलाब-सुगंधित चाशनी में डुबोया जाता है — भारत की सबसे लोकप्रिय मिठाइयों में से एक।",
+                ingredients: [
+                    { name: "मिल्क पाउडर", quantity: "1", unit: "कप" },
+                    { name: "मैदा", quantity: "1/4", unit: "कप" },
+                    { name: "बेकिंग सोडा", quantity: "1/4", unit: "चम्मच" },
+                    { name: "दूध", quantity: "1/4", unit: "कप" },
+                    { name: "घी", quantity: "2", unit: "टेबलस्पून" },
+                    { name: "चीनी", quantity: "2", unit: "कप" },
+                    { name: "पानी", quantity: "2", unit: "कप" },
+                    { name: "गुलाब एसेंस", quantity: "1", unit: "चम्मच" },
+                    { name: "इलायची", quantity: "4", unit: "फली" },
+                    { name: "तेल", quantity: "2", unit: "कप" }
+                ],
+                instructions: [
+                    { step: 1, description: "एक बाउल में मिल्क पाउडर, मैदा और बेकिंग सोडा मिलाएं।" },
+                    { step: 2, description: "इसमें दूध और घी डालकर मुलायम आटा तैयार करें।" },
+                    { step: 3, description: "आटे को 10 मिनट के लिए ढककर रख दें।" },
+                    { step: 4, description: "आटे से छोटी-छोटी गोलियां बनाएं, जिनमें दरार न हो।" },
+                    { step: 5, description: "कढ़ाई में तेल गरम करें और गुलाब जामुन को धीमी आँच पर सुनहरा भूरा होने तक तलें।" },
+                    { step: 6, description: "एक पैन में चीनी, पानी और इलायची डालकर चाशनी तैयार करें।" },
+                    { step: 7, description: "चाशनी में गुलाब एसेंस डालें।" },
+                    { step: 8, description: "तले हुए गुलाब जामुन को गरम चाशनी में 2 घंटे तक भिगोकर रखें।" },
+                    { step: 9, description: "गरम या ठंडा परोसें।" }
+                ]
+            }
+        }
     },
     {
         title: "Kung Pao Chicken",
@@ -1665,49 +1716,6 @@ const sampleRecipes = [
                 ]
             }
         }
-    },
-    {
-        title: "Chicken Tacos",
-        description: "Soft tortillas filled with seasoned chicken, salsa, and toppings",
-        image: "https://2.bp.blogspot.com/-29m_xlLshDc/XDyqEnK9zUI/AAAAAAAAImQ/J87pQJ2xVcMiMZ_3omspbm2s5-G_UE9ngCEwYBhgL/s1600/Crock%2Bpot%2Bchicken%2Btacos%2Bon%2Bplatter.jpg",
-        video: "https://www.youtube.com/embed/PGklx6OD_MM",
-        cuisine: "Mexican",
-        category: "main course",
-        difficulty: "easy",
-        prepTime: 15,
-        cookTime: 20,
-        servings: 4,
-        ingredients: [
-            { name: "Chicken breast", quantity: "500", unit: "g" },
-            { name: "Corn tortillas", quantity: "8", unit: "pieces" },
-            { name: "Onion", quantity: "1", unit: "medium" },
-            { name: "Tomatoes", quantity: "2", unit: "large" },
-            { name: "Avocado", quantity: "1", unit: "piece" },
-            { name: "Cilantro", quantity: "1/4", unit: "cup" },
-            { name: "Lime", quantity: "2", unit: "pieces" },
-            { name: "Cumin", quantity: "1", unit: "tsp" },
-            { name: "Paprika", quantity: "1", unit: "tsp" },
-            { name: "Garlic powder", quantity: "1", unit: "tsp" },
-            { name: "Olive oil", quantity: "2", unit: "tbsp" },
-            { name: "Salt", quantity: "1", unit: "tsp" },
-            { name: "Black pepper", quantity: "1/2", unit: "tsp" }
-        ],
-        instructions: [
-            { step: 1, description: "Season chicken with cumin, paprika, garlic powder, salt, and pepper" },
-            { step: 2, description: "Heat oil and cook chicken until done, then shred" },
-            { step: 3, description: "Dice tomatoes, onion, and avocado for salsa" },
-            { step: 4, description: "Mix vegetables with cilantro and lime juice" },
-            { step: 5, description: "Warm tortillas in a dry pan" },
-            { step: 6, description: "Fill tortillas with chicken and salsa" },
-            { step: 7, description: "Serve with additional lime wedges" }
-        ],
-        nutrition: {
-            calories: 320,
-            protein: 28,
-            carbs: 25,
-            fat: 12
-        },
-        tags: ["mexican", "chicken", "tortillas", "fresh", "quick"]
     },
     {
         title: "Chicken Tacos",
