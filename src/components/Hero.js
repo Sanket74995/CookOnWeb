@@ -9,6 +9,7 @@ const Hero = () => {
     const navigate = useNavigate();
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [favorites, setFavorites] = useState([]);
 
     useEffect(() => {
         const fetchRecipes = async () => {
@@ -29,12 +30,71 @@ const Hero = () => {
         fetchRecipes();
     }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetchFavorites();
+        }
+    }, []);
+
+    const fetchFavorites = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/favorites', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setFavorites(data.map(recipe => recipe._id));
+            }
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+        }
+    };
+
+    const toggleFavorite = async (recipeId) => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const isFav = favorites.includes(recipeId);
+        const url = `http://localhost:5000/api/auth/favorites/${recipeId}`;
+        const method = isFav ? 'DELETE' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                if (isFav) {
+                    setFavorites(prev => prev.filter(id => id !== recipeId));
+                } else {
+                    setFavorites(prev => [...prev, recipeId]);
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    };
+
     const handleRecipeClick = (recipeId) => {
         // Check if user is logged in
         const token = localStorage.getItem('token');
         if (token) {
             // User is logged in, navigate to recipe detail page
             navigate(`/recipe/${recipeId}`);
+        } else {
+            // User is not logged in, navigate to register page
+            navigate('/register');
+        }
+    };
+
+    const handleGetStarted = () => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (token) {
+            // User is logged in, navigate to recipes page
+            navigate('/recipes');
         } else {
             // User is not logged in, navigate to register page
             navigate('/register');
@@ -96,7 +156,7 @@ const Hero = () => {
 
                 <h1>{t('welcome')} <span className="highlight">CookOnWeb</span></h1>
                 <p>{t('where_recipes_speak')}</p>
-                <button className="hero-button" onClick={() => navigate('/register')}>
+                <button className="hero-button" onClick={handleGetStarted}>
                     {t('get_started')}
                 </button>
             </div>
@@ -112,7 +172,11 @@ const Hero = () => {
                                     onClick={() => handleRecipeClick(recipe._id)}
                                     className="recipe-card-wrapper"
                                 >
-                                    <RecipeCard recipe={recipe} />
+                                    <RecipeCard
+                                        recipe={recipe}
+                                        isFavorited={favorites.includes(recipe._id)}
+                                        onToggleFavorite={toggleFavorite}
+                                    />
                                 </div>
                             ))}
                         </div>

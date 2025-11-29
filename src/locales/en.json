@@ -1,5 +1,5 @@
 {
-    "welcome": "Welcome to",
+    "welcome": "Welcome",
     "login": "Login",
     "register": "Register",
     "login_success": "Login successful! Welcome to CookOnWeb!",
@@ -113,5 +113,6 @@
     "view_recipe": "View Recipe",
     "min": "min",
     "servings": "servings",
-    "loading_recipes": "Loading recipes..."
+    "loading_recipes": "Loading recipes...",
+    "show_only_favorites": "Show only favorites"
 }

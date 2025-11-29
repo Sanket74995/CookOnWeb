@@ -113,5 +113,6 @@
     "view_recipe": "व्यंजन देखें",
     "min": "मिनट",
     "servings": "सेवन",
-    "loading_recipes": "व्यंजन लोड हो रहे हैं..."
+    "loading_recipes": "व्यंजन लोड हो रहे हैं...",
+    "show_only_favorites": "केवल पसंदीदा दिखाएं"
 }

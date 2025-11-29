@@ -16,6 +16,8 @@ const Recipes = () => {
     const [selectedTags, setSelectedTags] = useState([]);
     const [isCuisineDropdownOpen, setIsCuisineDropdownOpen] = useState(false);
     const [isDietDropdownOpen, setIsDietDropdownOpen] = useState(false);
+    const [favorites, setFavorites] = useState([]);
+    const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,6 +44,53 @@ const Recipes = () => {
         };
         fetchRecipes();
     }, []);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetchFavorites();
+        }
+    }, []);
+
+    const fetchFavorites = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/favorites', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setFavorites(data.map(recipe => recipe._id));
+            }
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+        }
+    };
+
+    const toggleFavorite = async (recipeId) => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const isFav = favorites.includes(recipeId);
+        const url = `http://localhost:5000/api/auth/favorites/${recipeId}`;
+        const method = isFav ? 'DELETE' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                if (isFav) {
+                    setFavorites(prev => prev.filter(id => id !== recipeId));
+                } else {
+                    setFavorites(prev => [...prev, recipeId]);
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    };
 
     // Helper function to check if recipe contains meat
     const hasMeat = (recipe) => {
@@ -80,8 +129,13 @@ const Recipes = () => {
             );
         }
 
+        // Filter by favorites
+        if (showOnlyFavorites) {
+            filtered = filtered.filter(recipe => favorites.includes(recipe._id));
+        }
+
         setFilteredRecipes(filtered);
-    }, [recipes, searchTerm, selectedCuisines, selectedDiet, selectedTags]);
+    }, [recipes, searchTerm, selectedCuisines, selectedDiet, selectedTags, showOnlyFavorites, favorites]);
 
     const handleRecipeClick = (recipeId) => {
         // Check if user is logged in
@@ -207,7 +261,18 @@ const Recipes = () => {
                     </div>
                 </div>
 
-
+                {localStorage.getItem('token') && (
+                    <div className="filter-item">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={showOnlyFavorites}
+                                onChange={(e) => setShowOnlyFavorites(e.target.checked)}
+                            />
+                            {t('show_only_favorites') || 'Show only favorites'}
+                        </label>
+                    </div>
+                )}
 
                 <div className="filter-item">
                     <button
@@ -217,6 +282,7 @@ const Recipes = () => {
                             setSelectedDiet(t('all'));
                             setSearchTerm('');
                             setSelectedTags([]);
+                            setShowOnlyFavorites(false);
                         }}
                     >
                         {t('reset_filters')}
@@ -230,7 +296,11 @@ const Recipes = () => {
                     <div className="cuisine-recipes" >
                         {recipes.map(recipe => (
                             <div key={recipe._id} onClick={() => handleRecipeClick(recipe._id)} className="recipe-card-wrapper">
-                                <RecipeCard recipe={recipe} />
+                                <RecipeCard
+                                    recipe={recipe}
+                                    isFavorited={favorites.includes(recipe._id)}
+                                    onToggleFavorite={toggleFavorite}
+                                />
                             </div>
                         ))}
                     </div>

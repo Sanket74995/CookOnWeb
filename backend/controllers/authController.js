@@ -98,7 +98,48 @@ const login = async (req, res) => {
     }
 };
 
+const getFavorites = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).populate('favorites');
+        res.json(user.favorites);
+    } catch (error) {
+        console.error('Get favorites error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const addFavorite = async (req, res) => {
+    try {
+        const { recipeId } = req.params;
+        const user = await User.findById(req.userId);
+        if (!user.favorites.some(id => id.toString() === recipeId)) {
+            user.favorites.push(recipeId);
+            await user.save();
+        }
+        res.json({ message: 'Added to favorites' });
+    } catch (error) {
+        console.error('Add favorite error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const removeFavorite = async (req, res) => {
+    try {
+        const { recipeId } = req.params;
+        const user = await User.findById(req.userId);
+        user.favorites = user.favorites.filter(id => id.toString() !== recipeId);
+        await user.save();
+        res.json({ message: 'Removed from favorites' });
+    } catch (error) {
+        console.error('Remove favorite error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    getFavorites,
+    addFavorite,
+    removeFavorite
 };

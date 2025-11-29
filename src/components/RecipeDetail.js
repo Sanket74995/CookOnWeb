@@ -310,7 +310,7 @@ const RecipeDetail = () => {
                 <div className="recipe-right-section">
                     {recipe.video && (
                         <div className="recipe-video-section">
-                            <h2>Video Tutorial</h2>
+                            {/* <h2>Video Tutorial</h2> */}
                             <div className="video-container">
                                 <iframe
                                     width="100%"
