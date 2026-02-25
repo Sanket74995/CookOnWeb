@@ -10,7 +10,11 @@ import Recipes from "./components/Recipes";
 import RecipeDetail from "./components/RecipeDetail";
 import Chatbot from "./components/Chatbot";
 import Footer from "./components/Footer";
-
+import Profile from './components/Profile';
+import Subscription from './components/Subscription';
+import ChangePassword from './components/ChangePassword';
+import Settings from './components/Settings';
+import AddRecipe from './components/AddRecipe';
 function App() {
   return (
     <I18nextProvider i18n={i18n}>
@@ -23,6 +27,11 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/subscription" element={<Subscription />} />
+            <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/add-recipe" element={<AddRecipe />} />
           </Routes>
           <Chatbot />
           <Footer />

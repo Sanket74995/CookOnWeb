@@ -20,6 +20,11 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/chatbot/admin', require('./routes/chatbotAdmin'));
+app.use('/api/recipes', require('./routes/recipes'));
+app.use('/uploads', express.static('uploads'));
+
+
 
 // Basic route
 app.get('/', (req, res) => {

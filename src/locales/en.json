@@ -114,5 +114,7 @@
     "min": "min",
     "servings": "servings",
     "loading_recipes": "Loading recipes...",
-    "show_only_favorites": "Show only favorites"
+    "show_only_favorites": "Show only favorites",
+    "recipe": "Recipe",
+    "step": "Step"
 }
