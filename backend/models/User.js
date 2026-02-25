@@ -44,7 +44,25 @@ const userSchema = new mongoose.Schema({
     favorites: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Recipe'
-    }]
+    }],
+    // 🔹 New field: subscription info
+    subscription: {
+        plan: {
+            type: String,
+            default: 'free'  // 'free', 'premium', etc.
+        },
+        status: {
+            type: String,
+            default: 'active' // 'active', 'canceled', etc.
+        },
+        startedAt: {
+            type: Date,
+            default: Date.now
+        },
+        expiresAt: {
+            type: Date
+        }
+    }
 });
 
 // Update the updatedAt field before saving

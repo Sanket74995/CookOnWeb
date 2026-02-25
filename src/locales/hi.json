@@ -114,5 +114,7 @@
     "min": "मिनट",
     "servings": "सेवन",
     "loading_recipes": "व्यंजन लोड हो रहे हैं...",
-    "show_only_favorites": "केवल पसंदीदा दिखाएं"
+    "show_only_favorites": "केवल पसंदीदा दिखाएं",
+    "recipe": "व्यंजन",
+    "step": "चरण"
 }

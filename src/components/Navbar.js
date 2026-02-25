@@ -44,6 +44,26 @@ const Navbar = () => {
         setDropdownOpen(false);
         navigate('/');
     };
+    const handleEditProfile = () => {
+        navigate('/profile');
+        setDropdownOpen(false);
+    };
+
+    const handleSubscription = () => {
+        navigate('/subscription');
+        setDropdownOpen(false);
+    };
+
+    const handleChangePassword = () => {
+        navigate('/change-password');
+        setDropdownOpen(false);
+    };
+
+    const handleSettings = () => {
+        navigate('/settings');
+        setDropdownOpen(false);
+    };
+
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
@@ -63,6 +83,11 @@ const Navbar = () => {
             id: 2,
             label: t('recipes'),
             href: "/recipes",
+        },
+        {
+            id: 3,
+            label: t('add_recipe'),
+            href: "/add-recipe",
         }
     ]
 
@@ -114,11 +139,13 @@ const Navbar = () => {
                                         </div>
                                         <hr />
                                         <ul className="profile-menu">
-                                            <li><FontAwesomeIcon icon={faEdit} /> {t('edit_profile')}</li>
-                                            <li><FontAwesomeIcon icon={faThumbsUp} /> {t('subscription')}</li>
-                                            <li><FontAwesomeIcon icon={faLock} /> {t('change_password')}</li>
-                                            <li><FontAwesomeIcon icon={faCog} /> {t('settings')}</li>
+                                            <li onClick={handleEditProfile}><FontAwesomeIcon icon={faEdit} /> {t('edit_profile')}</li>
+                                            <li onClick={handleSubscription}><FontAwesomeIcon icon={faThumbsUp} /> {t('subscription')}</li>
+                                            <li onClick={handleChangePassword}><FontAwesomeIcon icon={faLock} /> {t('change_password')}</li>
+                                            <li onClick={handleSettings}><FontAwesomeIcon icon={faCog} /> {t('settings')}</li>
                                         </ul>
+
+
                                         <div className="profile-footer">
                                             <span className="help-center">{t('help_center')}</span> |{' '}
                                             <span className="signout" onClick={handleLogout}>

@@ -4,7 +4,7 @@
   right: 25px;
   z-index: 2000;
   font-family: "Poppins", sans-serif;
-   display: flex;
+  display: flex;
   flex-direction: column;
   align-items: flex-end;
 
@@ -21,8 +21,8 @@
     overflow: hidden;
     animation: fadeInUp 0.35s ease;
     position: absolute;
-  bottom: 65px;
-  right: 0;
+    bottom: 65px;
+    right: 0;
 
     .chatbot-header {
       background: linear-gradient(135deg, #E67E22, #d35400);
@@ -103,6 +103,18 @@
         }
       }
 
+      .query-type-badge {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        margin-bottom: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        opacity: 0.8;
+      }
+
+
+
       .recipe-list {
         margin-top: 6px;
         padding-left: 16px;
@@ -141,6 +153,7 @@
         span:nth-child(2) {
           animation-delay: 0.2s;
         }
+
         span:nth-child(3) {
           animation-delay: 0.4s;
         }
@@ -208,7 +221,8 @@
       gap: 6px;
       border-top: 1px solid #eee;
       background-color: #fafafa;
-      max-height: 70px; /* less height for compact view */
+      max-height: 70px;
+      /* less height for compact view */
       overflow-y: auto;
       scrollbar-width: none;
 
@@ -266,6 +280,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -277,6 +292,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -284,9 +300,13 @@
 }
 
 @keyframes typingBounce {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     transform: scale(0);
   }
+
   40% {
     transform: scale(1);
   }

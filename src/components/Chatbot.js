@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/Chatbot.scss';
 
@@ -21,10 +21,10 @@ const Chatbot = () => {
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-    if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-}, [messages, isTyping]);
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages, isTyping]);
 
 
     useEffect(() => {
@@ -41,7 +41,7 @@ const Chatbot = () => {
     const toggleChat = () => {
         setIsOpen(!isOpen);
         setError(null);
-        if (!isOpen) setMessages([]);
+        //if (!isOpen) setMessages([]);
     };
 
     const handleInputChange = (e) => setInputValue(e.target.value);
@@ -103,34 +103,50 @@ const Chatbot = () => {
                         <button className="close-btn" onClick={toggleChat}>&times;</button>
                     </div>
 
-                  <div className="chatbot-messages">
-    {messages.map((message, index) => (
-        <div key={index} className={`message ${message.sender}`}>
-            <p>{message.text}</p>
-            {message.recipes && message.recipes.length > 0 && (
-                <ul className="recipe-list">
-                    {message.recipes.map((recipe, idx) => (
-                        <li key={idx}
-                            className="clickable-recipe"
-                            onClick={() => {
-                                const isLoggedIn = localStorage.getItem('token') !== null;
-                                window.location.href = isLoggedIn ? `/recipe/${recipe._id}` : '/login';
-                            }}>
-                            <strong>{recipe.title}</strong> — {recipe.cuisine} ({recipe.category})
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    ))}
+                    <div className="chatbot-messages">
+                        {messages.map((message, index) => (
+                            <div key={index} className={`message ${message.sender}`}>
+                                {message.sender === 'bot' && message.queryType && (
+                                    <span className="query-type-badge">
+                                        {message.queryType === 'ingredients' && '🔍 Ingredient-based'}
+                                        {message.queryType === 'dietary' && '🥗 Dietary preference'}
+                                        {message.queryType === 'cuisine' && '🍽 Cuisine'}
+                                        {message.queryType === 'category' && '🕒 Meal type'}
+                                        {message.queryType === 'specific_recipe' && '📌 Specific dish'}
+                                        {message.queryType === 'random' && '🎲 Suggestions'}
+                                    </span>
+                                )}
 
-    {isTyping && <div className="message bot typing-indicator">Typing...</div>}
-    {loading && <div className="message bot">Loading recipes...</div>}
-    {error && <div className="message error">{error}</div>}
+                                <p>{message.text}</p>
 
-    {/* 👇 Always keep this at the end */}
-    <div ref={messagesEndRef} />
-</div>
+                                {message.recipes && message.recipes.length > 0 && (
+                                    <ul className="recipe-list">
+                                        {message.recipes.map((recipe, idx) => (
+                                            <li
+                                                key={idx}
+                                                className="clickable-recipe"
+                                                onClick={() => {
+                                                    const isLoggedIn = localStorage.getItem('token') !== null;
+                                                    window.location.href = isLoggedIn ? `/recipe/${recipe._id}` : '/login';
+                                                }}
+                                            >
+                                                <strong>{recipe.title}</strong> — {recipe.cuisine} ({recipe.category})
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        ))}
+
+
+
+                        {isTyping && <div className="message bot typing-indicator">Typing...</div>}
+                        {loading && <div className="message bot">Loading recipes...</div>}
+                        {error && <div className="message error">{error}</div>}
+
+                        {/* 👇 Always keep this at the end */}
+                        <div ref={messagesEndRef} />
+                    </div>
 
 
                     <div className="chatbot-input">
