@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 require('dotenv').config();
+const connectDB = require('./DB');
 
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
@@ -31,13 +31,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to the CookOnWeb API!');
 });
 
-// MongoDB connection
-let MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cookonweb';
-
-// Replace localhost with 127.0.0.1 to avoid IPv6 issues
-MONGODB_URI = MONGODB_URI.replace('localhost', '127.0.0.1');
-
-mongoose.connect(MONGODB_URI)
+connectDB()
     .then(() => {
         console.log('Connected to MongoDB');
 
