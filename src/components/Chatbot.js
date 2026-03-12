@@ -1,14 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/Chatbot.scss';
 
 const commonQueries = [
-    "Recipes with chicken, tomato and garlic",
-    "Italian pasta dishes",
-    "Vegetarian dinner ideas",
-    "Desserts with chocolate",
-    "Quick snacks using bread"
+    'Gym breakfast ideas',
+    'Diabetic-friendly Indian dinner',
+    'Vegetarian high-protein meals',
+    'Kids lunchbox recipes',
+    'Quick recipes with paneer'
 ];
+
+const getSessionId = () => {
+    const existing = localStorage.getItem('chatbotSessionId');
+    if (existing) return existing;
+    const created = `chat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    localStorage.setItem('chatbotSessionId', created);
+    return created;
+};
+
+const formatGoalLabel = (value) => String(value || '').replace(/-/g, ' ');
 
 const Chatbot = () => {
     const { t } = useTranslation();
@@ -19,6 +29,7 @@ const Chatbot = () => {
     const [error, setError] = useState(null);
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
+    const sessionIdRef = useRef(getSessionId());
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -26,61 +37,79 @@ const Chatbot = () => {
         }
     }, [messages, isTyping]);
 
-
     useEffect(() => {
         if (isOpen && messages.length === 0) {
-            // Show welcome message when opened
-            const welcomeMessage = {
-                text: "👋 Hi! I’m your recipe assistant. Ask me something like ‘recipes with egg and cheese’ or ‘Italian dishes’.",
+            setMessages([{
+                text: "Hi. I can learn from your food plan, favorites, and feedback. Try 'gym lunch ideas' or 'diabetic Indian breakfast'.",
                 sender: 'bot'
-            };
-            setMessages([welcomeMessage]);
+            }]);
         }
-    }, [isOpen]);
+    }, [isOpen, messages.length]);
 
-    const toggleChat = () => {
-        setIsOpen(!isOpen);
-        setError(null);
-        //if (!isOpen) setMessages([]);
+    const sendFeedback = async ({ logId, helpful, clickedRecipeId }) => {
+        if (!logId) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            await fetch('http://localhost:5000/api/chatbot/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ logId, helpful, clickedRecipeId })
+            });
+        } catch (feedbackError) {
+            console.error('Feedback error:', feedbackError);
+        }
     };
-
-    const handleInputChange = (e) => setInputValue(e.target.value);
 
     const handleSendMessage = async (messageText) => {
         const textToSend = messageText !== undefined ? messageText : inputValue;
         if (textToSend.trim() === '') return;
 
-        // Add user message
-        const userMessage = { text: textToSend, sender: 'user' };
-        setMessages(prev => [...prev, userMessage]);
+        setMessages((prev) => [...prev, { text: textToSend, sender: 'user' }]);
         setLoading(true);
         setError(null);
         setIsTyping(true);
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:5000/api/chatbot/query', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: textToSend })
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    message: textToSend,
+                    sessionId: sessionIdRef.current
+                })
             });
 
-            if (!response.ok) throw new Error('Failed to get response from chatbot API');
+            if (!response.ok) {
+                throw new Error('Failed to get response from chatbot API');
+            }
 
             const data = await response.json();
-
-            // Add bot message
             const botMessage = {
                 text: data.message,
                 sender: 'bot',
                 recipes: data.recipes || [],
-                queryType: data.queryType
+                queryType: data.queryType,
+                logId: data.logId,
+                learnedFrom: data.learnedFrom || null,
+                feedbackGiven: false
             };
 
-            setMessages(prev => [...prev, botMessage]);
+            setMessages((prev) => [...prev, botMessage]);
         } catch (err) {
             console.error(err);
-            setError('Error: ' + err.message);
-            setMessages(prev => [...prev, { text: 'Sorry, something went wrong. Please try again later.', sender: 'bot' }]);
+            setError(`Error: ${err.message}`);
+            setMessages((prev) => [...prev, {
+                text: 'Sorry, something went wrong. Please try again later.',
+                sender: 'bot'
+            }]);
         } finally {
             setLoading(false);
             setIsTyping(false);
@@ -88,11 +117,21 @@ const Chatbot = () => {
         }
     };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') handleSendMessage();
+    const handleFeedbackClick = async (index, helpful) => {
+        const message = messages[index];
+        if (!message?.logId || message.feedbackGiven) return;
+
+        await sendFeedback({ logId: message.logId, helpful });
+        setMessages((prev) => prev.map((item, itemIndex) =>
+            itemIndex === index ? { ...item, feedbackGiven: true, helpful } : item
+        ));
     };
 
-    const handleQuickQueryClick = (query) => handleSendMessage(query);
+    const handleRecipeClick = async (message, recipeId) => {
+        await sendFeedback({ logId: message.logId, clickedRecipeId: recipeId, helpful: true });
+        const isLoggedIn = localStorage.getItem('token') !== null;
+        window.location.href = isLoggedIn ? `/recipe/${recipeId}` : '/login';
+    };
 
     return (
         <div className="chatbot-container">
@@ -100,7 +139,7 @@ const Chatbot = () => {
                 <div className="chatbot-window">
                     <div className="chatbot-header">
                         <h3>{t('chatbot_title') || 'Recipe Chatbot'}</h3>
-                        <button className="close-btn" onClick={toggleChat}>&times;</button>
+                        <button className="close-btn" onClick={() => { setIsOpen(false); setError(null); }}>&times;</button>
                     </div>
 
                     <div className="chatbot-messages">
@@ -108,16 +147,30 @@ const Chatbot = () => {
                             <div key={index} className={`message ${message.sender}`}>
                                 {message.sender === 'bot' && message.queryType && (
                                     <span className="query-type-badge">
-                                        {message.queryType === 'ingredients' && '🔍 Ingredient-based'}
-                                        {message.queryType === 'dietary' && '🥗 Dietary preference'}
-                                        {message.queryType === 'cuisine' && '🍽 Cuisine'}
-                                        {message.queryType === 'category' && '🕒 Meal type'}
-                                        {message.queryType === 'specific_recipe' && '📌 Specific dish'}
-                                        {message.queryType === 'random' && '🎲 Suggestions'}
+                                        {message.queryType === 'ingredients' && 'Ingredient-based'}
+                                        {message.queryType === 'dietary' && 'Dietary preference'}
+                                        {message.queryType === 'cuisine' && 'Cuisine'}
+                                        {message.queryType === 'category' && 'Meal type'}
+                                        {message.queryType === 'specific_recipe' && 'Specific dish'}
+                                        {message.queryType === 'preference' && 'Taste or mood'}
+                                        {message.queryType === 'conversation' && 'Assistant'}
+                                        {message.queryType === 'random' && 'Suggestions'}
                                     </span>
                                 )}
 
                                 <p>{message.text}</p>
+
+                                {message.learnedFrom && (message.learnedFrom.foodProfileGoal || message.learnedFrom.topTags?.length > 0) && (
+                                    <div className="chatbot-learning-note">
+                                        Learned from:
+                                        {' '}
+                                        {message.learnedFrom.foodProfileGoal
+                                            ? message.learnedFrom.source === 'query'
+                                                ? `your request (${formatGoalLabel(message.learnedFrom.foodProfileGoal)})`
+                                                : `food plan (${formatGoalLabel(message.learnedFrom.foodProfileGoal)})`
+                                            : `past likes (${message.learnedFrom.topTags.join(', ')})`}
+                                    </div>
+                                )}
 
                                 {message.recipes && message.recipes.length > 0 && (
                                     <ul className="recipe-list">
@@ -125,36 +178,53 @@ const Chatbot = () => {
                                             <li
                                                 key={idx}
                                                 className="clickable-recipe"
-                                                onClick={() => {
-                                                    const isLoggedIn = localStorage.getItem('token') !== null;
-                                                    window.location.href = isLoggedIn ? `/recipe/${recipe._id}` : '/login';
-                                                }}
+                                                onClick={() => handleRecipeClick(message, recipe._id)}
                                             >
-                                                <strong>{recipe.title}</strong> — {recipe.cuisine} ({recipe.category})
+                                                <strong>{recipe.title}</strong> - {recipe.cuisine} ({recipe.category})
                                             </li>
                                         ))}
                                     </ul>
                                 )}
+
+                                {message.sender === 'bot' && message.logId && (
+                                    <div className="chatbot-feedback">
+                                        <button
+                                            type="button"
+                                            disabled={message.feedbackGiven}
+                                            onClick={() => handleFeedbackClick(index, true)}
+                                        >
+                                            Helpful
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={message.feedbackGiven}
+                                            onClick={() => handleFeedbackClick(index, false)}
+                                        >
+                                            Not helpful
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))}
 
-
-
-                        {isTyping && <div className="message bot typing-indicator">Typing...</div>}
+                        {isTyping && (
+                            <div className="typing-indicator" aria-label="Chatbot is typing">
+                                <span />
+                                <span />
+                                <span />
+                            </div>
+                        )}
                         {loading && <div className="message bot">Loading recipes...</div>}
                         {error && <div className="message error">{error}</div>}
-
-                        {/* 👇 Always keep this at the end */}
                         <div ref={messagesEndRef} />
                     </div>
-
 
                     <div className="chatbot-input">
                         <input
                             type="text"
                             value={inputValue}
-                            onChange={handleInputChange}
-                            onKeyPress={handleKeyPress}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
                             placeholder="Ask about recipes or ingredients..."
                             disabled={loading}
                         />
@@ -166,7 +236,7 @@ const Chatbot = () => {
                     <h5>Suggestions</h5>
                     <div className="quick-queries">
                         {commonQueries.map((query, idx) => (
-                            <button key={idx} className="quick-query-btn" onClick={() => handleQuickQueryClick(query)}>
+                            <button key={idx} className="quick-query-btn" onClick={() => handleSendMessage(query)}>
                                 {query}
                             </button>
                         ))}
@@ -174,8 +244,13 @@ const Chatbot = () => {
                 </div>
             )}
 
-            <button className="chatbot-toggle" onClick={toggleChat}>
-                <span className="chat-icon">💬</span>
+            <button
+                type="button"
+                className="chatbot-toggle"
+                onClick={() => setIsOpen((prev) => !prev)}
+                aria-label={isOpen ? 'Close chatbot' : 'Open chatbot'}
+            >
+                <span className="chat-icon">Chat</span>
             </button>
         </div>
     );

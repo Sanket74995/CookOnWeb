@@ -1,9 +1,13 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const auth = require('../middleware/auth');
 const {
+    addReview,
     getAllRecipes,
+    getMyRecipes,
+    getRecommendedRecipes,
     getRecipeById,
     createRecipe,
     updateRecipe,
@@ -13,8 +17,14 @@ const {
 
 
 const router = express.Router();
+const uploadDir = path.join(__dirname, '..', 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: 'uploads', // make sure this folder exists
+  destination: uploadDir,
   filename: (req, file, cb) => {
     cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_'));
   },
@@ -38,6 +48,12 @@ router.get('/', getAllRecipes);
 // GET /api/recipes/search - Search recipes
 router.get('/search', searchRecipes);
 
+// GET /api/recipes/mine - Get current user's recipes
+router.get('/mine', auth, getMyRecipes);
+
+// GET /api/recipes/recommended - Get food-profile based recommendations
+router.get('/recommended', auth, getRecommendedRecipes);
+
 // GET /api/recipes/:id - Get recipe by ID
 router.get('/:id', getRecipeById);
 
@@ -45,9 +61,12 @@ router.get('/:id', getRecipeById);
 router.post('/', auth, upload.single('image'), createRecipe);
 
 // PUT /api/recipes/:id - Update recipe (protected)
-router.put('/:id', auth, updateRecipe);
+router.put('/:id', auth, upload.single('image'), updateRecipe);
 
 // DELETE /api/recipes/:id - Delete recipe (protected)
 router.delete('/:id', auth, deleteRecipe);
+
+// POST /api/recipes/:id/reviews - Add or update a review
+router.post('/:id/reviews', auth, addReview);
 
 module.exports = router;

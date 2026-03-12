@@ -3635,6 +3635,598 @@ const sampleRecipes = [
                 ]
             }
         }
+    },
+    {
+        title: "Grilled Chicken Quinoa Power Bowl",
+        description: "High-protein gym-friendly bowl with grilled chicken, quinoa, broccoli, and yogurt dressing",
+        image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/6xJ0tV0QwY8",
+        cuisine: "International",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 20,
+        cookTime: 20,
+        servings: 2,
+        ingredients: [
+            { name: "Chicken breast", quantity: "300", unit: "g" },
+            { name: "Quinoa", quantity: "1", unit: "cup" },
+            { name: "Broccoli florets", quantity: "2", unit: "cups" },
+            { name: "Greek yogurt", quantity: "1/2", unit: "cup" },
+            { name: "Lemon juice", quantity: "1", unit: "tbsp" },
+            { name: "Garlic", quantity: "2", unit: "cloves" },
+            { name: "Olive oil", quantity: "1", unit: "tbsp" },
+            { name: "Salt", quantity: "1/2", unit: "tsp" },
+            { name: "Black pepper", quantity: "1/2", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Cook quinoa according to package instructions" },
+            { step: 2, description: "Season chicken with salt and pepper" },
+            { step: 3, description: "Grill chicken for 5-6 minutes per side until cooked" },
+            { step: 4, description: "Steam broccoli until just tender" },
+            { step: 5, description: "Mix yogurt, lemon juice, garlic, and olive oil for dressing" },
+            { step: 6, description: "Slice chicken and assemble bowl with quinoa, broccoli, and dressing" }
+        ],
+        nutrition: {
+            calories: 430,
+            protein: 42,
+            carbs: 28,
+            fat: 14
+        },
+        tags: ["gym", "high-protein", "meal-prep", "balanced", "healthy"]
+    },
+    {
+        title: "Paneer Spinach Protein Skillet",
+        description: "Protein-rich vegetarian skillet with paneer, spinach, peppers, and warm spices",
+        image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/l4i8S8M2G7Q",
+        cuisine: "Indian",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 20,
+        servings: 3,
+        ingredients: [
+            { name: "Paneer", quantity: "300", unit: "g" },
+            { name: "Spinach", quantity: "4", unit: "cups" },
+            { name: "Bell pepper", quantity: "1", unit: "large" },
+            { name: "Onion", quantity: "1", unit: "medium" },
+            { name: "Tomato", quantity: "2", unit: "medium" },
+            { name: "Ginger garlic paste", quantity: "1", unit: "tbsp" },
+            { name: "Cumin", quantity: "1", unit: "tsp" },
+            { name: "Turmeric", quantity: "1/2", unit: "tsp" },
+            { name: "Olive oil", quantity: "1", unit: "tbsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Saute cumin, onion, and ginger garlic paste in oil" },
+            { step: 2, description: "Add tomato, turmeric, and cook until softened" },
+            { step: 3, description: "Add paneer cubes and bell pepper" },
+            { step: 4, description: "Fold in spinach and cook until wilted" },
+            { step: 5, description: "Serve hot on its own or with whole wheat roti" }
+        ],
+        nutrition: {
+            calories: 360,
+            protein: 24,
+            carbs: 14,
+            fat: 22
+        },
+        tags: ["high-protein", "vegetarian", "gym", "indian", "quick"]
+    },
+    {
+        title: "Diabetic-Friendly Moong Dal Soup",
+        description: "Light and comforting soup with moong dal, vegetables, and gentle spices for a diabetic-friendly meal",
+        image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/Q1nS2d4k9Sg",
+        cuisine: "Indian",
+        category: "soup",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 25,
+        servings: 4,
+        ingredients: [
+            { name: "Moong dal", quantity: "1", unit: "cup" },
+            { name: "Bottle gourd", quantity: "1", unit: "cup" },
+            { name: "Carrot", quantity: "1/2", unit: "cup" },
+            { name: "Tomato", quantity: "1", unit: "medium" },
+            { name: "Ginger", quantity: "1", unit: "tsp" },
+            { name: "Turmeric", quantity: "1/2", unit: "tsp" },
+            { name: "Cumin", quantity: "1/2", unit: "tsp" },
+            { name: "Salt", quantity: "1/2", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Wash moong dal thoroughly" },
+            { step: 2, description: "Add dal, vegetables, ginger, turmeric, cumin, and water to a pot" },
+            { step: 3, description: "Cook until dal is soft and vegetables are tender" },
+            { step: 4, description: "Blend lightly if desired and season with salt" },
+            { step: 5, description: "Serve warm with fresh coriander" }
+        ],
+        nutrition: {
+            calories: 180,
+            protein: 11,
+            carbs: 24,
+            fat: 3
+        },
+        tags: ["diabetic", "low-sugar", "soup", "light", "healthy"]
+    },
+    {
+        title: "Baked Salmon with Green Beans",
+        description: "Heart-healthy salmon tray bake with lemon, herbs, and crisp green beans",
+        image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/c5nXn4fV7QQ",
+        cuisine: "Mediterranean",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 18,
+        servings: 2,
+        ingredients: [
+            { name: "Salmon fillets", quantity: "2", unit: "pieces" },
+            { name: "Green beans", quantity: "250", unit: "g" },
+            { name: "Lemon", quantity: "1", unit: "medium" },
+            { name: "Olive oil", quantity: "1", unit: "tbsp" },
+            { name: "Garlic", quantity: "2", unit: "cloves" },
+            { name: "Oregano", quantity: "1", unit: "tsp" },
+            { name: "Black pepper", quantity: "1/2", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Preheat oven to 200C" },
+            { step: 2, description: "Arrange salmon and green beans on a baking tray" },
+            { step: 3, description: "Top with olive oil, garlic, oregano, lemon juice, and pepper" },
+            { step: 4, description: "Bake for 15-18 minutes until salmon flakes easily" },
+            { step: 5, description: "Serve immediately with extra lemon" }
+        ],
+        nutrition: {
+            calories: 340,
+            protein: 33,
+            carbs: 10,
+            fat: 18
+        },
+        tags: ["heart-healthy", "high-protein", "low-carb", "mediterranean", "quick"]
+    },
+    {
+        title: "Tofu Stir Fry with Cauliflower Rice",
+        description: "Low-carb diabetic-friendly stir fry with tofu, mushrooms, and cauliflower rice",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/3mY8zWqj4l0",
+        cuisine: "Asian",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 15,
+        servings: 2,
+        ingredients: [
+            { name: "Firm tofu", quantity: "250", unit: "g" },
+            { name: "Cauliflower rice", quantity: "3", unit: "cups" },
+            { name: "Mushrooms", quantity: "1", unit: "cup" },
+            { name: "Bell pepper", quantity: "1", unit: "medium" },
+            { name: "Soy sauce", quantity: "1", unit: "tbsp" },
+            { name: "Garlic", quantity: "2", unit: "cloves" },
+            { name: "Sesame oil", quantity: "1", unit: "tsp" },
+            { name: "Spring onion", quantity: "2", unit: "stalks" }
+        ],
+        instructions: [
+            { step: 1, description: "Pan sear tofu cubes until lightly golden" },
+            { step: 2, description: "Stir fry mushrooms, bell pepper, and garlic" },
+            { step: 3, description: "Add cauliflower rice and cook for 3-4 minutes" },
+            { step: 4, description: "Return tofu to pan with soy sauce and sesame oil" },
+            { step: 5, description: "Finish with chopped spring onion and serve" }
+        ],
+        nutrition: {
+            calories: 250,
+            protein: 18,
+            carbs: 14,
+            fat: 12
+        },
+        tags: ["diabetic", "low-carb", "vegan", "light", "quick"]
+    },
+    {
+        title: "Overnight Oats with Chia and Berries",
+        description: "Balanced breakfast with oats, chia seeds, yogurt, and berries for steady energy",
+        image: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/f0x8z0B5Fzk",
+        cuisine: "International",
+        category: "breakfast",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 0,
+        servings: 2,
+        ingredients: [
+            { name: "Rolled oats", quantity: "1", unit: "cup" },
+            { name: "Chia seeds", quantity: "2", unit: "tbsp" },
+            { name: "Greek yogurt", quantity: "1/2", unit: "cup" },
+            { name: "Milk", quantity: "1", unit: "cup" },
+            { name: "Blueberries", quantity: "1/2", unit: "cup" },
+            { name: "Strawberries", quantity: "1/2", unit: "cup" },
+            { name: "Cinnamon", quantity: "1/2", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Mix oats, chia seeds, yogurt, milk, and cinnamon in a jar" },
+            { step: 2, description: "Refrigerate overnight or for at least 6 hours" },
+            { step: 3, description: "Top with berries before serving" }
+        ],
+        nutrition: {
+            calories: 290,
+            protein: 15,
+            carbs: 32,
+            fat: 9
+        },
+        tags: ["balanced", "breakfast", "high-fiber", "meal-prep", "healthy"]
+    },
+    {
+        title: "Turkey Lettuce Wraps",
+        description: "Lean turkey wraps with crunchy vegetables for a quick weight-loss friendly lunch",
+        image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/mC8I9meP6rA",
+        cuisine: "American",
+        category: "lunch",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 10,
+        servings: 3,
+        ingredients: [
+            { name: "Ground turkey", quantity: "300", unit: "g" },
+            { name: "Lettuce leaves", quantity: "8", unit: "pieces" },
+            { name: "Carrot", quantity: "1", unit: "medium" },
+            { name: "Cucumber", quantity: "1/2", unit: "medium" },
+            { name: "Soy sauce", quantity: "1", unit: "tbsp" },
+            { name: "Garlic", quantity: "2", unit: "cloves" },
+            { name: "Olive oil", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Cook turkey with olive oil and garlic until browned" },
+            { step: 2, description: "Season with soy sauce" },
+            { step: 3, description: "Fill lettuce leaves with turkey, carrot, and cucumber" },
+            { step: 4, description: "Serve immediately as wraps" }
+        ],
+        nutrition: {
+            calories: 220,
+            protein: 24,
+            carbs: 8,
+            fat: 9
+        },
+        tags: ["weight-loss", "high-protein", "low-carb", "lunch", "quick"]
+    },
+    {
+        title: "Besan Vegetable Chilla",
+        description: "Savory Indian breakfast pancakes made with gram flour and vegetables for a diabetic-friendly start",
+        image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/p7W3x7K6mX4",
+        cuisine: "Indian",
+        category: "breakfast",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 15,
+        servings: 2,
+        ingredients: [
+            { name: "Besan", quantity: "1", unit: "cup" },
+            { name: "Onion", quantity: "1/2", unit: "cup" },
+            { name: "Tomato", quantity: "1/2", unit: "cup" },
+            { name: "Capsicum", quantity: "1/4", unit: "cup" },
+            { name: "Coriander", quantity: "2", unit: "tbsp" },
+            { name: "Turmeric", quantity: "1/4", unit: "tsp" },
+            { name: "Cumin", quantity: "1/2", unit: "tsp" },
+            { name: "Olive oil", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Mix besan with water to make a smooth batter" },
+            { step: 2, description: "Add chopped vegetables, coriander, turmeric, and cumin" },
+            { step: 3, description: "Heat a non-stick pan and spread a ladle of batter" },
+            { step: 4, description: "Cook both sides with a little oil until golden" },
+            { step: 5, description: "Serve hot with mint yogurt or chutney" }
+        ],
+        nutrition: {
+            calories: 210,
+            protein: 10,
+            carbs: 20,
+            fat: 8
+        },
+        tags: ["indian", "diabetic", "breakfast", "high-fiber", "low-sugar"]
+    },
+    {
+        title: "Oats Upma with Peas",
+        description: "A light Indian breakfast with oats, peas, and vegetables that supports steady blood sugar",
+        image: "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/XT7M5QY2qfI",
+        cuisine: "Indian",
+        category: "breakfast",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 15,
+        servings: 2,
+        ingredients: [
+            { name: "Rolled oats", quantity: "1", unit: "cup" },
+            { name: "Green peas", quantity: "1/2", unit: "cup" },
+            { name: "Carrot", quantity: "1/4", unit: "cup" },
+            { name: "Onion", quantity: "1/4", unit: "cup" },
+            { name: "Mustard seeds", quantity: "1/2", unit: "tsp" },
+            { name: "Curry leaves", quantity: "8", unit: "pieces" },
+            { name: "Green chili", quantity: "1", unit: "small" },
+            { name: "Oil", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Dry roast oats for 2-3 minutes and set aside" },
+            { step: 2, description: "Temper mustard seeds, curry leaves, onion, and chili in oil" },
+            { step: 3, description: "Add peas and carrot and cook until tender" },
+            { step: 4, description: "Add oats with hot water and cook until fluffy" },
+            { step: 5, description: "Serve warm with lemon juice" }
+        ],
+        nutrition: {
+            calories: 190,
+            protein: 7,
+            carbs: 27,
+            fat: 6
+        },
+        tags: ["indian", "diabetic", "breakfast", "light", "healthy"]
+    },
+    {
+        title: "Soya Paneer Bhurji",
+        description: "Vegetarian gym meal with paneer, soya granules, and spices for a strong protein boost",
+        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/2m3_7vYq9jI",
+        cuisine: "Indian",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 15,
+        servings: 3,
+        ingredients: [
+            { name: "Paneer", quantity: "200", unit: "g" },
+            { name: "Soya granules", quantity: "1", unit: "cup" },
+            { name: "Onion", quantity: "1", unit: "medium" },
+            { name: "Tomato", quantity: "2", unit: "medium" },
+            { name: "Capsicum", quantity: "1", unit: "small" },
+            { name: "Turmeric", quantity: "1/2", unit: "tsp" },
+            { name: "Red chili powder", quantity: "1/2", unit: "tsp" },
+            { name: "Oil", quantity: "1", unit: "tbsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Soak soya granules in hot water and squeeze out excess water" },
+            { step: 2, description: "Saute onion, tomato, and capsicum in oil with spices" },
+            { step: 3, description: "Add soya granules and cook for 3-4 minutes" },
+            { step: 4, description: "Crumble paneer into the pan and mix well" },
+            { step: 5, description: "Serve hot with salad or roti" }
+        ],
+        nutrition: {
+            calories: 320,
+            protein: 29,
+            carbs: 13,
+            fat: 16
+        },
+        tags: ["vegetarian", "gym", "high-protein", "indian", "meal-prep"]
+    },
+    {
+        title: "Chickpea Millet Salad Bowl",
+        description: "Vegetarian post-workout bowl with chickpeas, millet, fresh vegetables, and lemon dressing",
+        image: "https://images.unsplash.com/photo-1543332164-6e82f355badc?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/4lQ2s4Xjk7o",
+        cuisine: "Mediterranean",
+        category: "salad",
+        difficulty: "easy",
+        prepTime: 20,
+        cookTime: 15,
+        servings: 2,
+        ingredients: [
+            { name: "Cooked chickpeas", quantity: "1", unit: "cup" },
+            { name: "Cooked millet", quantity: "1", unit: "cup" },
+            { name: "Cucumber", quantity: "1/2", unit: "cup" },
+            { name: "Cherry tomatoes", quantity: "1/2", unit: "cup" },
+            { name: "Red onion", quantity: "2", unit: "tbsp" },
+            { name: "Lemon juice", quantity: "1", unit: "tbsp" },
+            { name: "Olive oil", quantity: "1", unit: "tsp" },
+            { name: "Parsley", quantity: "2", unit: "tbsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Combine chickpeas, millet, cucumber, tomatoes, and onion" },
+            { step: 2, description: "Whisk lemon juice, olive oil, and parsley" },
+            { step: 3, description: "Pour dressing over the salad and toss well" },
+            { step: 4, description: "Serve chilled or at room temperature" }
+        ],
+        nutrition: {
+            calories: 340,
+            protein: 16,
+            carbs: 42,
+            fat: 10
+        },
+        tags: ["vegetarian", "gym", "balanced", "high-fiber", "healthy"]
+    },
+    {
+        title: "Low-Sodium Lauki Moong Stew",
+        description: "Kidney-friendly light stew with bottle gourd, moong dal, and minimal salt",
+        image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/L5f3a2n0uP0",
+        cuisine: "Indian",
+        category: "soup",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 25,
+        servings: 3,
+        ingredients: [
+            { name: "Bottle gourd", quantity: "2", unit: "cups" },
+            { name: "Moong dal", quantity: "1/2", unit: "cup" },
+            { name: "Ginger", quantity: "1", unit: "tsp" },
+            { name: "Turmeric", quantity: "1/4", unit: "tsp" },
+            { name: "Cumin", quantity: "1/2", unit: "tsp" },
+            { name: "Coriander", quantity: "1", unit: "tbsp" },
+            { name: "Oil", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Wash moong dal and chop bottle gourd" },
+            { step: 2, description: "Pressure cook lauki, dal, turmeric, and water until soft" },
+            { step: 3, description: "Lightly temper cumin and ginger in a little oil" },
+            { step: 4, description: "Mix into the stew and finish with coriander" },
+            { step: 5, description: "Serve warm with a squeeze of lemon if desired" }
+        ],
+        nutrition: {
+            calories: 150,
+            protein: 8,
+            carbs: 19,
+            fat: 4
+        },
+        tags: ["kidney-friendly", "low-sodium", "light", "soup", "healthy"]
+    },
+    {
+        title: "Herb Rice with Steamed Fish",
+        description: "Simple low-sodium meal with steamed fish, herbs, and soft rice for kidney-friendly eating",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/KgZLqA8m8Pk",
+        cuisine: "Asian",
+        category: "main course",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 20,
+        servings: 2,
+        ingredients: [
+            { name: "White fish fillet", quantity: "250", unit: "g" },
+            { name: "Cooked rice", quantity: "1", unit: "cup" },
+            { name: "Ginger", quantity: "1", unit: "tsp" },
+            { name: "Spring onion", quantity: "2", unit: "tbsp" },
+            { name: "Parsley", quantity: "1", unit: "tbsp" },
+            { name: "Olive oil", quantity: "1", unit: "tsp" },
+            { name: "Black pepper", quantity: "1/4", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Steam fish with ginger and black pepper until cooked through" },
+            { step: 2, description: "Warm rice and toss with spring onion, parsley, and olive oil" },
+            { step: 3, description: "Serve steamed fish over herb rice" }
+        ],
+        nutrition: {
+            calories: 280,
+            protein: 28,
+            carbs: 23,
+            fat: 7
+        },
+        tags: ["kidney-friendly", "low-sodium", "light", "high-protein", "simple"]
+    },
+    {
+        title: "Cinnamon Yogurt Berry Bowl",
+        description: "PCOS-friendly breakfast with yogurt, seeds, berries, and cinnamon for balanced energy",
+        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/8J6E9B2m0xA",
+        cuisine: "International",
+        category: "breakfast",
+        difficulty: "easy",
+        prepTime: 10,
+        cookTime: 0,
+        servings: 1,
+        ingredients: [
+            { name: "Greek yogurt", quantity: "1", unit: "cup" },
+            { name: "Blueberries", quantity: "1/3", unit: "cup" },
+            { name: "Flax seeds", quantity: "1", unit: "tbsp" },
+            { name: "Pumpkin seeds", quantity: "1", unit: "tbsp" },
+            { name: "Cinnamon", quantity: "1/2", unit: "tsp" },
+            { name: "Chia seeds", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Add yogurt to a serving bowl" },
+            { step: 2, description: "Top with berries, flax seeds, pumpkin seeds, and chia seeds" },
+            { step: 3, description: "Sprinkle cinnamon and serve chilled" }
+        ],
+        nutrition: {
+            calories: 240,
+            protein: 18,
+            carbs: 14,
+            fat: 11
+        },
+        tags: ["pcos-friendly", "breakfast", "high-protein", "low-sugar", "quick"]
+    },
+    {
+        title: "Lentil Veggie Stuffed Peppers",
+        description: "PCOS-friendly balanced meal with lentils, vegetables, and baked bell peppers",
+        image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/3Cq7Dq0N5nA",
+        cuisine: "Mediterranean",
+        category: "main course",
+        difficulty: "medium",
+        prepTime: 20,
+        cookTime: 30,
+        servings: 4,
+        ingredients: [
+            { name: "Bell peppers", quantity: "4", unit: "large" },
+            { name: "Cooked lentils", quantity: "1 1/2", unit: "cups" },
+            { name: "Onion", quantity: "1/2", unit: "cup" },
+            { name: "Tomato", quantity: "1/2", unit: "cup" },
+            { name: "Spinach", quantity: "1", unit: "cup" },
+            { name: "Olive oil", quantity: "1", unit: "tbsp" },
+            { name: "Garlic", quantity: "2", unit: "cloves" },
+            { name: "Paprika", quantity: "1/2", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Cut peppers in half and remove seeds" },
+            { step: 2, description: "Saute onion, garlic, tomato, spinach, and lentils with paprika" },
+            { step: 3, description: "Stuff the peppers with the filling" },
+            { step: 4, description: "Bake at 190C for 25-30 minutes until tender" }
+        ],
+        nutrition: {
+            calories: 260,
+            protein: 13,
+            carbs: 28,
+            fat: 9
+        },
+        tags: ["pcos-friendly", "balanced", "high-fiber", "vegetarian", "healthy"]
+    },
+    {
+        title: "Mini Veggie Idli Lunchbox",
+        description: "Soft mini idlis with hidden vegetables for a kids lunchbox that is easy to pack",
+        image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/5iYvR7lI5qA",
+        cuisine: "Indian",
+        category: "snack",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 12,
+        servings: 3,
+        ingredients: [
+            { name: "Idli batter", quantity: "2", unit: "cups" },
+            { name: "Carrot", quantity: "1/4", unit: "cup" },
+            { name: "Beetroot", quantity: "2", unit: "tbsp" },
+            { name: "Peas", quantity: "2", unit: "tbsp" },
+            { name: "Oil", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Mix grated carrot, beetroot, and peas into idli batter" },
+            { step: 2, description: "Grease mini idli moulds lightly" },
+            { step: 3, description: "Steam mini idlis for 10-12 minutes" },
+            { step: 4, description: "Cool and pack with coconut chutney or ketchup" }
+        ],
+        nutrition: {
+            calories: 160,
+            protein: 5,
+            carbs: 28,
+            fat: 3
+        },
+        tags: ["kids-lunchbox", "indian", "snack", "kid-friendly", "vegetarian"]
+    },
+    {
+        title: "Cheese Corn Veggie Roll",
+        description: "Colorful kid-friendly lunchbox roll with soft roti, cheese, corn, and vegetables",
+        image: "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=400&h=300&fit=crop",
+        video: "https://www.youtube.com/embed/D6x1A4Xk8Zs",
+        cuisine: "Indian",
+        category: "snack",
+        difficulty: "easy",
+        prepTime: 15,
+        cookTime: 10,
+        servings: 2,
+        ingredients: [
+            { name: "Whole wheat roti", quantity: "2", unit: "pieces" },
+            { name: "Sweet corn", quantity: "1/2", unit: "cup" },
+            { name: "Grated cheese", quantity: "1/3", unit: "cup" },
+            { name: "Capsicum", quantity: "1/4", unit: "cup" },
+            { name: "Carrot", quantity: "1/4", unit: "cup" },
+            { name: "Butter", quantity: "1", unit: "tsp" }
+        ],
+        instructions: [
+            { step: 1, description: "Saute corn and vegetables lightly in butter" },
+            { step: 2, description: "Place the filling on rotis and add grated cheese" },
+            { step: 3, description: "Roll tightly and toast briefly on a pan" },
+            { step: 4, description: "Slice into pieces and pack warm or at room temperature" }
+        ],
+        nutrition: {
+            calories: 230,
+            protein: 8,
+            carbs: 26,
+            fat: 10
+        },
+        tags: ["kids-lunchbox", "kid-friendly", "vegetarian", "quick", "snack"]
     }
 
 ];

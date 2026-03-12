@@ -45,15 +45,54 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Recipe'
     }],
-    // 🔹 New field: subscription info
+    settings: {
+        language: {
+            type: String,
+            default: 'en'
+        },
+        theme: {
+            type: String,
+            default: 'light'
+        },
+        emailNotifications: {
+            type: Boolean,
+            default: true
+        },
+        recipeUpdates: {
+            type: Boolean,
+            default: true
+        },
+        foodProfile: {
+            goal: {
+                type: String,
+                default: 'balanced'
+            },
+            conditions: [{
+                type: String,
+                trim: true
+            }],
+            preferredCuisines: [{
+                type: String,
+                trim: true
+            }],
+            avoidIngredients: [{
+                type: String,
+                trim: true
+            }],
+            calorieTarget: {
+                type: Number,
+                default: 0
+            }
+        }
+    },
     subscription: {
         plan: {
             type: String,
-            default: 'free'  // 'free', 'premium', etc.
+            default: 'free'
         },
         status: {
             type: String,
-            default: 'active' // 'active', 'canceled', etc.
+            default: 'active'
         },
         startedAt: {
             type: Date,
@@ -65,7 +104,6 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// Update the updatedAt field before saving
 userSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
