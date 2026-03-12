@@ -1,27 +1,56 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Account.scss';
 
-const API_BASE = 'http://localhost:5000/api/auth'; // adjust if different
+const AUTH_API = 'http://localhost:5000/api/auth';
+const RECIPE_API = 'http://localhost:5000/api/recipes';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
+  const [myRecipes, setMyRecipes] = useState([]);
+  const [loadingRecipes, setLoadingRecipes] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE}/me`, {
+      const res = await fetch(`${AUTH_API}/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok)
+      if (res.ok) {
         setForm({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           email: data.email || '',
         });
+      }
     };
+
+    const fetchMyRecipes = async () => {
+      try {
+        const res = await fetch(`${RECIPE_API}/mine`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setMyRecipes(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch my recipes:', error);
+      } finally {
+        setLoadingRecipes(false);
+      }
+    };
+
     fetchProfile();
-  }, []);
+    fetchMyRecipes();
+  }, [navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,7 +59,7 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE}/me`, {
+    const res = await fetch(`${AUTH_API}/me`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -47,6 +76,28 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteRecipe = async (recipeId) => {
+    const confirmed = window.confirm('Delete this recipe permanently?');
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${RECIPE_API}/${recipeId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to delete recipe');
+      }
+
+      setMyRecipes((prev) => prev.filter((recipe) => recipe._id !== recipeId));
+    } catch (error) {
+      console.error('Delete recipe failed:', error);
+      alert(error.message || 'Unable to delete recipe');
+    }
+  };
+
   const initials =
     (form.firstName?.[0] || '').toUpperCase() ||
     (form.lastName?.[0] || '').toUpperCase() ||
@@ -55,7 +106,6 @@ const Profile = () => {
   return (
     <div className="page-container">
       <div className="account-page">
-        {/* Left: main form */}
         <div className="account-card account-card--highlight">
           <div className="account-header">
             <div>
@@ -105,14 +155,73 @@ const Profile = () => {
               <button type="submit" className="btn-primary">
                 Save Changes
               </button>
-              <button type="button" className="btn-ghost">
-                Cancel
+              <button type="button" className="btn-ghost" onClick={() => navigate('/add-recipe')}>
+                Add Recipe
               </button>
             </div>
           </form>
+
+          <div className="dashboard-section">
+            <div className="dashboard-header">
+              <h3>My Recipes</h3>
+              <button className="btn-ghost" type="button" onClick={() => navigate('/add-recipe')}>
+                Create new
+              </button>
+            </div>
+
+            {loadingRecipes ? (
+              <div className="dashboard-empty">Loading your recipes...</div>
+            ) : myRecipes.length === 0 ? (
+              <div className="dashboard-empty">
+                You have not published any recipes yet.
+              </div>
+            ) : (
+              <div className="dashboard-recipes">
+                {myRecipes.map((recipe) => (
+                  <article key={recipe._id} className="dashboard-recipe-card">
+                    <img src={recipe.image} alt={recipe.title} />
+                    <div className="dashboard-recipe-card__body">
+                      <div>
+                        <h4>{recipe.title}</h4>
+                        <p>{recipe.description}</p>
+                        <div className="dashboard-recipe-meta">
+                          <span>{recipe.cuisine}</span>
+                          <span>{recipe.rating?.average || 0}/5</span>
+                          <span>{recipe.reviews?.length || 0} reviews</span>
+                        </div>
+                      </div>
+
+                      <div className="dashboard-recipe-actions">
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          onClick={() => navigate(`/recipe/${recipe._id}`)}
+                        >
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          onClick={() => navigate(`/recipe/${recipe._id}/edit`)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-ghost btn-ghost--danger"
+                          onClick={() => handleDeleteRecipe(recipe._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right: summary card */}
         <div className="account-side">
           <div className="account-card account-card--muted">
             <div className="account-summary">
@@ -127,8 +236,14 @@ const Profile = () => {
 
             <ul className="account-list">
               <li>
-                <span>Account Type</span>
-                <span className="value">CookOnWeb User</span>
+                <span>Recipes Published</span>
+                <span className="value">{myRecipes.length}</span>
+              </li>
+              <li>
+                <span>Total Reviews</span>
+                <span className="value">
+                  {myRecipes.reduce((sum, recipe) => sum + (recipe.reviews?.length || 0), 0)}
+                </span>
               </li>
               <li>
                 <span>Status</span>

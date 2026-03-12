@@ -1,10 +1,357 @@
+const fs = require('fs');
+const path = require('path');
 const Recipe = require('../models/Recipe');
+const User = require('../models/User');
 
-// Get all recipes
+const normalizeNumber = (value, fallback = 0) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const parseIngredients = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (typeof value !== 'string') {
+        return [];
+    }
+
+    return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => {
+            const match = item.match(/^([\d./]+\s*[a-zA-Z]*)\s+(.+)$/);
+
+            if (!match) {
+                return {
+                    name: item,
+                    quantity: '1',
+                    unit: ''
+                };
+            }
+
+            const [, quantityAndUnit, name] = match;
+            const parts = quantityAndUnit.trim().split(/\s+/);
+
+            return {
+                name: name.trim(),
+                quantity: parts[0] || '1',
+                unit: parts.slice(1).join(' ')
+            };
+        });
+};
+
+const parseInstructions = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (typeof value !== 'string') {
+        return [];
+    }
+
+    return value
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line, index) => ({
+            step: index + 1,
+            description: line.replace(/^\d+[\).\s-]*/, '').trim()
+        }))
+        .filter((step) => step.description);
+};
+
+const parseTags = (value) => {
+    if (Array.isArray(value)) {
+        return value.map((tag) => String(tag).trim()).filter(Boolean);
+    }
+
+    if (typeof value !== 'string') {
+        return [];
+    }
+
+    return value.split(',').map((tag) => tag.trim()).filter(Boolean);
+};
+
+const parseNutrition = (value) => {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return {
+            calories: normalizeNumber(value.calories, undefined),
+            protein: normalizeNumber(value.protein, undefined),
+            carbs: normalizeNumber(value.carbs, undefined),
+            fat: normalizeNumber(value.fat, undefined)
+        };
+    }
+
+    if (typeof value !== 'string' || !value.trim()) {
+        return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+
+    try {
+        return parseNutrition(JSON.parse(value));
+    } catch (error) {
+        return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+};
+
+const cleanupFile = async (filePath) => {
+    if (!filePath) return;
+    try {
+        await fs.promises.unlink(filePath);
+    } catch (error) {
+        if (error.code !== 'ENOENT') {
+            console.error('Image cleanup error:', error);
+        }
+    }
+};
+
+const uploadToCloudinary = async (file) => {
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
+
+    if (!cloudName || !uploadPreset || !file?.path) {
+        return null;
+    }
+
+    const formData = new FormData();
+    const fileBuffer = await fs.promises.readFile(file.path);
+    const extension = path.extname(file.originalname || '').toLowerCase();
+    const mimeType = file.mimetype || (
+        extension === '.png' ? 'image/png' :
+        extension === '.webp' ? 'image/webp' :
+        'image/jpeg'
+    );
+
+    formData.append('file', new Blob([fileBuffer], { type: mimeType }), file.originalname || 'recipe-image');
+    formData.append('upload_preset', uploadPreset);
+    if (process.env.CLOUDINARY_FOLDER) {
+        formData.append('folder', process.env.CLOUDINARY_FOLDER);
+    }
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+    });
+
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(`Cloudinary upload failed: ${message}`);
+    }
+
+    const payload = await response.json();
+    return payload.secure_url || payload.url || null;
+};
+
+const resolveImageUrl = async (req) => {
+    if (!req.file) {
+        return req.body.image || '';
+    }
+
+    try {
+        const cloudUrl = await uploadToCloudinary(req.file);
+        if (cloudUrl) {
+            await cleanupFile(req.file.path);
+            return cloudUrl;
+        }
+    } catch (error) {
+        console.error('Cloud image upload error, falling back to local file:', error.message);
+    }
+
+    return `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+};
+
+const buildRecipePayload = async (req, { isUpdate = false } = {}) => {
+    const {
+        title,
+        description,
+        image,
+        video,
+        cuisine,
+        category,
+        difficulty,
+        prepTime,
+        cookTime,
+        cookingTime,
+        servings,
+        ingredients,
+        instructions,
+        nutrition,
+        tags
+    } = req.body;
+
+    const payload = {};
+
+    if (title !== undefined) payload.title = title;
+    if (description !== undefined) payload.description = description;
+    if (video !== undefined) payload.video = video || '';
+    if (cuisine !== undefined) payload.cuisine = cuisine;
+    if (category !== undefined) payload.category = category;
+    if (difficulty !== undefined) payload.difficulty = difficulty || 'medium';
+    if (prepTime !== undefined) payload.prepTime = normalizeNumber(prepTime, 0);
+    if (cookTime !== undefined || cookingTime !== undefined) payload.cookTime = normalizeNumber(cookTime || cookingTime, 0);
+    if (servings !== undefined) payload.servings = normalizeNumber(servings, 1);
+    if (ingredients !== undefined) payload.ingredients = parseIngredients(ingredients);
+    if (instructions !== undefined) payload.instructions = parseInstructions(instructions);
+    if (tags !== undefined) payload.tags = parseTags(tags);
+    if (nutrition !== undefined) payload.nutrition = parseNutrition(nutrition);
+
+    const resolvedImage = await resolveImageUrl(req);
+    if (resolvedImage) {
+        payload.image = resolvedImage;
+    } else if (!isUpdate && image) {
+        payload.image = image;
+    }
+
+    if (!isUpdate) {
+        payload.video = payload.video || '';
+        payload.difficulty = payload.difficulty || 'medium';
+        payload.prepTime = payload.prepTime ?? 0;
+        payload.cookTime = payload.cookTime ?? 0;
+        payload.servings = payload.servings ?? 1;
+        payload.ingredients = payload.ingredients || [];
+        payload.instructions = payload.instructions || [];
+        payload.tags = payload.tags || [];
+        payload.nutrition = payload.nutrition || { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+
+    return payload;
+};
+
+const validateRecipePayload = (payload, { isUpdate = false } = {}) => {
+    const requiredFields = ['title', 'description', 'image', 'cuisine', 'category'];
+    if (!isUpdate) {
+        for (const field of requiredFields) {
+            if (!payload[field]) {
+                return `${field} is required`;
+            }
+        }
+    }
+
+    if ((payload.ingredients && payload.ingredients.length === 0) || (!isUpdate && !payload.ingredients?.length)) {
+        return 'At least one ingredient is required';
+    }
+
+    if ((payload.instructions && payload.instructions.length === 0) || (!isUpdate && !payload.instructions?.length)) {
+        return 'At least one instruction is required';
+    }
+
+    if (!isUpdate && !payload.cookTime) {
+        return 'Cook time is required';
+    }
+
+    if (!isUpdate && !payload.servings) {
+        return 'Servings is required';
+    }
+
+    return null;
+};
+
+const populateRecipeQuery = (query) => query
+    .populate('author', 'firstName lastName username')
+    .populate('reviews.user', 'firstName lastName username');
+
+const includesAny = (values, patterns) => {
+    const haystack = (values || []).map((value) => String(value).toLowerCase());
+    return patterns.some((pattern) => haystack.some((value) => value.includes(pattern)));
+};
+
+const scoreRecipeForProfile = (recipe, foodProfile = {}) => {
+    const goal = (foodProfile.goal || 'balanced').toLowerCase();
+    const conditions = (foodProfile.conditions || []).map((item) => item.toLowerCase());
+    const preferredCuisines = (foodProfile.preferredCuisines || []).map((item) => item.toLowerCase());
+    const avoidIngredients = (foodProfile.avoidIngredients || []).map((item) => item.toLowerCase());
+    const tags = (recipe.tags || []).map((tag) => String(tag).toLowerCase());
+    const ingredientNames = (recipe.ingredients || []).map((ingredient) => String(ingredient.name || '').toLowerCase());
+    const cuisine = String(recipe.cuisine || '').toLowerCase();
+    const nutrition = recipe.nutrition || {};
+    const totalTime = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
+
+    let score = 0;
+    const reasons = [];
+
+    if (preferredCuisines.includes(cuisine)) {
+        score += 3;
+        reasons.push(`Matches preferred cuisine: ${recipe.cuisine}`);
+    }
+
+    if (avoidIngredients.length && includesAny(ingredientNames, avoidIngredients)) {
+        return { score: -100, reasons: ['Contains ingredients you want to avoid'] };
+    }
+
+    const highProtein = Number(nutrition.protein || 0) >= 18 || includesAny(tags, ['high-protein', 'protein', 'gym']);
+    const lowSugar = !includesAny(tags, ['dessert', 'sweet', 'sugary']) && !includesAny(ingredientNames, ['sugar', 'honey', 'syrup']);
+    const lowCarb = Number(nutrition.carbs || 0) > 0 ? Number(nutrition.carbs) <= 25 : includesAny(tags, ['low-carb', 'keto']);
+    const lowFat = Number(nutrition.fat || 0) > 0 ? Number(nutrition.fat) <= 15 : includesAny(tags, ['light', 'healthy']);
+    const moderateCalories = Number(nutrition.calories || 0) > 0 ? Number(nutrition.calories) <= 450 : true;
+
+    if (goal === 'gym' || goal === 'high-protein') {
+        if (highProtein) {
+            score += 5;
+            reasons.push('Higher protein fit for gym goals');
+        }
+        if (moderateCalories) {
+            score += 1;
+        }
+    }
+
+    if (goal === 'weight-loss') {
+        if (moderateCalories) {
+            score += 4;
+            reasons.push('Moderate calorie recipe');
+        }
+        if (lowFat) {
+            score += 2;
+        }
+        if (highProtein) {
+            score += 1;
+        }
+    }
+
+    if (goal === 'diabetic' || conditions.includes('diabetic')) {
+        if (lowSugar) {
+            score += 5;
+            reasons.push('Avoids obviously sugary ingredients');
+        } else {
+            score -= 5;
+        }
+        if (lowCarb) {
+            score += 3;
+            reasons.push('Lower carb profile');
+        }
+    }
+
+    if (goal === 'heart-healthy' || conditions.includes('heart')) {
+        if (lowFat) {
+            score += 4;
+            reasons.push('Lower fat profile');
+        }
+        if (!includesAny(ingredientNames, ['butter', 'cream'])) {
+            score += 2;
+        }
+    }
+
+    if (goal === 'balanced') {
+        score += 2;
+        if (moderateCalories) score += 1;
+        if (totalTime && totalTime <= 45) score += 1;
+    }
+
+    if (conditions.includes('vegetarian')) {
+        const hasMeat = includesAny(ingredientNames, ['chicken', 'beef', 'pork', 'fish', 'lamb', 'mutton', 'seafood']);
+        score += hasMeat ? -8 : 4;
+        if (!hasMeat) {
+            reasons.push('Vegetarian-friendly');
+        }
+    }
+
+    return { score, reasons };
+};
+
 const getAllRecipes = async (req, res) => {
     try {
-        const recipes = await Recipe.find()
-            .populate('author', 'firstName lastName username')
+        const recipes = await populateRecipeQuery(Recipe.find())
             .sort({ createdAt: -1 });
 
         res.json(recipes);
@@ -14,11 +361,57 @@ const getAllRecipes = async (req, res) => {
     }
 };
 
-// Get recipe by ID
+const getMyRecipes = async (req, res) => {
+    try {
+        const recipes = await populateRecipeQuery(
+            Recipe.find({ author: req.userId })
+        ).sort({ updatedAt: -1 });
+
+        res.json(recipes);
+    } catch (error) {
+        console.error('Get my recipes error:', error);
+        res.status(500).json({ message: 'Server error while fetching your recipes' });
+    }
+};
+
+const getRecommendedRecipes = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('settings.foodProfile');
+        const foodProfile = user?.settings?.foodProfile || {};
+        const recipes = await populateRecipeQuery(Recipe.find()).sort({ createdAt: -1 });
+
+        const recommended = recipes
+            .map((recipe) => {
+                const result = scoreRecipeForProfile(recipe, foodProfile);
+                return {
+                    recipe,
+                    score: result.score,
+                    reasons: result.reasons
+                };
+            })
+            .filter((item) => item.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 12)
+            .map((item) => ({
+                ...item.recipe.toObject(),
+                recommendationReasons: item.reasons
+            }));
+
+        res.json({
+            foodProfile,
+            recipes: recommended
+        });
+    } catch (error) {
+        console.error('Get recommended recipes error:', error);
+        res.status(500).json({ message: 'Server error while fetching recommendations' });
+    }
+};
+
 const getRecipeById = async (req, res) => {
     try {
-        const recipe = await Recipe.findById(req.params.id)
-            .populate('author', 'firstName lastName username');
+        const recipe = await populateRecipeQuery(
+            Recipe.findById(req.params.id)
+        );
 
         if (!recipe) {
             return res.status(404).json({ message: 'Recipe not found' });
@@ -31,52 +424,21 @@ const getRecipeById = async (req, res) => {
     }
 };
 
-// Create new recipe
 const createRecipe = async (req, res) => {
     try {
-        const {
-            title,
-            description,
-            image,
-            video,
-            cuisine,
-            category,
-            difficulty,
-            prepTime,
-            cookTime,
-            servings,
-            ingredients,
-            instructions,
-            nutrition,
-            tags
-        } = req.body;
+        const payload = await buildRecipePayload(req);
+        const validationError = validateRecipePayload(payload);
 
-        // Validate required fields
-        if (!title || !description || !image || !cuisine || !category || !ingredients || !instructions) {
-            return res.status(400).json({ message: 'Missing required fields' });
+        if (validationError) {
+            return res.status(400).json({ message: validationError });
         }
 
         const newRecipe = new Recipe({
-            title,
-            description,
-            image,
-            video: video || '',
-            cuisine,
-            category,
-            difficulty,
-            prepTime,
-            cookTime,
-            servings,
-            ingredients,
-            instructions,
-            nutrition,
-            tags,
-            author: req.userId // Assuming userId is set from auth middleware
+            ...payload,
+            author: req.userId
         });
 
         await newRecipe.save();
-
-        // Populate author info
         await newRecipe.populate('author', 'firstName lastName username');
 
         res.status(201).json({
@@ -89,7 +451,6 @@ const createRecipe = async (req, res) => {
     }
 };
 
-// Update recipe
 const updateRecipe = async (req, res) => {
     try {
         const recipe = await Recipe.findById(req.params.id);
@@ -98,20 +459,24 @@ const updateRecipe = async (req, res) => {
             return res.status(404).json({ message: 'Recipe not found' });
         }
 
-        // Check if user is the author
         if (recipe.author.toString() !== req.userId) {
             return res.status(403).json({ message: 'Not authorized to update this recipe' });
         }
 
-        const updatedRecipe = await Recipe.findByIdAndUpdate(
-            req.params.id,
-            { ...req.body, updatedAt: Date.now() },
-            { new: true, runValidators: true }
-        ).populate('author', 'firstName lastName username');
+        const payload = await buildRecipePayload(req, { isUpdate: true });
+        const validationError = validateRecipePayload(payload, { isUpdate: true });
+
+        if (validationError) {
+            return res.status(400).json({ message: validationError });
+        }
+
+        Object.assign(recipe, payload, { updatedAt: Date.now() });
+        await recipe.save();
+        await recipe.populate('author', 'firstName lastName username');
 
         res.json({
             message: 'Recipe updated successfully',
-            recipe: updatedRecipe
+            recipe
         });
     } catch (error) {
         console.error('Update recipe error:', error);
@@ -119,7 +484,6 @@ const updateRecipe = async (req, res) => {
     }
 };
 
-// Delete recipe
 const deleteRecipe = async (req, res) => {
     try {
         const recipe = await Recipe.findById(req.params.id);
@@ -128,13 +492,11 @@ const deleteRecipe = async (req, res) => {
             return res.status(404).json({ message: 'Recipe not found' });
         }
 
-        // Check if user is the author
         if (recipe.author.toString() !== req.userId) {
             return res.status(403).json({ message: 'Not authorized to delete this recipe' });
         }
 
         await Recipe.findByIdAndDelete(req.params.id);
-
         res.json({ message: 'Recipe deleted successfully' });
     } catch (error) {
         console.error('Delete recipe error:', error);
@@ -142,17 +504,82 @@ const deleteRecipe = async (req, res) => {
     }
 };
 
-// Search recipes
+const addReview = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const normalizedRating = normalizeNumber(rating, 0);
+
+        if (normalizedRating < 1 || normalizedRating > 5) {
+            return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+        }
+
+        const recipe = await Recipe.findById(req.params.id);
+        if (!recipe) {
+            return res.status(404).json({ message: 'Recipe not found' });
+        }
+
+        const existingReview = recipe.reviews.find((review) => review.user.toString() === req.userId);
+        const reviewerName = [req.user.firstName, req.user.lastName].filter(Boolean).join(' ') || req.user.username;
+
+        if (existingReview) {
+            existingReview.rating = normalizedRating;
+            existingReview.comment = (comment || '').trim();
+            existingReview.name = reviewerName;
+            existingReview.createdAt = new Date();
+        } else {
+            recipe.reviews.push({
+                user: req.userId,
+                name: reviewerName,
+                rating: normalizedRating,
+                comment: (comment || '').trim()
+            });
+        }
+
+        recipe.rating.count = recipe.reviews.length;
+        recipe.rating.average = recipe.reviews.length
+            ? Number((recipe.reviews.reduce((sum, review) => sum + review.rating, 0) / recipe.reviews.length).toFixed(1))
+            : 0;
+
+        await recipe.save();
+        await recipe.populate('reviews.user', 'firstName lastName username');
+        await recipe.populate('author', 'firstName lastName username');
+
+        res.status(201).json({
+            message: existingReview ? 'Review updated successfully' : 'Review added successfully',
+            recipe
+        });
+    } catch (error) {
+        console.error('Add review error:', error);
+        res.status(500).json({ message: 'Server error while adding review' });
+    }
+};
+
 const searchRecipes = async (req, res) => {
     try {
-        const { query, cuisine, category, difficulty, tags } = req.query;
-        let searchCriteria = {};
+        const {
+            query,
+            cuisine,
+            category,
+            difficulty,
+            tags,
+            maxTime,
+            minRating,
+            author,
+            sort = 'latest'
+        } = req.query;
+
+        const searchCriteria = {};
 
         if (query) {
-            searchCriteria.$text = { $search: query };
+            searchCriteria.$or = [
+                { title: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } },
+                { 'ingredients.name': { $regex: query, $options: 'i' } },
+                { tags: { $elemMatch: { $regex: query, $options: 'i' } } }
+            ];
         }
         if (cuisine) {
-            searchCriteria.cuisine = cuisine;
+            searchCriteria.cuisine = { $regex: cuisine, $options: 'i' };
         }
         if (category) {
             searchCriteria.category = category;
@@ -160,15 +587,38 @@ const searchRecipes = async (req, res) => {
         if (difficulty) {
             searchCriteria.difficulty = difficulty;
         }
+        if (author) {
+            searchCriteria.author = author;
+        }
         if (tags) {
-            // Tags should be a comma-separated string, convert to array
-            const tagArray = tags.split(',').map(tag => tag.trim());
-            searchCriteria.tags = { $in: tagArray };
+            const tagArray = parseTags(tags);
+            if (tagArray.length) {
+                searchCriteria.tags = { $all: tagArray };
+            }
+        }
+        if (maxTime) {
+            searchCriteria.$expr = {
+                $lte: [
+                    { $add: ['$prepTime', '$cookTime'] },
+                    normalizeNumber(maxTime, 0)
+                ]
+            };
+        }
+        if (minRating) {
+            searchCriteria['rating.average'] = { $gte: normalizeNumber(minRating, 0) };
         }
 
-        const recipes = await Recipe.find(searchCriteria)
-            .populate('author', 'firstName lastName username')
-            .sort({ createdAt: -1 });
+        let sortCriteria = { createdAt: -1 };
+        if (sort === 'rating') {
+            sortCriteria = { 'rating.average': -1, 'rating.count': -1 };
+        } else if (sort === 'time') {
+            sortCriteria = { cookTime: 1, prepTime: 1 };
+        } else if (sort === 'popular') {
+            sortCriteria = { 'rating.count': -1, createdAt: -1 };
+        }
+
+        const recipes = await populateRecipeQuery(Recipe.find(searchCriteria))
+            .sort(sortCriteria);
 
         res.json(recipes);
     } catch (error) {
@@ -178,10 +628,13 @@ const searchRecipes = async (req, res) => {
 };
 
 module.exports = {
-    getAllRecipes,
-    getRecipeById,
+    addReview,
     createRecipe,
-    updateRecipe,
     deleteRecipe,
-    searchRecipes
+    getAllRecipes,
+    getMyRecipes,
+    getRecommendedRecipes,
+    getRecipeById,
+    searchRecipes,
+    updateRecipe
 };

@@ -426,3 +426,39 @@
         max-width: calc((100% - 16px) / 2);
     }
 }
+
+.filters-section--grid {
+    flex-wrap: wrap;
+
+    .filter-item {
+        min-width: 180px;
+
+        input[type="text"],
+        select,
+        .custom-dropdown .dropdown-button,
+        .diet-options .dropdown-button {
+            width: 100%;
+            min-height: auto;
+        }
+    }
+
+    .filter-item--checkbox {
+        justify-content: flex-end;
+        min-width: 220px;
+
+        label {
+            text-transform: none;
+            letter-spacing: normal;
+            font-weight: 600;
+        }
+    }
+}
+
+.recipes-empty {
+    text-align: center;
+    padding: 48px 20px;
+    background: white;
+    border-radius: 16px;
+    color: #718096;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}

@@ -7,17 +7,19 @@ const RecipeCard = ({ recipe, isFavorited = false, onToggleFavorite }) => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const currentLang = i18n.language || 'en';
+    const tags = Array.isArray(recipe.tags) ? recipe.tags : [];
+    const totalTime = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
 
-    const handleViewRecipe = () => {
+    const handleViewRecipe = (e) => {
+        e.stopPropagation();
         const token = localStorage.getItem('token');
         if (token) {
-            navigate('/recipes');
+            navigate(`/recipe/${recipe._id}`);
         } else {
             navigate('/login');
         }
     };
 
-    // Determine title and description based on current language and translations
     const title = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].title
         ? recipe.translations[currentLang].title
         : recipe.title;
@@ -40,27 +42,29 @@ const RecipeCard = ({ recipe, isFavorited = false, onToggleFavorite }) => {
                 <p className="recipe-description">{description}</p>
                 <div className="recipe-meta">
                     <span className="recipe-time">
-                        ⏱️ {recipe.prepTime + recipe.cookTime} {t('min')}
+                        {totalTime} {t('min')}
                     </span>
                     <span className="recipe-servings">
-                        👥 {recipe.servings} {t('servings')}
+                        {recipe.servings} {t('servings')}
                     </span>
                 </div>
                 <div className="recipe-tags">
-                    {recipe.tags.slice(0, 3).map((tag, index) => (
+                    {tags.slice(0, 3).map((tag, index) => (
                         <span key={index} className="recipe-tag">#{tag}</span>
                     ))}
                 </div>
                 <div className="recipe-actions">
                     {onToggleFavorite && (
                         <button
-                            className="favorite-btn"
+                            className={`favorite-btn ${isFavorited ? 'is-active' : ''}`}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onToggleFavorite(recipe._id);
                             }}
+                            aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                            title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
                         >
-                            {isFavorited ? '❤️' : '🤍'}
+                            {isFavorited ? '\u2665' : '\u2661'}
                         </button>
                     )}
                     <button onClick={handleViewRecipe} className="recipe-view-btn">

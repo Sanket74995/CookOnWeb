@@ -1,5 +1,34 @@
 const mongoose = require('mongoose');
 
+const reviewSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    comment: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: ''
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+}, { _id: true });
+
 const recipeSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -57,7 +86,7 @@ const recipeSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ['appetizer', 'main course', 'dessert', 'beverage', 'snack', 'salad', 'soup', 'bread'],
+        enum: ['appetizer', 'breakfast', 'lunch', 'dinner', 'main course', 'dessert', 'beverage', 'snack', 'salad', 'soup', 'bread'],
         trim: true
     },
     difficulty: {
@@ -155,7 +184,8 @@ const recipeSchema = new mongoose.Schema({
             type: Number,
             default: 0
         }
-    }
+    },
+    reviews: [reviewSchema]
 });
 
 // Update the updatedAt field before saving

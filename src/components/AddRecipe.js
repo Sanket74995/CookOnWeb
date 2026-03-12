@@ -1,29 +1,84 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../styles/AddRecipe.scss";
 
 const API = "http://localhost:5000/api/recipes";
 
-const AddRecipe = () => {
-  const [form, setForm] = useState({
-    title: "",
-    ingredients: "",
-    instructions: "",
-    cookingTime: "",
-    difficulty: "",
-    category: "",
-    cuisine: "",
-    servings: "",
-  });
+const emptyForm = {
+  title: "",
+  description: "",
+  ingredients: "",
+  instructions: "",
+  prepTime: "",
+  cookTime: "",
+  difficulty: "medium",
+  category: "",
+  cuisine: "",
+  servings: "",
+  tags: "",
+};
 
+const AddRecipe = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+
+  const [form, setForm] = useState(emptyForm);
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(isEditMode);
 
-  // handle preview URL cleanup
+  useEffect(() => {
+    if (!isEditMode) {
+      return undefined;
+    }
+
+    const fetchRecipe = async () => {
+      try {
+        const response = await fetch(`${API}/${id}`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load recipe");
+        }
+
+        setForm({
+          title: data.title || "",
+          description: data.description || "",
+          ingredients: Array.isArray(data.ingredients)
+            ? data.ingredients
+                .map((item) => [item.quantity, item.unit, item.name].filter(Boolean).join(" "))
+                .join(", ")
+            : "",
+          instructions: Array.isArray(data.instructions)
+            ? data.instructions.map((item) => item.description).join("\n")
+            : "",
+          prepTime: data.prepTime ?? "",
+          cookTime: data.cookTime ?? "",
+          difficulty: data.difficulty || "medium",
+          category: data.category || "",
+          cuisine: data.cuisine || "",
+          servings: data.servings ?? "",
+          tags: Array.isArray(data.tags) ? data.tags.join(", ") : "",
+        });
+        setPreview(data.image || null);
+      } catch (error) {
+        console.error("Failed to load recipe for editing:", error);
+        alert("Unable to load this recipe.");
+        navigate("/profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipe();
+  }, [id, isEditMode, navigate]);
+
   useEffect(() => {
     if (!image) {
-      setPreview(null);
-      return;
+      return undefined;
     }
+
     const url = URL.createObjectURL(image);
     setPreview(url);
 
@@ -35,61 +90,90 @@ const AddRecipe = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const validateForm = () => {
+    if (!localStorage.getItem("token")) {
+      alert("Please log in before saving a recipe.");
+      return false;
+    }
 
-  const data = new FormData();
-  Object.keys(form).forEach((key) => data.append(key, form[key]));
-  data.set("ingredients", form.ingredients); // simple string
-  data.append("image", image);
+    if (
+      !form.title.trim() ||
+      !form.description.trim() ||
+      !form.ingredients.trim() ||
+      !form.instructions.trim() ||
+      !form.cookTime ||
+      !form.category ||
+      !form.cuisine.trim() ||
+      !form.servings ||
+      (!isEditMode && !image && !preview)
+    ) {
+      alert("Please fill in all required fields.");
+      return false;
+    }
 
-  const res = await fetch(API, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    body: data,
-  });
+    return true;
+  };
 
-  const resBody = await res.json().catch(() => ({}));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
-  if (res.ok) {
-    alert("Recipe added!");
-    setForm({
-      title: "",
-      ingredients: "",
-      instructions: "",
-      cookingTime: "",
-      difficulty: "",
-      category: "",
-      cuisine: "",
-      servings: "",
-    });
-    setImage(null);
-  } else {
-    console.log("Create recipe error:", resBody);
-    alert(resBody.message || "Failed");
+    setSubmitting(true);
+    const data = new FormData();
+    Object.entries(form).forEach(([key, value]) => data.append(key, value));
+    if (image) {
+      data.append("image", image);
+    }
+
+    try {
+      const response = await fetch(isEditMode ? `${API}/${id}` : API, {
+        method: isEditMode ? "PUT" : "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: data,
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.message || "Failed to save recipe");
+      }
+
+      alert(isEditMode ? "Recipe updated!" : "Recipe added!");
+      navigate(isEditMode ? `/recipe/${id}` : "/profile");
+    } catch (error) {
+      console.error("Save recipe request failed:", error);
+      alert(error.message || "Unable to save recipe.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="page-container">Loading recipe editor...</div>;
   }
-};
-
 
   return (
     <div className="page-container">
       <div className="add-recipe-page">
-        {/* LEFT: MAIN FORM */}
         <div className="add-recipe-main">
           <div className="add-recipe-header">
             <div>
-              <h2 className="add-recipe-header__title">Add New Recipe</h2>
+              <h2 className="add-recipe-header__title">
+                {isEditMode ? "Edit Recipe" : "Add New Recipe"}
+              </h2>
               <p className="add-recipe-header__subtitle">
-                Share your favourite dish with the CookOnWeb community.
+                {isEditMode
+                  ? "Update your recipe details, image, and instructions."
+                  : "Share your favourite dish with the CookOnWeb community."}
               </p>
             </div>
-            <span className="add-recipe-header__badge">Creator Mode</span>
+            <span className="add-recipe-header__badge">
+              {isEditMode ? "Edit Mode" : "Creator Mode"}
+            </span>
           </div>
 
           <form className="add-recipe-form" onSubmit={handleSubmit}>
-            {/* Title & Basic Info */}
             <div className="form-section">
               <div className="form-section__title">Basic details</div>
               <div className="form-section__hint">
@@ -106,6 +190,16 @@ const AddRecipe = () => {
                 />
               </div>
 
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="A short summary of the recipe, taste, and style"
+                />
+              </div>
+
               <div className="form-grid">
                 <div className="form-group">
                   <label>Cuisine</label>
@@ -119,11 +213,7 @@ const AddRecipe = () => {
 
                 <div className="form-group">
                   <label>Category</label>
-                  <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                  >
+                  <select name="category" value={form.category} onChange={handleChange}>
                     <option value="">Select category</option>
                     <option value="appetizer">Appetizer</option>
                     <option value="main course">Main course</option>
@@ -139,11 +229,22 @@ const AddRecipe = () => {
 
               <div className="time-serving-row">
                 <div className="form-group">
-                  <label>Cooking time (minutes)</label>
+                  <label>Prep time (minutes)</label>
                   <input
                     type="number"
-                    name="cookingTime"
-                    value={form.cookingTime}
+                    name="prepTime"
+                    value={form.prepTime}
+                    onChange={handleChange}
+                    placeholder="e.g. 15"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Cook time (minutes)</label>
+                  <input
+                    type="number"
+                    name="cookTime"
+                    value={form.cookTime}
                     onChange={handleChange}
                     placeholder="e.g. 30"
                   />
@@ -162,12 +263,7 @@ const AddRecipe = () => {
 
                 <div className="form-group">
                   <label>Difficulty</label>
-                  <select
-                    name="difficulty"
-                    value={form.difficulty}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select difficulty</option>
+                  <select name="difficulty" value={form.difficulty} onChange={handleChange}>
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
@@ -176,11 +272,12 @@ const AddRecipe = () => {
               </div>
             </div>
 
-            {/* Image Upload */}
             <div className="form-section form-section--divider">
               <div className="form-section__title">Cover photo</div>
               <div className="form-section__hint">
-                A good photo makes people more likely to try your recipe.
+                {isEditMode
+                  ? "Upload a new image only if you want to replace the current one."
+                  : "A good photo makes people more likely to try your recipe."}
               </div>
 
               <div className="image-upload">
@@ -189,11 +286,12 @@ const AddRecipe = () => {
                     type="file"
                     accept="image/*"
                     style={{ display: "none" }}
-                    onChange={(e) => setImage(e.target.files[0])}
+                    onChange={(e) => setImage(e.target.files?.[0] || null)}
                   />
                   <span>
-                    <strong>Click to upload</strong> or drag &amp; drop<br />
-                    JPG, PNG, WEBP • up to ~5MB
+                    <strong>Click to upload</strong> or drag &amp; drop
+                    <br />
+                    JPG, PNG, WEBP
                   </span>
                 </label>
 
@@ -205,14 +303,11 @@ const AddRecipe = () => {
               </div>
             </div>
 
-            {/* Ingredients */}
             <div className="form-section form-section--divider">
               <div className="form-section__title">Ingredients</div>
               <div className="form-section__hint">
-                Write ingredients separated by commas. (We’ll make this more
-                advanced later.)
+                Write ingredients separated by commas.
               </div>
-
               <div className="form-group">
                 <textarea
                   name="ingredients"
@@ -223,61 +318,65 @@ const AddRecipe = () => {
               </div>
             </div>
 
-            {/* Instructions */}
             <div className="form-section form-section--divider">
               <div className="form-section__title">Instructions</div>
               <div className="form-section__hint">
-                Explain each step clearly so anyone can follow.
+                Put each step on a new line so the app can number them.
               </div>
-
               <div className="form-group">
                 <textarea
                   name="instructions"
                   value={form.instructions}
                   onChange={handleChange}
-                  placeholder={`1. Heat oil in pan...\n2. Add onions and sauté...\n3. Add tomatoes and spices...`}
+                  placeholder={`1. Heat oil in pan...\n2. Add onions and saute...\n3. Add tomatoes and spices...`}
                 />
               </div>
             </div>
 
-            {/* Actions */}
+            <div className="form-section form-section--divider">
+              <div className="form-section__title">Tags</div>
+              <div className="form-section__hint">
+                Optional. Use commas like `quick, spicy, vegetarian`.
+              </div>
+              <div className="form-group">
+                <input
+                  name="tags"
+                  value={form.tags}
+                  onChange={handleChange}
+                  placeholder="e.g. quick, paneer, dinner"
+                />
+              </div>
+            </div>
+
             <div className="form-actions">
-              <button type="button" className="btn-outlined">
-                Save as draft
+              <button type="button" className="btn-outlined" onClick={() => navigate("/profile")}>
+                Cancel
               </button>
               <button type="submit" className="btn-primary">
-                Publish recipe
+                {submitting
+                  ? isEditMode ? "Saving..." : "Publishing..."
+                  : isEditMode ? "Save changes" : "Publish recipe"}
               </button>
             </div>
           </form>
         </div>
 
-        {/* RIGHT: SIDE PANEL / PREVIEW */}
         <div className="add-recipe-side">
           <div>
             <div className="preview-header">Live preview</div>
             <div className="preview-card">
-              <div className="preview-title">
-                {form.title || "Your recipe title"}
-              </div>
+              <div className="preview-title">{form.title || "Your recipe title"}</div>
               <div className="preview-meta">
                 <span>{form.cuisine || "Cuisine"}</span>
-                <span>
-                  {form.cookingTime
-                    ? `${form.cookingTime} min`
-                    : "Cooking time"}
-                </span>
-                <span>
-                  {form.servings ? `${form.servings} servings` : "Servings"}
-                </span>
+                <span>{form.cookTime ? `${form.cookTime} min` : "Cook time"}</span>
+                <span>{form.servings ? `${form.servings} servings` : "Servings"}</span>
               </div>
             </div>
           </div>
 
           <div className="tip-box">
-            Tip: After publishing, you can always edit your recipe from the
-            profile section. Try to keep steps simple and ingredients precise so
-            beginners can cook with confidence.
+            Cloud image upload is supported when `CLOUDINARY_CLOUD_NAME` and
+            `CLOUDINARY_UPLOAD_PRESET` are configured in the backend.
           </div>
         </div>
       </div>
