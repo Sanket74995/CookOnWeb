@@ -1,6 +1,8 @@
 const User = require('../models/User');
+const FamilyGroup = require('../models/FamilyGroup');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const makeInviteCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 
 // Register a new user
 const register = async (req, res) => {
@@ -218,6 +220,94 @@ const updateSettings = async (req, res) => {
   }
 };
 
+const getPantry = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('pantry');
+    res.json(user?.pantry || []);
+  } catch (err) {
+    console.error('Get pantry error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const updatePantry = async (req, res) => {
+  try {
+    const pantry = Array.isArray(req.body.pantry) ? req.body.pantry : [];
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { pantry },
+      { new: true }
+    ).select('pantry');
+
+    res.json({ message: 'Pantry updated', pantry: user?.pantry || [] });
+  } catch (err) {
+    console.error('Update pantry error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getFamilyGroups = async (req, res) => {
+  try {
+    const groups = await FamilyGroup.find({ 'members.user': req.userId })
+      .populate('members.user', 'firstName lastName username email')
+      .select('name inviteCode owner members createdAt');
+
+    res.json(groups);
+  } catch (err) {
+    console.error('Get family groups error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const createFamilyGroup = async (req, res) => {
+  try {
+    const name = String(req.body.name || '').trim();
+    if (!name) {
+      return res.status(400).json({ message: 'Family group name is required' });
+    }
+
+    const group = await FamilyGroup.create({
+      name,
+      inviteCode: makeInviteCode(),
+      owner: req.userId,
+      members: [{ user: req.userId, role: 'owner' }]
+    });
+
+    await User.findByIdAndUpdate(req.userId, { $addToSet: { familyGroups: group._id } });
+    const populated = await FamilyGroup.findById(group._id).populate('members.user', 'firstName lastName username email');
+    res.status(201).json({ message: 'Family group created', group: populated });
+  } catch (err) {
+    console.error('Create family group error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const joinFamilyGroup = async (req, res) => {
+  try {
+    const inviteCode = String(req.body.inviteCode || '').trim().toUpperCase();
+    if (!inviteCode) {
+      return res.status(400).json({ message: 'Invite code is required' });
+    }
+
+    const group = await FamilyGroup.findOne({ inviteCode });
+    if (!group) {
+      return res.status(404).json({ message: 'Family group not found' });
+    }
+
+    if (!group.members.some((member) => String(member.user) === String(req.userId))) {
+      group.members.push({ user: req.userId, role: 'member' });
+      await group.save();
+      await User.findByIdAndUpdate(req.userId, { $addToSet: { familyGroups: group._id } });
+    }
+
+    const populated = await FamilyGroup.findById(group._id).populate('members.user', 'firstName lastName username email');
+    res.json({ message: 'Joined family group', group: populated });
+  } catch (err) {
+    console.error('Join family group error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // ✅ NEW: simple subscription info
 const getSubscription = async (req, res) => {
   try {
@@ -276,4 +366,23 @@ module.exports = {
   updateSettings,
   getSubscription,
   upgradeSubscription, // 👈 add this
+};
+module.exports = {
+  register,
+  login,
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+  getProfile,
+  updateProfile,
+  changePassword,
+  getSettings,
+  getPantry,
+  getFamilyGroups,
+  updateSettings,
+  updatePantry,
+  createFamilyGroup,
+  joinFamilyGroup,
+  getSubscription,
+  upgradeSubscription,
 };

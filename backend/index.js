@@ -7,6 +7,7 @@ const connectDB = require('./DB');
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const chatbotRoutes = require('./routes/chatbot');
+const mealPlanRoutes = require('./routes/mealPlans');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/meal-plans', mealPlanRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/chatbot/admin', require('./routes/chatbotAdmin'));
 app.use('/api/recipes', require('./routes/recipes'));

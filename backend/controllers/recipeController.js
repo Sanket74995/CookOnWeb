@@ -3,9 +3,36 @@ const path = require('path');
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
 
+const DIETARY_FILTERS = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'high-protein', 'low-carb', 'diabetic-friendly', 'heart-healthy'];
+const INGREDIENT_EXCLUSIONS = {
+    vegetarian: /chicken|beef|pork|fish|seafood|lamb|mutton|bacon|ham|shrimp|prawn/i,
+    vegan: /chicken|beef|pork|fish|seafood|lamb|mutton|bacon|ham|shrimp|prawn|milk|cheese|paneer|butter|cream|ghee|yogurt|curd|egg|honey/i,
+    'gluten-free': /wheat|maida|flour|bread|pasta|noodle|semolina|sooji|rava/i,
+    'dairy-free': /milk|cheese|paneer|butter|cream|ghee|yogurt|curd/i
+};
+
 const normalizeNumber = (value, fallback = 0) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const parseFractionNumber = (value) => {
+    const normalized = String(value || '').trim();
+    if (!normalized) return null;
+
+    if (/^\d+\/\d+$/.test(normalized)) {
+        const [numerator, denominator] = normalized.split('/').map(Number);
+        return denominator ? numerator / denominator : null;
+    }
+
+    if (/^\d+\s+\d+\/\d+$/.test(normalized)) {
+        const [whole, fraction] = normalized.split(/\s+/);
+        const [numerator, denominator] = fraction.split('/').map(Number);
+        return denominator ? Number(whole) + numerator / denominator : null;
+    }
+
+    const numeric = Number(normalized.replace(/[^0-9.]/g, ''));
+    return Number.isFinite(numeric) ? numeric : null;
 };
 
 const parseIngredients = (value) => {
@@ -75,6 +102,21 @@ const parseTags = (value) => {
     return value.split(',').map((tag) => tag.trim()).filter(Boolean);
 };
 
+const parseDietaryFilters = (value) => {
+    if (Array.isArray(value)) {
+        return value.map((item) => String(item).trim().toLowerCase()).filter(Boolean);
+    }
+
+    if (typeof value !== 'string') {
+        return [];
+    }
+
+    return value
+        .split(',')
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean);
+};
+
 const parseNutrition = (value) => {
     if (value && typeof value === 'object' && !Array.isArray(value)) {
         return {
@@ -94,6 +136,121 @@ const parseNutrition = (value) => {
     } catch (error) {
         return { calories: 0, protein: 0, carbs: 0, fat: 0 };
     }
+};
+
+const getRecipeIngredientNames = (recipe) =>
+    (recipe.ingredients || []).map((ingredient) => String(ingredient.name || '').toLowerCase());
+
+const getRecipeTags = (recipe) =>
+    (recipe.tags || []).map((tag) => String(tag).toLowerCase());
+
+const matchesDietaryFilter = (recipe, dietaryFilter) => {
+    const filter = String(dietaryFilter || '').toLowerCase();
+    const ingredients = getRecipeIngredientNames(recipe).join(' ');
+    const tags = getRecipeTags(recipe);
+    const nutrition = recipe.nutrition || {};
+
+    if (INGREDIENT_EXCLUSIONS[filter]) {
+        return !INGREDIENT_EXCLUSIONS[filter].test(ingredients) || tags.includes(filter);
+    }
+
+    if (filter === 'high-protein') {
+        return Number(nutrition.protein || 0) >= 18 || tags.includes('high-protein') || tags.includes('gym') || tags.includes('protein');
+    }
+
+    if (filter === 'low-carb') {
+        return (Number(nutrition.carbs || 0) > 0 && Number(nutrition.carbs) <= 25) || tags.includes('low-carb') || tags.includes('keto');
+    }
+
+    if (filter === 'diabetic-friendly') {
+        return tags.includes('diabetic') || tags.includes('low-sugar') || tags.includes('low-carb') || (
+            !/sugar|syrup|sweetened|jaggery|honey/i.test(ingredients) &&
+            (Number(nutrition.carbs || 0) === 0 || Number(nutrition.carbs || 0) <= 30)
+        );
+    }
+
+    if (filter === 'heart-healthy') {
+        return tags.includes('heart-healthy') || tags.includes('low-sodium') || (
+            !/butter|cream|ghee/i.test(ingredients) &&
+            (Number(nutrition.fat || 0) === 0 || Number(nutrition.fat || 0) <= 18)
+        );
+    }
+
+    return tags.includes(filter);
+};
+
+const applyDietaryFilters = (recipes, dietaryFilters = []) => {
+    if (!dietaryFilters.length) {
+        return recipes;
+    }
+
+    return recipes.filter((recipe) => dietaryFilters.every((filter) => matchesDietaryFilter(recipe, filter)));
+};
+
+const formatTitleCase = (value) =>
+    String(value || '')
+        .split(/[\s-]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+
+const extractYouTubeVideoId = (url) => {
+    const value = String(url || '').trim();
+    const shortMatch = value.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+    if (shortMatch) return shortMatch[1];
+
+    const longMatch = value.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+    if (longMatch) return longMatch[1];
+
+    const embedMatch = value.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{6,})/);
+    return embedMatch ? embedMatch[1] : '';
+};
+
+const buildGeneratedRecipe = (ingredients = [], options = {}, sourceRecipes = []) => {
+    const cleanedIngredients = ingredients
+        .map((item) => String(item || '').trim().toLowerCase())
+        .filter(Boolean)
+        .slice(0, 8);
+
+    const primary = cleanedIngredients.slice(0, 3).map(formatTitleCase);
+    const cuisine = options.cuisine ? formatTitleCase(options.cuisine) : '';
+    const dietary = options.dietaryFilters?.map(formatTitleCase) || [];
+    const titleCore = primary.length ? primary.join(' ') : 'Pantry';
+    const title = `${cuisine ? `${cuisine} ` : ''}${titleCore} Skillet`;
+
+    const sourceTags = [...new Set(sourceRecipes.flatMap((recipe) => recipe.tags || []))].slice(0, 4);
+    const sourceIngredientNames = sourceRecipes.flatMap((recipe) => (recipe.ingredients || []).map((item) => item.name)).slice(0, 5);
+    const combinedIngredients = [...new Set([...cleanedIngredients, ...sourceIngredientNames.map((item) => String(item).toLowerCase())])].slice(0, 10);
+
+    const ingredientObjects = combinedIngredients.map((name, index) => ({
+        name: formatTitleCase(name),
+        quantity: index < cleanedIngredients.length ? '1' : '0.5',
+        unit: index < cleanedIngredients.length ? 'cup' : 'cup'
+    }));
+
+    const instructions = [
+        `Prep ${primary.length ? primary.join(', ').toLowerCase() : 'your pantry ingredients'} into bite-sized pieces.`,
+        `Heat a pan, add aromatics or oil, and cook the base ingredients for 4 to 5 minutes.`,
+        `Add the remaining ingredients with salt, pepper, and your favorite spices, then cook until tender.`,
+        `Finish with herbs or a squeeze of lemon and serve warm.`
+    ].map((description, index) => ({
+        step: index + 1,
+        description
+    }));
+
+    return {
+        title,
+        description: `A quick ${dietary.length ? `${dietary.join(', ')} ` : ''}recipe idea generated from your available ingredients.`,
+        cuisine: cuisine || 'Flexible',
+        category: options.category || 'main course',
+        difficulty: options.maxTime && Number(options.maxTime) <= 20 ? 'easy' : 'medium',
+        prepTime: 10,
+        cookTime: options.maxTime ? Math.max(10, Math.min(30, Number(options.maxTime))) : 20,
+        servings: 2,
+        ingredients: ingredientObjects,
+        instructions,
+        tags: [...new Set([...sourceTags, ...cleanedIngredients, ...(options.dietaryFilters || [])])].slice(0, 8)
+    };
 };
 
 const cleanupFile = async (filePath) => {
@@ -561,6 +718,7 @@ const searchRecipes = async (req, res) => {
             cuisine,
             category,
             difficulty,
+            dietary,
             tags,
             maxTime,
             minRating,
@@ -569,6 +727,7 @@ const searchRecipes = async (req, res) => {
         } = req.query;
 
         const searchCriteria = {};
+        const dietaryFilters = parseDietaryFilters(dietary);
 
         if (query) {
             searchCriteria.$or = [
@@ -620,10 +779,138 @@ const searchRecipes = async (req, res) => {
         const recipes = await populateRecipeQuery(Recipe.find(searchCriteria))
             .sort(sortCriteria);
 
-        res.json(recipes);
+        res.json(applyDietaryFilters(recipes, dietaryFilters));
     } catch (error) {
         console.error('Search recipes error:', error);
         res.status(500).json({ message: 'Server error while searching recipes' });
+    }
+};
+
+const generateRecipeFromIngredients = async (req, res) => {
+    try {
+        const ingredients = Array.isArray(req.body.ingredients)
+            ? req.body.ingredients
+            : String(req.body.ingredients || '')
+                .split(',')
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+        if (!ingredients.length) {
+            return res.status(400).json({ message: 'At least one ingredient is required' });
+        }
+
+        const dietaryFilters = parseDietaryFilters(req.body.dietary || req.body.dietaryFilters);
+        const maxTime = normalizeNumber(req.body.maxTime, 0);
+        const ingredientRegexes = ingredients.map((ingredient) => new RegExp(ingredient, 'i'));
+
+        const recipes = await populateRecipeQuery(Recipe.find({
+            $or: ingredientRegexes.map((regex) => ({ 'ingredients.name': { $regex: regex } }))
+        }).limit(40));
+
+        const rankedMatches = applyDietaryFilters(recipes, dietaryFilters)
+            .map((recipe) => {
+                const ingredientNames = getRecipeIngredientNames(recipe);
+                const matchCount = ingredients.filter((ingredient) =>
+                    ingredientNames.some((name) => name.includes(String(ingredient).toLowerCase()))
+                ).length;
+
+                const totalTime = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
+                const timeScore = maxTime > 0 && totalTime > 0 && totalTime <= maxTime ? 2 : 0;
+
+                return {
+                    recipe,
+                    matchScore: matchCount + timeScore
+                };
+            })
+            .sort((a, b) => b.matchScore - a.matchScore)
+            .map((item) => item.recipe)
+            .slice(0, 5);
+
+        const generatedRecipe = buildGeneratedRecipe(ingredients, {
+            cuisine: req.body.cuisine,
+            category: req.body.category,
+            maxTime,
+            dietaryFilters
+        }, rankedMatches);
+
+        return res.json({
+            message: 'Generated a recipe idea from your ingredients.',
+            matchedRecipes: rankedMatches,
+            generatedRecipe,
+            supportedDietaryFilters: DIETARY_FILTERS
+        });
+    } catch (error) {
+        console.error('Generate recipe from ingredients error:', error);
+        return res.status(500).json({ message: 'Server error while generating recipe idea' });
+    }
+};
+
+const importRecipeFromUrl = async (req, res) => {
+    try {
+        const sourceUrl = String(req.body.url || '').trim();
+        if (!sourceUrl) {
+            return res.status(400).json({ message: 'Recipe URL is required' });
+        }
+
+        const youtubeId = extractYouTubeVideoId(sourceUrl);
+        if (youtubeId) {
+            return res.json({
+                message: 'Imported YouTube recipe draft successfully',
+                recipe: {
+                    title: 'Imported YouTube Recipe',
+                    description: 'Review the video and update ingredients/instructions before publishing.',
+                    image: `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`,
+                    video: youtubeId,
+                    cuisine: 'International',
+                    category: 'main course',
+                    difficulty: 'medium',
+                    prepTime: 15,
+                    cookTime: 20,
+                    servings: 2,
+                    ingredients: [],
+                    instructions: [],
+                    tags: ['imported', 'youtube']
+                }
+            });
+        }
+
+        const response = await fetch(sourceUrl, {
+            headers: {
+                'User-Agent': 'CookOnWeb Recipe Importer'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Unable to fetch recipe URL (${response.status})`);
+        }
+
+        const html = await response.text();
+        const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || 'Imported Recipe';
+        const description = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1]?.trim()
+            || 'Imported recipe draft. Review and complete the details before publishing.';
+        const image = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
+
+        return res.json({
+            message: 'Imported recipe draft successfully',
+            recipe: {
+                title: title.slice(0, 100),
+                description: description.slice(0, 500),
+                image,
+                video: '',
+                cuisine: 'International',
+                category: 'main course',
+                difficulty: 'medium',
+                prepTime: 15,
+                cookTime: 20,
+                servings: 2,
+                ingredients: [],
+                instructions: [],
+                tags: ['imported', 'web']
+            }
+        });
+    } catch (error) {
+        console.error('Import recipe error:', error);
+        return res.status(500).json({ message: error.message || 'Server error while importing recipe' });
     }
 };
 
@@ -631,6 +918,8 @@ module.exports = {
     addReview,
     createRecipe,
     deleteRecipe,
+    generateRecipeFromIngredients,
+    importRecipeFromUrl,
     getAllRecipes,
     getMyRecipes,
     getRecommendedRecipes,

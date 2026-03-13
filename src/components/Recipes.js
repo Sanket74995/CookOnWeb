@@ -5,6 +5,16 @@ import '../styles/Recipes.scss';
 import RecipeCard from './RecipeCard';
 
 const API = 'http://localhost:5000/api/recipes';
+const DEFAULT_FILTERS = {
+    query: '',
+    cuisine: '',
+    difficulty: '',
+    dietary: '',
+    maxTime: '',
+    minRating: '',
+    sort: 'latest'
+};
+const DIETARY_OPTIONS = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'high-protein', 'low-carb', 'diabetic-friendly', 'heart-healthy'];
 const normalizeCuisine = (value) => (value || '').trim().toLowerCase();
 const formatCuisineLabel = (value) => {
     const normalized = normalizeCuisine(value);
@@ -20,24 +30,31 @@ const Recipes = () => {
     const navigate = useNavigate();
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
     const [favorites, setFavorites] = useState([]);
     const [recommended, setRecommended] = useState([]);
     const [foodProfile, setFoodProfile] = useState(null);
-    const [filters, setFilters] = useState({
-        query: '',
-        cuisine: '',
-        difficulty: '',
-        maxTime: '',
-        minRating: '',
-        sort: 'latest'
-    });
+    const [filters, setFilters] = useState(DEFAULT_FILTERS);
+    const [searchInput, setSearchInput] = useState(DEFAULT_FILTERS.query);
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [useFoodPlan, setUseFoodPlan] = useState(false);
+    const [generatorInput, setGeneratorInput] = useState('');
+    const [generatorDietary, setGeneratorDietary] = useState([]);
+    const [generatorResult, setGeneratorResult] = useState(null);
+    const [generating, setGenerating] = useState(false);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setFilters((prev) => prev.query === searchInput ? prev : { ...prev, query: searchInput });
+        }, 350);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchInput]);
 
     useEffect(() => {
         const searchRecipes = async () => {
             try {
-                setLoading(true);
+                setIsSearching(true);
                 const params = new URLSearchParams();
                 Object.entries(filters).forEach(([key, value]) => {
                     if (value) {
@@ -57,6 +74,7 @@ const Recipes = () => {
                 console.error('Error fetching recipes:', error);
             } finally {
                 setLoading(false);
+                setIsSearching(false);
             }
         };
 
@@ -159,6 +177,47 @@ const Recipes = () => {
         setFilters((prev) => ({ ...prev, [key]: value }));
     };
 
+    const toggleDietaryOption = (option) => {
+        setGeneratorDietary((prev) =>
+            prev.includes(option)
+                ? prev.filter((item) => item !== option)
+                : [...prev, option]
+        );
+    };
+
+    const generateFromIngredients = async () => {
+        if (!generatorInput.trim()) {
+            alert('Enter a few ingredients first.');
+            return;
+        }
+
+        try {
+            setGenerating(true);
+            const response = await fetch(`${API}/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ingredients: generatorInput,
+                    dietaryFilters: generatorDietary,
+                    maxTime: filters.maxTime || undefined,
+                    cuisine: filters.cuisine || undefined
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to generate recipe idea');
+            }
+            setGeneratorResult(data);
+        } catch (error) {
+            console.error('Ingredient recipe generation failed:', error);
+            alert(error.message || 'Unable to generate recipe idea');
+        } finally {
+            setGenerating(false);
+        }
+    };
+
     if (loading) {
         return <div className="recipes-loading">{t('loading_recipes')}</div>;
     }
@@ -197,15 +256,56 @@ const Recipes = () => {
             )}
 
             <div className="filters-section filters-section--grid">
+                <div className="filter-item" style={{ gridColumn: '1 / -1' }}>
+                    <label>Pantry to recipe generator:</label>
+                    <input
+                        type="text"
+                        value={generatorInput}
+                        onChange={(e) => setGeneratorInput(e.target.value)}
+                        placeholder="e.g. paneer, onion, capsicum, tomato"
+                    />
+                    <div className="tags-list" style={{ marginTop: '10px' }}>
+                        {DIETARY_OPTIONS.map((option) => (
+                            <button
+                                key={option}
+                                type="button"
+                                className="reset-button"
+                                style={{
+                                    marginRight: '8px',
+                                    marginBottom: '8px',
+                                    opacity: generatorDietary.includes(option) ? 1 : 0.7
+                                }}
+                                onClick={() => toggleDietaryOption(option)}
+                            >
+                                {generatorDietary.includes(option) ? 'Selected:' : 'Add:'} {option}
+                            </button>
+                        ))}
+                    </div>
+                    <button className="reset-button" type="button" onClick={generateFromIngredients} disabled={generating}>
+                        {generating ? 'Generating...' : 'Generate recipe idea'}
+                    </button>
+                </div>
+
+                {generatorResult?.generatedRecipe && (
+                    <div className="recipes-empty" style={{ gridColumn: '1 / -1', textAlign: 'left' }}>
+                        <strong>Generated idea:</strong> {generatorResult.generatedRecipe.title}
+                        <br />
+                        {generatorResult.generatedRecipe.description}
+                        <br />
+                        <strong>Ingredients:</strong> {generatorResult.generatedRecipe.ingredients.map((item) => `${item.quantity} ${item.unit} ${item.name}`.trim()).join(', ')}
+                    </div>
+                )}
+
                 <div className="filter-item">
                     <label htmlFor="search">{t('search')}:</label>
                     <input
                         type="text"
                         id="search"
                         placeholder={t('search_placeholder')}
-                        value={filters.query}
-                        onChange={(e) => updateFilter('query', e.target.value)}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
                     />
+                    {isSearching && <div className="filter-status">Searching...</div>}
                 </div>
 
                 <div className="filter-item">
@@ -225,6 +325,16 @@ const Recipes = () => {
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
+                    </select>
+                </div>
+
+                <div className="filter-item">
+                    <label>Dietary:</label>
+                    <select value={filters.dietary} onChange={(e) => updateFilter('dietary', e.target.value)}>
+                        <option value="">All dietary styles</option>
+                        {DIETARY_OPTIONS.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                        ))}
                     </select>
                 </div>
 
@@ -289,14 +399,8 @@ const Recipes = () => {
                     <button
                         className="reset-button"
                         onClick={() => {
-                            setFilters({
-                                query: '',
-                                cuisine: '',
-                                difficulty: '',
-                                maxTime: '',
-                                minRating: '',
-                                sort: 'latest'
-                            });
+                            setFilters(DEFAULT_FILTERS);
+                            setSearchInput(DEFAULT_FILTERS.query);
                             setShowOnlyFavorites(false);
                             setUseFoodPlan(false);
                         }}
@@ -311,26 +415,48 @@ const Recipes = () => {
                     No recipes matched these filters. Try broadening the search.
                 </div>
             ) : (
-                Object.entries(groupedRecipes).map(([cuisineKey, group]) => (
-                    <section key={cuisineKey} className="cuisine-section">
-                        <h2>{t(group.label.toLowerCase()) || group.label}</h2>
-                        <div className="cuisine-recipes">
-                            {group.recipes.map((recipe) => (
-                                <div
-                                    key={recipe._id}
-                                    onClick={() => navigate(`/recipe/${recipe._id}`)}
-                                    className="recipe-card-wrapper"
-                                >
-                                    <RecipeCard
-                                        recipe={recipe}
-                                        isFavorited={favorites.includes(recipe._id)}
-                                        onToggleFavorite={toggleFavorite}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                ))
+                <>
+                    {generatorResult?.matchedRecipes?.length > 0 && (
+                        <section className="cuisine-section">
+                            <h2>Best pantry matches</h2>
+                            <div className="cuisine-recipes">
+                                {generatorResult.matchedRecipes.map((recipe) => (
+                                    <div
+                                        key={recipe._id}
+                                        onClick={() => navigate(`/recipe/${recipe._id}`)}
+                                        className="recipe-card-wrapper"
+                                    >
+                                        <RecipeCard
+                                            recipe={recipe}
+                                            isFavorited={favorites.includes(recipe._id)}
+                                            onToggleFavorite={toggleFavorite}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+                    {Object.entries(groupedRecipes).map(([cuisineKey, group]) => (
+                        <section key={cuisineKey} className="cuisine-section">
+                            <h2>{t(group.label.toLowerCase()) || group.label}</h2>
+                            <div className="cuisine-recipes">
+                                {group.recipes.map((recipe) => (
+                                    <div
+                                        key={recipe._id}
+                                        onClick={() => navigate(`/recipe/${recipe._id}`)}
+                                        className="recipe-card-wrapper"
+                                    >
+                                        <RecipeCard
+                                            recipe={recipe}
+                                            isFavorited={favorites.includes(recipe._id)}
+                                            onToggleFavorite={toggleFavorite}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    ))}
+                </>
             )}
         </div>
     );
