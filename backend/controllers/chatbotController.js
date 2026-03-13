@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Recipe = require('../models/Recipe');
 const ChatLog = require('../models/ChatLog');
 const User = require('../models/User');
+const MealPlan = require('../models/MealPlan');
 
 const COMMON_INGREDIENTS = [
   'potato', 'aloo', 'rice', 'chawal', 'chicken', 'paneer', 'tomato', 'onion', 'garlic',
@@ -70,6 +71,157 @@ const PREFERENCE_ALIASES = {
   protein: ['protein', 'high protein'],
   vegetarian: ['vegetarian', 'veg'],
   vegan: ['vegan']
+};
+
+const SHOPPING_INTENTS = ['shopping list', 'grocery list', 'groceries', 'buy for this week'];
+const PLANNER_INTENTS = ['meal plan', 'plan my week', 'weekly plan', 'planner', 'schedule meals'];
+const SCALE_INTENTS = ['scale recipe', 'double recipe', 'halve recipe', 'half recipe', 'servings'];
+const GENERATE_INTENTS = ['generate recipe', 'create recipe', 'make recipe from', 'recipe from ingredients'];
+
+const safeNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const getStartOfWeek = (value) => {
+  const date = value ? new Date(value) : new Date();
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  const clone = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = clone.getUTCDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  clone.setUTCDate(clone.getUTCDate() + diff);
+  return clone.toISOString().slice(0, 10);
+};
+
+const parseQuantityValue = (value) => {
+  const normalized = String(value || '').trim();
+  if (!normalized) return null;
+
+  if (/^\d+\/\d+$/.test(normalized)) {
+    const [numerator, denominator] = normalized.split('/').map(Number);
+    return denominator ? numerator / denominator : null;
+  }
+
+  if (/^\d+\s+\d+\/\d+$/.test(normalized)) {
+    const [whole, fraction] = normalized.split(/\s+/);
+    const [numerator, denominator] = fraction.split('/').map(Number);
+    return denominator ? Number(whole) + numerator / denominator : null;
+  }
+
+  const numeric = Number(normalized.replace(/[^0-9.]/g, ''));
+  return Number.isFinite(numeric) ? numeric : null;
+};
+
+const formatQuantity = (value) => {
+  if (!Number.isFinite(value)) return '';
+  const rounded = Math.round(value * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+};
+
+const buildShoppingListFromEntries = (entries = []) => {
+  const grouped = new Map();
+
+  entries.forEach((entry) => {
+    const recipe = entry.recipe;
+    if (!recipe) return;
+
+    const baseServings = safeNumber(recipe.servings, 1) || 1;
+    const scale = (safeNumber(entry.servings, baseServings) || baseServings) / baseServings;
+
+    (recipe.ingredients || []).forEach((ingredient) => {
+      const name = String(ingredient.name || '').trim();
+      if (!name) return;
+
+      const unit = String(ingredient.unit || '').trim().toLowerCase();
+      const key = `${name.toLowerCase()}::${unit}`;
+      const numericQuantity = parseQuantityValue(ingredient.quantity);
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          name,
+          unit: ingredient.unit || '',
+          quantityValue: 0,
+          quantityText: [],
+          recipes: []
+        });
+      }
+
+      const current = grouped.get(key);
+      current.recipes.push(recipe.title);
+
+      if (numericQuantity != null) {
+        current.quantityValue += numericQuantity * scale;
+      } else if (ingredient.quantity) {
+        current.quantityText.push(`${ingredient.quantity}${ingredient.unit ? ` ${ingredient.unit}` : ''}`.trim());
+      }
+    });
+  });
+
+  return [...grouped.values()].map((item) => ({
+    name: item.name,
+    unit: item.unit,
+    quantity: item.quantityValue > 0 ? formatQuantity(item.quantityValue) : item.quantityText.join(' + '),
+    recipes: [...new Set(item.recipes)].slice(0, 3)
+  })).sort((a, b) => a.name.localeCompare(b.name));
+};
+
+const findRelevantMealPlan = async (userId, requestedWeekStart = null) => {
+  const populate = {
+    path: 'entries.recipe',
+    select: 'title ingredients servings'
+  };
+
+  if (requestedWeekStart) {
+    const requestedPlan = await MealPlan.findOne({ user: userId, weekStart: requestedWeekStart }).populate(populate);
+    if (requestedPlan?.entries?.length) {
+      return requestedPlan;
+    }
+  }
+
+  return MealPlan.findOne({ user: userId, 'entries.0': { $exists: true } })
+    .sort({ updatedAt: -1, createdAt: -1 })
+    .populate(populate);
+};
+
+const buildGeneratedRecipe = (ingredients = [], options = {}, sourceRecipes = []) => {
+  const cleaned = ingredients.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 8);
+  const title = `${cleaned.slice(0, 3).map((item) => item.charAt(0).toUpperCase() + item.slice(1)).join(' ')} Bowl`.trim() || 'Pantry Bowl';
+  const tags = [...new Set([
+    ...(options.dietaryFilters || []),
+    ...sourceRecipes.flatMap((recipe) => recipe.tags || []),
+    ...cleaned
+  ])].slice(0, 8);
+
+  return {
+    title,
+    description: `A quick recipe concept using ${cleaned.join(', ')}${options.dietaryFilters?.length ? ` for a ${options.dietaryFilters.join(', ')} meal` : ''}.`,
+    ingredients: cleaned.map((item) => ({ name: item, quantity: '1', unit: 'cup' })),
+    instructions: [
+      { step: 1, description: 'Prep the ingredients into even pieces.' },
+      { step: 2, description: 'Cook aromatics first, then add the main ingredients.' },
+      { step: 3, description: 'Season well and simmer or saute until tender.' },
+      { step: 4, description: 'Finish with herbs or lemon and serve warm.' }
+    ],
+    tags
+  };
+};
+
+const extractRecipeNameForScaling = (normalizedQuery) => {
+  const cleaned = normalizedQuery
+    .replace(/^(please\s+)?(can you\s+)?/i, '')
+    .replace(/\b(scale|double|halve|half)\b/gi, '')
+    .replace(/\b(recipe)\b/gi, '')
+    .replace(/\bto\s+\d+\s*(servings|people|portion|portions)\b/gi, '')
+    .replace(/\bfor\s+\d+\s*(servings|people|portion|portions)\b/gi, '')
+    .replace(/\b\d+\s*(servings|people|portion|portions)\b/gi, '')
+    .replace(/\bplease\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned;
 };
 
 const extractQueryGoals = (normalizedQuery) => {
@@ -157,6 +309,23 @@ const parseUserQuery = (query) => {
     };
   }
 
+  if (SHOPPING_INTENTS.some((term) => normalizedQuery.includes(term))) {
+    parsedQuery = { type: 'shopping_list' };
+  }
+
+  if (parsedQuery.type === 'unknown' && PLANNER_INTENTS.some((term) => normalizedQuery.includes(term))) {
+    parsedQuery = { type: 'meal_plan' };
+  }
+
+  if (parsedQuery.type === 'unknown' && SCALE_INTENTS.some((term) => normalizedQuery.includes(term))) {
+    const servingsMatch = normalizedQuery.match(/(\d+)\s*(servings|people|portion)/);
+    parsedQuery = {
+      type: 'scale_recipe',
+      targetServings: servingsMatch ? Number(servingsMatch[1]) : null,
+      recipeName: extractRecipeNameForScaling(normalizedQuery)
+    };
+  }
+
   const timeMatch = normalizedQuery.match(/(\d+)\s*(min|mins|minute|minutes|hour|hours|hr|hrs)/);
   if (timeMatch) {
     const value = parseInt(timeMatch[1], 10);
@@ -186,7 +355,10 @@ const parseUserQuery = (query) => {
           .filter((item) => item.length > 1);
 
         if (ingredients.length > 0) {
-          parsedQuery = { type: 'ingredients', ingredients };
+          parsedQuery = {
+            type: GENERATE_INTENTS.some((term) => normalizedQuery.includes(term)) ? 'generate_recipe' : 'ingredients',
+            ingredients
+          };
           break;
         }
       }
@@ -201,8 +373,15 @@ const parseUserQuery = (query) => {
 
     const ingredients = potentialIngredients.filter((item) => COMMON_INGREDIENTS.includes(item));
     if (ingredients.length > 1) {
-      parsedQuery = { type: 'ingredients', ingredients };
+      parsedQuery = {
+        type: GENERATE_INTENTS.some((term) => normalizedQuery.includes(term)) ? 'generate_recipe' : 'ingredients',
+        ingredients
+      };
     }
+  }
+
+  if (parsedQuery.type === 'unknown' && GENERATE_INTENTS.some((term) => normalizedQuery.includes(term))) {
+    parsedQuery = { type: 'generate_recipe', ingredients: [] };
   }
 
   if (parsedQuery.type === 'unknown' && queryGoals.length > 0) {
@@ -560,6 +739,277 @@ const getLearningMessage = (signals, parsedQuery) => {
   return '';
 };
 
+const getGeminiConfig = () => ({
+  apiKey: process.env.GEMINI_API_KEY || '',
+  model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-lite'
+});
+
+const summarizeSessionMemory = (sessionMemory = []) =>
+  sessionMemory
+    .slice(0, 4)
+    .reverse()
+    .map((item) => `${item.queryType || 'message'}: ${String(item.userMessage || '').trim()}`)
+    .join('\n');
+
+const buildLLMContext = ({
+  userMessage,
+  parsedQuery,
+  recipes = [],
+  shoppingList = [],
+  generatedRecipe = null,
+  mealPlan = null,
+  scalePreview = null,
+  signals = null,
+  sessionMemory = [],
+  fallbackMessage = ''
+}) => {
+  const profile = signals?.foodProfile || {};
+
+  return {
+    userMessage,
+    parsedQuery,
+    profile: {
+      goal: profile.goal || '',
+      conditions: profile.conditions || [],
+      preferredCuisines: profile.preferredCuisines || [],
+      avoidIngredients: profile.avoidIngredients || []
+    },
+    topTags: signals?.topTags || [],
+    recentConversation: summarizeSessionMemory(sessionMemory),
+    recipes: recipes.slice(0, 5).map((recipe) => ({
+      title: recipe.title,
+      cuisine: recipe.cuisine,
+      category: recipe.category,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      rating: recipe.rating?.average || 0,
+      tags: recipe.tags || [],
+      ingredients: (recipe.ingredients || []).slice(0, 8).map((ingredient) => ingredient.name)
+    })),
+    shoppingList: shoppingList.slice(0, 10),
+    generatedRecipe,
+    mealPlan: mealPlan ? {
+      weekStart: mealPlan.weekStart,
+      entries: (mealPlan.entries || []).slice(0, 8).map((entry) => ({
+        date: entry.date,
+        mealType: entry.mealType,
+        recipeTitle: entry.recipe?.title || ''
+      }))
+    } : null,
+    scalePreview,
+    fallbackMessage
+  };
+};
+
+const generateGeminiReply = async (context) => {
+  const { apiKey, model } = getGeminiConfig();
+  if (!apiKey) return null;
+
+  const systemPrompt = [
+    'You are CookOnWeb\'s recipe assistant.',
+    'Answer naturally and helpfully using ONLY the provided application context.',
+    'Do not invent recipes, meal plans, shopping items, or user preferences that are not in the context.',
+    'If there are recipe matches, recommend the best ones with short reasons.',
+    'If there is a generated recipe idea, present it clearly as a generated idea.',
+    'If there is a shopping list or meal plan, summarize it in a user-friendly way.',
+    'Keep the answer concise, practical, and conversational.'
+  ].join(' ');
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `${systemPrompt}\n\nApplication context:\n${JSON.stringify(context, null, 2)}`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 400
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini API error: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data?.candidates?.[0]?.content?.parts?.map((part) => part.text).filter(Boolean).join('\n').trim() || null;
+};
+
+const getSessionMemory = async (sessionId) => {
+  if (!sessionId) return [];
+
+  return ChatLog.find({ sessionId })
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .select('userMessage queryType createdAt');
+};
+
+const formatList = (items = [], limit = 3) =>
+  items
+    .filter(Boolean)
+    .slice(0, limit)
+    .join(', ');
+
+const buildRecipeReason = (recipe, parsedQuery, signals) => {
+  const reasons = [];
+  const totalTime = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
+  const tags = (recipe.tags || []).map((tag) => String(tag).toLowerCase());
+
+  if (parsedQuery?.ingredients?.length) {
+    const ingredientNames = (recipe.ingredients || []).map((ingredient) => String(ingredient.name || '').toLowerCase());
+    const matched = parsedQuery.ingredients.filter((ingredient) =>
+      ingredientNames.some((name) => name.includes(String(ingredient).toLowerCase()))
+    );
+    if (matched.length) reasons.push(`uses ${formatList(matched)}`);
+  }
+
+  if (parsedQuery?.dietary && tags.some((tag) => tag.includes(String(parsedQuery.dietary).toLowerCase()))) {
+    reasons.push(`fits ${parsedQuery.dietary}`);
+  }
+
+  if (signals?.foodProfile?.goal && tags.includes(String(signals.foodProfile.goal).toLowerCase())) {
+    reasons.push(`matches your ${signals.foodProfile.goal.replace(/-/g, ' ')}`);    
+  }
+
+  if (totalTime > 0 && totalTime <= 30) {
+    reasons.push(`ready in about ${totalTime} min`);
+  }
+
+  if (recipe.rating?.average >= 4) {
+    reasons.push(`rated ${recipe.rating.average}/5`);
+  }
+
+  return reasons.slice(0, 2);
+};
+
+const buildAssistantReply = ({
+  parsedQuery,
+  recipes = [],
+  shoppingList = [],
+  generatedRecipe = null,
+  mealPlan = null,
+  scalePreview = null,
+  signals = null,
+  sessionMemory = [],
+  fallbackMessage = ''
+}) => {
+  const memoryHint = sessionMemory.length > 1
+    ? `I also looked at your recent chat context so this stays consistent with what we were discussing.`
+    : '';
+
+  if (parsedQuery.type === 'shopping_list') {
+    if (!shoppingList.length) {
+      return fallbackMessage || 'I could not find a saved meal plan yet. Save your planner week first, or ask me to create one for you.';
+    }
+
+    const topItems = shoppingList.slice(0, 8).map((item, index) =>
+      `${index + 1}. ${item.name} - ${item.quantity}${item.unit ? ` ${item.unit}` : ''}`
+    ).join('\n');
+
+    return `I built your shopping list from the saved meal plan for the week starting ${mealPlan?.weekStart || 'your latest saved week'}.\n\n${topItems}\n\n${memoryHint}`.trim();
+  }
+
+  if (parsedQuery.type === 'meal_plan' && mealPlan?.entries?.length) {
+    const preview = mealPlan.entries.slice(0, 6).map((entry, index) =>
+      `${index + 1}. ${entry.date} - ${entry.mealType}: ${entry.recipe?.title || 'Recipe'}`
+    ).join('\n');
+
+    return `I created a weekly meal plan for the week starting ${mealPlan.weekStart}. I balanced it around your saved food profile and stronger recipe matches.\n\n${preview}\n\nYou can open Planner to edit any slot.`.trim();
+  }
+
+  if (parsedQuery.type === 'scale_recipe' && scalePreview) {
+    const items = scalePreview.ingredients.slice(0, 8).map((ingredient, index) =>
+      `${index + 1}. ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`.trim()
+    ).join('\n');
+
+    return `I scaled ${scalePreview.title} from ${scalePreview.baseServings} to ${scalePreview.targetServings} servings.\n\n${items}\n\nIf you want, I can also help turn this into a shopping list.`.trim();
+  }
+
+  if (parsedQuery.type === 'generate_recipe' && generatedRecipe) {
+    const matchedTitles = recipes.length ? `I also found a few similar recipes in your collection: ${formatList(recipes.map((recipe) => recipe.title), 3)}.` : '';
+    return `I generated a recipe idea called "${generatedRecipe.title}". ${generatedRecipe.description}\n\nCore ingredients: ${formatList(generatedRecipe.ingredients.map((item) => item.name), 6)}.\n\n${matchedTitles}`.trim();
+  }
+
+  if (recipes.length) {
+    const introByType = {
+      ingredients: `I found recipes that make good use of ${formatList(parsedQuery.ingredients, 3)}.`,
+      dietary: `I found options that fit ${parsedQuery.dietary}.`,
+      cuisine: `I found some ${parsedQuery.cuisine} recipes.`,
+      category: `I found some ${parsedQuery.category} ideas.`,
+      specific_recipe: `I found close matches for ${parsedQuery.recipeName}.`,
+      preference: `I found recipe ideas that fit ${formatList(parsedQuery.preferenceTags, 3)}.`,
+      random: 'Here are a few recipe ideas from your collection.'
+    };
+
+    const summary = recipes.slice(0, 4).map((recipe, index) => {
+      const reasonText = buildRecipeReason(recipe, parsedQuery, signals);
+      return `${index + 1}. ${recipe.title}${recipe.cuisine ? ` (${recipe.cuisine})` : ''}${reasonText.length ? ` - ${reasonText.join(', ')}` : ''}`;
+    }).join('\n');
+
+    const learningMessage = getLearningMessage(signals, parsedQuery);
+
+    return `${introByType[parsedQuery.type] || fallbackMessage || 'Here are some suggestions.'}\n\n${summary}${learningMessage ? `\n\n${learningMessage}` : ''}${memoryHint ? `\n\n${memoryHint}` : ''}`.trim();
+  }
+
+  return fallbackMessage || "I couldn't find a strong match yet, but try giving me a main ingredient, cuisine, meal type, or health goal.";
+};
+
+const createWeeklyMealPlan = async (user, signals) => {
+  const weekStart = getStartOfWeek();
+  const foodProfile = signals?.foodProfile || {};
+  const recipes = await Recipe.find().sort({ 'rating.average': -1, createdAt: -1 }).limit(80);
+
+  const scored = personalizeRecipes(recipes, signals, { queryGoals: foodProfile.goal ? [foodProfile.goal] : [] }).slice(0, 21);
+  const weekEntries = [];
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(`${weekStart}T00:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + index);
+    return date.toISOString().slice(0, 10);
+  });
+  const mealTypes = ['breakfast', 'lunch', 'dinner'];
+
+  days.forEach((date, dayIndex) => {
+    mealTypes.forEach((mealType, mealIndex) => {
+      const recipe = scored[(dayIndex * mealTypes.length + mealIndex) % Math.max(scored.length, 1)];
+      if (!recipe) return;
+
+      weekEntries.push({
+        date,
+        mealType,
+        recipe: recipe._id,
+        servings: recipe.servings || 1,
+        notes: foodProfile.goal ? `Picked for ${String(foodProfile.goal).replace(/-/g, ' ')}` : ''
+      });
+    });
+  });
+
+  const mealPlan = await MealPlan.findOneAndUpdate(
+    { user: user._id, weekStart },
+    { user: user._id, weekStart, entries: weekEntries, updatedAt: new Date() },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  ).populate({
+    path: 'entries.recipe',
+    select: 'title cuisine category servings ingredients'
+  });
+
+  return {
+    weekStart,
+    entries: mealPlan.entries || []
+  };
+};
+
 const processQuery = async (req, res) => {
   try {
     const { message, sessionId = '' } = req.body;
@@ -570,11 +1020,16 @@ const processQuery = async (req, res) => {
 
     const user = await getUserFromRequest(req);
     const signals = await collectUserSignals(user);
+    const sessionMemory = await getSessionMemory(sessionId);
     const query = message.toLowerCase().trim();
     const parsedQuery = parseUserQuery(query);
 
     let recipes = [];
     let responseMessage = '';
+    let shoppingList = [];
+    let generatedRecipe = null;
+    let mealPlan = null;
+    let scalePreview = null;
 
     const filters = {
       maxTime: parsedQuery.maxTime,
@@ -615,7 +1070,78 @@ const processQuery = async (req, res) => {
       });
     }
 
-    if (parsedQuery.type === 'ingredients') {
+    if (parsedQuery.type === 'shopping_list') {
+      if (!user) {
+        responseMessage = 'Log in first and save a weekly meal plan, then I can build your shopping list.';
+      } else {
+        const weekStart = getStartOfWeek();
+        const plan = await findRelevantMealPlan(user._id, weekStart);
+        const entries = plan?.entries || [];
+        mealPlan = plan ? { weekStart: plan.weekStart, entries: plan.entries || [] } : null;
+        shoppingList = buildShoppingListFromEntries(entries);
+        responseMessage = shoppingList.length
+          ? `Here is your shopping list for the week starting ${plan.weekStart}.\n\n`
+          : 'I could not find a saved meal plan yet. Save your planner week first, or ask me to create a meal plan for you.';
+        shoppingList.slice(0, 10).forEach((item, index) => {
+          responseMessage += `${index + 1}. ${item.name} - ${item.quantity}${item.unit ? ` ${item.unit}` : ''}\n`;
+        });
+      }
+    } else if (parsedQuery.type === 'meal_plan') {
+      if (!user) {
+        responseMessage = 'Log in first and I can create a personalized weekly meal plan for you.';
+      } else {
+        mealPlan = await createWeeklyMealPlan(user, signals);
+        recipes = mealPlan.entries.slice(0, 6).map((entry) => entry.recipe).filter(Boolean);
+        responseMessage = `I created a weekly meal plan for the week starting ${mealPlan.weekStart}.\n\n`;
+        mealPlan.entries.slice(0, 6).forEach((entry, index) => {
+          responseMessage += `${index + 1}. ${entry.date} - ${entry.mealType}: ${entry.recipe?.title || 'Recipe'}\n`;
+        });
+      }
+    } else if (parsedQuery.type === 'scale_recipe') {
+      const recipeSearchTerm = parsedQuery.recipeName || query;
+      const candidateRecipes = await searchByName(recipeSearchTerm, filters, signals, parsedQuery);
+      const recipe = candidateRecipes[0];
+      const targetServings = parsedQuery.targetServings || (recipe ? Math.max(2, Number(recipe.servings || 1) * 2) : 2);
+
+      if (!recipe) {
+        responseMessage = 'Tell me which recipe to scale, for example: scale paneer curry to 4 servings.';
+      } else {
+        scalePreview = {
+          recipeId: recipe._id,
+          title: recipe.title,
+          baseServings: recipe.servings || 1,
+          targetServings,
+          ingredients: (recipe.ingredients || []).map((ingredient) => {
+            const quantity = parseQuantityValue(ingredient.quantity);
+            const scaledQuantity = quantity != null
+              ? formatQuantity(quantity * (targetServings / Math.max(Number(recipe.servings || 1), 1)))
+              : ingredient.quantity;
+            return {
+              name: ingredient.name,
+              unit: ingredient.unit || '',
+              quantity: scaledQuantity
+            };
+          })
+        };
+        recipes = [recipe];
+        responseMessage = `Scaled ${recipe.title} from ${scalePreview.baseServings} to ${targetServings} servings.\n\n`;
+        scalePreview.ingredients.slice(0, 8).forEach((ingredient, index) => {
+          responseMessage += `${index + 1}. ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}\n`;
+        });
+      }
+    } else if (parsedQuery.type === 'generate_recipe') {
+      const ingredients = parsedQuery.ingredients || [];
+      recipes = ingredients.length ? await searchByIngredients(ingredients, filters, signals, parsedQuery) : [];
+      generatedRecipe = buildGeneratedRecipe(ingredients, {
+        dietaryFilters: parsedQuery.queryGoals || []
+      }, recipes);
+      responseMessage = ingredients.length
+        ? `I generated a recipe idea using ${ingredients.join(', ')}.\n\n`
+        : 'Tell me a few ingredients and I can generate a recipe idea from them.';
+      if (ingredients.length) {
+        responseMessage += `${generatedRecipe.title}\n${generatedRecipe.description}\n`;
+      }
+    } else if (parsedQuery.type === 'ingredients') {
       recipes = await searchByIngredients(parsedQuery.ingredients, filters, signals, parsedQuery);
       responseMessage = recipes.length
         ? `Here are some recipes that use ${parsedQuery.ingredients.join(', ')}.\n\n`
@@ -652,21 +1178,38 @@ const processQuery = async (req, res) => {
         : `I don't have any recipes in my collection yet.`;
     }
 
-    const learningMessage = getLearningMessage(signals, parsedQuery);
-    if (learningMessage) {
-      responseMessage += `${learningMessage}\n\n`;
-    }
-
-    recipes.slice(0, 4).forEach((recipe, index) => {
-      responseMessage += `${index + 1}. ${recipe.title}`;
-      if (recipe.cuisine) responseMessage += ` (${recipe.cuisine})`;
-      if (recipe.category) responseMessage += ` - ${recipe.category}`;
-      if (recipe.tags?.length) responseMessage += ` - ${recipe.tags.slice(0, 2).join(', ')}`;
-      responseMessage += '\n';
+    const localReply = buildAssistantReply({
+      parsedQuery,
+      recipes,
+      shoppingList,
+      generatedRecipe,
+      mealPlan,
+      scalePreview,
+      signals,
+      sessionMemory,
+      fallbackMessage: responseMessage
     });
+    responseMessage = localReply;
 
-    if (!responseMessage.trim()) {
-      responseMessage = "I'm your recipe assistant. Ask for ingredients, cuisines, diabetic-friendly meals, gym meals, breakfast ideas, or quick recipes.";
+    try {
+      const llmReply = await generateGeminiReply(buildLLMContext({
+        userMessage: message,
+        parsedQuery,
+        recipes,
+        shoppingList,
+        generatedRecipe,
+        mealPlan,
+        scalePreview,
+        signals,
+        sessionMemory,
+        fallbackMessage: localReply
+      }));
+
+      if (llmReply) {
+        responseMessage = llmReply;
+      }
+    } catch (llmError) {
+      console.error('Gemini reply generation failed, using local fallback:', llmError.message);
     }
 
     const chatLog = await ChatLog.create({
@@ -682,6 +1225,10 @@ const processQuery = async (req, res) => {
     return res.json({
       message: responseMessage,
       recipes: recipes.slice(0, 5),
+      shoppingList,
+      generatedRecipe,
+      mealPlan,
+      scalePreview,
       queryType: parsedQuery.type,
       logId: chatLog._id,
       learnedFrom: {

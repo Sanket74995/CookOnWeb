@@ -17,6 +17,7 @@ const emptyForm = {
   servings: "",
   tags: "",
 };
+const quickDietaryTags = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'high-protein', 'low-carb', 'diabetic-friendly', 'heart-healthy'];
 
 const AddRecipe = () => {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ const AddRecipe = () => {
   const [preview, setPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(isEditMode);
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     if (!isEditMode) {
@@ -90,6 +93,24 @@ const AddRecipe = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const addQuickTag = (tag) => {
+    setForm((prev) => {
+      const existing = prev.tags
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      if (existing.includes(tag)) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        tags: [...existing, tag].join(', ')
+      };
+    });
+  };
+
   const validateForm = () => {
     if (!localStorage.getItem("token")) {
       alert("Please log in before saving a recipe.");
@@ -112,6 +133,52 @@ const AddRecipe = () => {
     }
 
     return true;
+  };
+
+  const handleImport = async () => {
+    if (!importUrl.trim()) {
+      alert("Paste a recipe URL or YouTube link first.");
+      return;
+    }
+
+    try {
+      setImporting(true);
+      const response = await fetch(`${API}/import`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: importUrl }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.message || "Failed to import recipe");
+      }
+
+      const imported = payload.recipe || {};
+      setForm((prev) => ({
+        ...prev,
+        title: imported.title || prev.title,
+        description: imported.description || prev.description,
+        prepTime: imported.prepTime ?? prev.prepTime,
+        cookTime: imported.cookTime ?? prev.cookTime,
+        difficulty: imported.difficulty || prev.difficulty,
+        category: imported.category || prev.category,
+        cuisine: imported.cuisine || prev.cuisine,
+        servings: imported.servings ?? prev.servings,
+        tags: Array.isArray(imported.tags) ? imported.tags.join(", ") : prev.tags,
+      }));
+      if (imported.image) {
+        setPreview(imported.image);
+      }
+      alert(payload.message || "Recipe imported. Review and complete the details.");
+    } catch (error) {
+      console.error("Import recipe failed:", error);
+      alert(error.message || "Unable to import recipe.");
+    } finally {
+      setImporting(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -174,6 +241,27 @@ const AddRecipe = () => {
           </div>
 
           <form className="add-recipe-form" onSubmit={handleSubmit}>
+            <div className="form-section">
+              <div className="form-section__title">Import recipe draft</div>
+              <div className="form-section__hint">
+                Paste a recipe page or YouTube URL to prefill this form.
+              </div>
+              <div className="form-grid">
+                <div className="form-group">
+                  <input
+                    value={importUrl}
+                    onChange={(e) => setImportUrl(e.target.value)}
+                    placeholder="https://example.com/recipe or https://youtube.com/watch?v=..."
+                  />
+                </div>
+                <div className="form-group">
+                  <button type="button" className="btn-outlined" onClick={handleImport} disabled={importing}>
+                    {importing ? "Importing..." : "Import from URL"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="form-section">
               <div className="form-section__title">Basic details</div>
               <div className="form-section__hint">
@@ -337,6 +425,19 @@ const AddRecipe = () => {
               <div className="form-section__title">Tags</div>
               <div className="form-section__hint">
                 Optional. Use commas like `quick, spicy, vegetarian`.
+              </div>
+              <div className="tags-list" style={{ marginBottom: '12px' }}>
+                {quickDietaryTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className="btn-outlined"
+                    style={{ marginRight: '8px', marginBottom: '8px' }}
+                    onClick={() => addQuickTag(tag)}
+                  >
+                    Add {tag}
+                  </button>
+                ))}
               </div>
               <div className="form-group">
                 <input

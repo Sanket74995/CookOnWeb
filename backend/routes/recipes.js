@@ -12,7 +12,9 @@ const {
     createRecipe,
     updateRecipe,
     deleteRecipe,
-    searchRecipes
+    searchRecipes,
+    generateRecipeFromIngredients,
+    importRecipeFromUrl
 } = require('../controllers/recipeController');
 
 
@@ -47,6 +49,12 @@ router.get('/', getAllRecipes);
 
 // GET /api/recipes/search - Search recipes
 router.get('/search', searchRecipes);
+
+// POST /api/recipes/generate - Generate recipe ideas from pantry ingredients
+router.post('/generate', generateRecipeFromIngredients);
+
+// POST /api/recipes/import - Import a recipe draft from URL or YouTube
+router.post('/import', importRecipeFromUrl);
 
 // GET /api/recipes/mine - Get current user's recipes
 router.get('/mine', auth, getMyRecipes);

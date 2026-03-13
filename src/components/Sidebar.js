@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faBook, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBook, faCog, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import './../styles/Sidebar.scss'
 
@@ -28,6 +28,8 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                 return <FontAwesomeIcon icon={faBook} />;
             case 'settings':
                 return <FontAwesomeIcon icon={faCog} />;
+            case 'planner':
+                return <FontAwesomeIcon icon={faCalendarDays} />;
             default:
                 return null;
         }

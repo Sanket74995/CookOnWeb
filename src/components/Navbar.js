@@ -88,6 +88,11 @@ const Navbar = () => {
             id: 3,
             label: t('add_recipe'),
             href: "/add-recipe",
+        },
+        {
+            id: 4,
+            label: 'Planner',
+            href: "/planner",
         }
     ]
 

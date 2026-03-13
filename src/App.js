@@ -15,6 +15,7 @@ import Subscription from './components/Subscription';
 import ChangePassword from './components/ChangePassword';
 import Settings from './components/Settings';
 import AddRecipe from './components/AddRecipe';
+import MealPlanner from './components/MealPlanner';
 function App() {
   return (
     <I18nextProvider i18n={i18n}>
@@ -33,6 +34,7 @@ function App() {
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/add-recipe" element={<AddRecipe />} />
+            <Route path="/planner" element={<MealPlanner />} />
           </Routes>
           <Chatbot />
           <Footer />

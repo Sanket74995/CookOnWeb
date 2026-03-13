@@ -19,6 +19,9 @@ const RecipeDetail = () => {
     const [timerInterval, setTimerInterval] = useState(null);
     const [reviewForm, setReviewForm] = useState({ rating: '5', comment: '' });
     const [savingReview, setSavingReview] = useState(false);
+    const [desiredServings, setDesiredServings] = useState(1);
+    const [voiceAssistant, setVoiceAssistant] = useState(null);
+    const [voiceListening, setVoiceListening] = useState(false);
 
     useEffect(() => {
         const fetchRecipe = async () => {
@@ -27,6 +30,7 @@ const RecipeDetail = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setRecipe(data);
+                    setDesiredServings(Number(data.servings || 1));
                 } else {
                     console.error('Failed to fetch recipe');
                 }
@@ -44,6 +48,41 @@ const RecipeDetail = () => {
             setSpeechSynthesis(window.speechSynthesis);
         }
     }, []);
+
+    // Voice commands trigger existing playback controls.
+    useEffect(() => {
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Recognition) return;
+
+        const recognition = new Recognition();
+        recognition.continuous = false;
+        recognition.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+        recognition.interimResults = false;
+        recognition.onstart = () => setVoiceListening(true);
+        recognition.onend = () => setVoiceListening(false);
+        recognition.onresult = (event) => {
+            const transcript = event.results?.[0]?.[0]?.transcript?.toLowerCase() || '';
+            if (!transcript) return;
+
+            if (transcript.includes('next')) {
+                startReading();
+            } else if (transcript.includes('pause')) {
+                pauseReading();
+            } else if (transcript.includes('resume')) {
+                resumeReading();
+            } else if (transcript.includes('stop')) {
+                stopReading();
+            } else if (transcript.includes('repeat')) {
+                setCurrentStep((prev) => Math.max(prev - 1, 0));
+                setWaitingForContinue(false);
+                setTimeout(() => startReading(), 100);
+            }
+        };
+
+        setVoiceAssistant(recognition);
+        return () => recognition.stop();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentLang]);
 
     useEffect(() => {
         if (timerActive && timerSeconds > 0) {
@@ -98,6 +137,33 @@ const RecipeDetail = () => {
     const servings = Number(recipe.servings || 0);
     const averageRating = recipe.rating?.average || 0;
     const reviewCount = recipe.rating?.count || reviews.length;
+    const servingScale = servings > 0 ? desiredServings / servings : 1;
+
+    const parseQuantity = (value) => {
+        const text = String(value || '').trim();
+        if (!text) return null;
+
+        if (/^\d+\/\d+$/.test(text)) {
+            const [numerator, denominator] = text.split('/').map(Number);
+            return denominator ? numerator / denominator : null;
+        }
+
+        if (/^\d+\s+\d+\/\d+$/.test(text)) {
+            const [whole, fraction] = text.split(/\s+/);
+            const [numerator, denominator] = fraction.split('/').map(Number);
+            return denominator ? Number(whole) + numerator / denominator : null;
+        }
+
+        const numeric = Number(text.replace(/[^0-9.]/g, ''));
+        return Number.isFinite(numeric) ? numeric : null;
+    };
+
+    const formatScaledQuantity = (value) => {
+        const parsed = parseQuantity(value);
+        if (parsed == null) return value;
+        const scaled = Math.round(parsed * servingScale * 100) / 100;
+        return Number.isInteger(scaled) ? String(scaled) : scaled.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    };
 
     const parseTimeFromText = (text) => {
         const timeRegex = /(\d+)\s*(minute|min|second|sec)s?/gi;
@@ -215,6 +281,19 @@ const RecipeDetail = () => {
         }
     };
 
+    const toggleVoiceAssistant = () => {
+        if (!voiceAssistant) {
+            alert('Voice recognition is not supported in your browser.');
+            return;
+        }
+
+        if (voiceListening) {
+            voiceAssistant.stop();
+        } else {
+            voiceAssistant.start();
+        }
+    };
+
     const submitReview = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
@@ -305,6 +384,9 @@ const RecipeDetail = () => {
                                     </button>
                                 </div>
                             )}
+                            <button className="read-recipe-button" type="button" onClick={toggleVoiceAssistant}>
+                                {voiceListening ? 'Stop Voice Assistant' : 'Voice Assistant'}
+                            </button>
                         </div>
 
                         <div className="recipe-meta-detail">
@@ -334,13 +416,24 @@ const RecipeDetail = () => {
                             </div>
                         </div>
 
+                        <div className="form-group" style={{ marginTop: '16px' }}>
+                            <label htmlFor="desiredServings">Scale recipe servings</label>
+                            <input
+                                id="desiredServings"
+                                type="number"
+                                min="1"
+                                value={desiredServings}
+                                onChange={(e) => setDesiredServings(Number(e.target.value) || 1)}
+                            />
+                        </div>
+
                         <div className="ingredients-section">
                             <h2>{i18n.t('ingredients')}</h2>
                             <ul className="ingredients-list">
                                 {ingredients.map((ingredient, index) => (
                                     <li key={index}>
                                         <span className="ingredient-quantity">
-                                            {ingredient.quantity || ''} {ingredient.unit || ''}
+                                            {formatScaledQuantity(ingredient.quantity) || ''} {ingredient.unit || ''}
                                         </span>
                                         <span className="ingredient-name">{ingredient.name}</span>
                                     </li>

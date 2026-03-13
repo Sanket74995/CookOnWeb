@@ -9,7 +9,12 @@ const {
   updateProfile,
   changePassword,
   getSettings,
+  getPantry,
+  getFamilyGroups,
   updateSettings,
+  updatePantry,
+  createFamilyGroup,
+  joinFamilyGroup,
   getSubscription,
   upgradeSubscription, // 👈 add
 } = require('../controllers/authController');
@@ -47,6 +52,11 @@ router.post('/change-password', auth, changePassword);
 // Settings
 router.get('/settings', auth, getSettings);
 router.put('/settings', auth, updateSettings);
+router.get('/pantry', auth, getPantry);
+router.put('/pantry', auth, updatePantry);
+router.get('/family-groups', auth, getFamilyGroups);
+router.post('/family-groups', auth, createFamilyGroup);
+router.post('/family-groups/join', auth, joinFamilyGroup);
 
 // Subscription
 router.get('/subscription', auth, getSubscription);

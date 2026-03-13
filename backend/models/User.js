@@ -45,6 +45,36 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Recipe'
     }],
+    pantry: [{
+        name: {
+            type: String,
+            trim: true,
+            required: true
+        },
+        quantity: {
+            type: String,
+            trim: true,
+            default: ''
+        },
+        unit: {
+            type: String,
+            trim: true,
+            default: ''
+        },
+        category: {
+            type: String,
+            trim: true,
+            default: 'general'
+        },
+        inStock: {
+            type: Boolean,
+            default: true
+        }
+    }],
+    familyGroups: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FamilyGroup'
+    }],
     settings: {
         language: {
             type: String,

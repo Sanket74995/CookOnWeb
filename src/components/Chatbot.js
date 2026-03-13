@@ -7,7 +7,11 @@ const commonQueries = [
     'Diabetic-friendly Indian dinner',
     'Vegetarian high-protein meals',
     'Kids lunchbox recipes',
-    'Quick recipes with paneer'
+    'Quick recipes with paneer',
+    'Create my meal plan for this week',
+    'Make my shopping list',
+    'Generate recipe with paneer, onion, tomato',
+    'Scale paneer curry to 4 servings'
 ];
 
 const getSessionId = () => {
@@ -96,6 +100,10 @@ const Chatbot = () => {
                 text: data.message,
                 sender: 'bot',
                 recipes: data.recipes || [],
+                shoppingList: data.shoppingList || [],
+                generatedRecipe: data.generatedRecipe || null,
+                mealPlan: data.mealPlan || null,
+                scalePreview: data.scalePreview || null,
                 queryType: data.queryType,
                 logId: data.logId,
                 learnedFrom: data.learnedFrom || null,
@@ -155,6 +163,10 @@ const Chatbot = () => {
                                         {message.queryType === 'preference' && 'Taste or mood'}
                                         {message.queryType === 'conversation' && 'Assistant'}
                                         {message.queryType === 'random' && 'Suggestions'}
+                                        {message.queryType === 'shopping_list' && 'Shopping list'}
+                                        {message.queryType === 'meal_plan' && 'Meal planner'}
+                                        {message.queryType === 'scale_recipe' && 'Recipe scaling'}
+                                        {message.queryType === 'generate_recipe' && 'Generated recipe'}
                                     </span>
                                 )}
 
@@ -184,6 +196,55 @@ const Chatbot = () => {
                                             </li>
                                         ))}
                                     </ul>
+                                )}
+
+                                {message.generatedRecipe && (
+                                    <div className="chatbot-learning-note">
+                                        <strong>{message.generatedRecipe.title}</strong>
+                                        <br />
+                                        {message.generatedRecipe.description}
+                                    </div>
+                                )}
+
+                                {message.scalePreview && (
+                                    <div className="chatbot-learning-note">
+                                        <strong>{message.scalePreview.title}</strong>
+                                        <br />
+                                        {message.scalePreview.baseServings} to {message.scalePreview.targetServings} servings
+                                        <ul className="recipe-list">
+                                            {message.scalePreview.ingredients.slice(0, 6).map((ingredient, ingredientIndex) => (
+                                                <li key={ingredientIndex}>
+                                                    {ingredient.quantity} {ingredient.unit} {ingredient.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {message.shoppingList && message.shoppingList.length > 0 && (
+                                    <div className="chatbot-learning-note">
+                                        <strong>Shopping List</strong>
+                                        <ul className="recipe-list">
+                                            {message.shoppingList.slice(0, 10).map((item, itemIndex) => (
+                                                <li key={itemIndex}>
+                                                    {item.name} - {item.quantity}{item.unit ? ` ${item.unit}` : ''}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {message.mealPlan?.entries?.length > 0 && (
+                                    <div className="chatbot-learning-note">
+                                        <strong>Planned week</strong>
+                                        <ul className="recipe-list">
+                                            {message.mealPlan.entries.slice(0, 7).map((entry, entryIndex) => (
+                                                <li key={entryIndex}>
+                                                    {entry.date} - {entry.mealType}: {entry.recipe?.title || 'Recipe'}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 )}
 
                                 {message.sender === 'bot' && message.logId && (

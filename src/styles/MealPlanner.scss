@@ -1,0 +1,95 @@
+.planner-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 56px;
+}
+
+.planner-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.planner-header__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.planner-day,
+.planner-card {
+  background: #fff9f0;
+  border: 1px solid #f0dcc5;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(117, 81, 32, 0.08);
+}
+
+.planner-slot {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.planner-slot label {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.planner-slot select,
+.planner-slot input,
+.planner-header__actions input {
+  border: 1px solid #d6c0a7;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.planner-card__header,
+.shopping-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.shopping-list {
+  display: grid;
+  gap: 12px;
+}
+
+.shopping-item {
+  border-top: 1px solid #ecd8c2;
+  padding-top: 12px;
+}
+
+.shopping-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.shopping-item__meta {
+  color: #7e6447;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .planner-header {
+    flex-direction: column;
+  }
+
+  .planner-header__actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
