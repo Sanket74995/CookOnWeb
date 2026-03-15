@@ -358,6 +358,74 @@
     }
 }
 
+.share-section {
+    margin-bottom: 30px;
+
+    h2 {
+        font-size: 1.5rem;
+        color: #2d3436;
+        margin-bottom: 15px;
+    }
+
+    .share-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+
+        .share-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+
+            &.facebook {
+                background: #1877f2;
+                color: white;
+
+                &:hover {
+                    background: #166fe5;
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.twitter {
+                background: #1da1f2;
+                color: white;
+
+                &:hover {
+                    background: #1a91da;
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.whatsapp {
+                background: #25d366;
+                color: white;
+
+                &:hover {
+                    background: #128c7e;
+                    transform: translateY(-1px);
+                }
+            }
+
+            &.copy-link {
+                background: #6c757d;
+                color: white;
+
+                &:hover {
+                    background: #5a6268;
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+}
+
 .reviews-section {
     h2 {
         font-size: 1.5rem;

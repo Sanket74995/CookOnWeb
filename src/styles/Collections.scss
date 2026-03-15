@@ -1,0 +1,286 @@
+.collections-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+
+    .collections-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+
+        h1 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .create-collection-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background: #2980b9;
+            }
+        }
+    }
+
+    .create-collection-form {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 1px solid #e9ecef;
+
+        .form-group {
+            margin-bottom: 15px;
+
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 500;
+                color: #2c3e50;
+            }
+
+            input, textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+
+                &:focus {
+                    outline: none;
+                    border-color: #3498db;
+                }
+            }
+
+            textarea {
+                resize: vertical;
+                min-height: 80px;
+            }
+
+            &.checkbox-group {
+                display: flex;
+                align-items: center;
+
+                label {
+                    display: flex;
+                    align-items: center;
+                    margin: 0;
+                    cursor: pointer;
+
+                    input {
+                        width: auto;
+                        margin-right: 8px;
+                    }
+                }
+            }
+        }
+
+        .form-actions {
+            text-align: right;
+
+            button {
+                background: #27ae60;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background-color 0.3s;
+
+                &:hover:not(:disabled) {
+                    background: #229954;
+                }
+
+                &:disabled {
+                    background: #95a5a6;
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+
+    .collections-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+
+            h3 {
+                color: #6c757d;
+                margin: 0 0 10px 0;
+            }
+
+            p {
+                color: #6c757d;
+                margin: 0;
+            }
+        }
+
+        .collection-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .collection-header {
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+
+                h3 {
+                    margin: 0;
+                    color: #2c3e50;
+                    flex: 1;
+                    margin-right: 10px;
+                }
+
+                .collection-actions {
+                    display: flex;
+                    gap: 8px;
+
+                    button {
+                        padding: 6px 12px;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        transition: background-color 0.3s;
+
+                        &.edit-btn {
+                            background: #3498db;
+                            color: white;
+
+                            &:hover {
+                                background: #2980b9;
+                            }
+                        }
+
+                        &.delete-btn {
+                            background: #e74c3c;
+                            color: white;
+
+                            &:hover {
+                                background: #c0392b;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .collection-description {
+                padding: 0 20px;
+                color: #7f8c8d;
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+
+            .collection-meta {
+                padding: 0 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+                color: #95a5a6;
+                margin-bottom: 15px;
+
+                .public-badge {
+                    background: #27ae60;
+                    color: white;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: 10px;
+                }
+            }
+
+            .collection-tags {
+                padding: 0 20px;
+                margin-bottom: 15px;
+
+                .tag {
+                    display: inline-block;
+                    background: #ecf0f1;
+                    color: #3498db;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    margin-right: 5px;
+                    margin-bottom: 5px;
+                }
+            }
+
+            .collection-preview {
+                padding: 0 20px 20px 20px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+
+                .preview-recipe {
+                    display: flex;
+                    align-items: center;
+                    background: #f8f9fa;
+                    border-radius: 6px;
+                    padding: 8px;
+                    flex: 1;
+                    min-width: 0;
+
+                    img {
+                        width: 40px;
+                        height: 40px;
+                        object-fit: cover;
+                        border-radius: 4px;
+                        margin-right: 10px;
+                    }
+
+                    span {
+                        font-size: 12px;
+                        color: #2c3e50;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                .more-recipes {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #ecf0f1;
+                    border-radius: 6px;
+                    padding: 8px;
+                    font-size: 12px;
+                    color: #7f8c8d;
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 60px;
+        color: #6c757d;
+    }
+}

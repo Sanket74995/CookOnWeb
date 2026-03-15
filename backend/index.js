@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const chatbotRoutes = require('./routes/chatbot');
 const mealPlanRoutes = require('./routes/mealPlans');
+const collectionRoutes = require('./routes/collections');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/meal-plans', mealPlanRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/collections', collectionRoutes);
 app.use('/api/chatbot/admin', require('./routes/chatbotAdmin'));
 app.use('/api/recipes', require('./routes/recipes'));
 app.use('/uploads', express.static('uploads'));

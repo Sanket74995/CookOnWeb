@@ -93,6 +93,16 @@ const Navbar = () => {
             id: 4,
             label: 'Planner',
             href: "/planner",
+        },
+        {
+            id: 5,
+            label: 'Collections',
+            href: "/collections",
+        },
+        {
+            id: 6,
+            label: 'Dashboard',
+            href: "/dashboard",
         }
     ]
 

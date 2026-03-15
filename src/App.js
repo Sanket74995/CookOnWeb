@@ -14,6 +14,9 @@ import Profile from './components/Profile';
 import Subscription from './components/Subscription';
 import ChangePassword from './components/ChangePassword';
 import Settings from './components/Settings';
+import Collections from './components/Collections';
+import CollectionDetail from './components/CollectionDetail';
+import Dashboard from './components/Dashboard';
 import AddRecipe from './components/AddRecipe';
 import MealPlanner from './components/MealPlanner';
 function App() {
@@ -35,6 +38,9 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/add-recipe" element={<AddRecipe />} />
             <Route path="/planner" element={<MealPlanner />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/collections/:id" element={<CollectionDetail />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
           <Chatbot />
           <Footer />

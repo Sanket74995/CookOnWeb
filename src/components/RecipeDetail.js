@@ -294,6 +294,45 @@ const RecipeDetail = () => {
         }
     };
 
+    const shareOnSocial = (platform, title, url) => {
+        const encodedTitle = encodeURIComponent(title);
+        const encodedUrl = encodeURIComponent(url);
+
+        let shareUrl = '';
+
+        switch (platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+                break;
+            default:
+                return;
+        }
+
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    };
+
+    const copyToClipboard = async (url) => {
+        try {
+            await navigator.clipboard.writeText(url);
+            alert('Link copied to clipboard!');
+        } catch (error) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Link copied to clipboard!');
+        }
+    };
+
     const submitReview = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
@@ -502,6 +541,36 @@ const RecipeDetail = () => {
                             {tags.map((tag, index) => (
                                 <span key={index} className="recipe-tag">#{i18n.t(tag.toLowerCase()) || tag}</span>
                             ))}
+                        </div>
+                    </div>
+
+                    <div className="share-section">
+                        <h2>Share this Recipe</h2>
+                        <div className="share-buttons">
+                            <button
+                                className="share-btn facebook"
+                                onClick={() => shareOnSocial('facebook', recipe.title, window.location.href)}
+                            >
+                                Facebook
+                            </button>
+                            <button
+                                className="share-btn twitter"
+                                onClick={() => shareOnSocial('twitter', recipe.title, window.location.href)}
+                            >
+                                Twitter
+                            </button>
+                            <button
+                                className="share-btn whatsapp"
+                                onClick={() => shareOnSocial('whatsapp', recipe.title, window.location.href)}
+                            >
+                                WhatsApp
+                            </button>
+                            <button
+                                className="share-btn copy-link"
+                                onClick={() => copyToClipboard(window.location.href)}
+                            >
+                                Copy Link
+                            </button>
                         </div>
                     </div>
 
