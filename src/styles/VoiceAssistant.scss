@@ -1,0 +1,157 @@
+.voice-assistant {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+
+  .voice-assistant-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &.listening {
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+      animation: pulse 1.5s infinite;
+
+      .voice-icon {
+        animation: bounce 1s infinite;
+      }
+    }
+
+    .voice-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .listening-animation {
+        display: flex;
+        gap: 2px;
+
+        span {
+          width: 4px;
+          height: 4px;
+          background: white;
+          border-radius: 50%;
+          animation: wave 1.5s infinite ease-in-out;
+
+          &:nth-child(1) { animation-delay: 0s; }
+          &:nth-child(2) { animation-delay: 0.2s; }
+          &:nth-child(3) { animation-delay: 0.4s; }
+        }
+      }
+    }
+  }
+
+  .voice-transcript {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    max-width: 250px;
+    word-wrap: break-word;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(10px);
+
+    .transcript-text {
+      opacity: 0.9;
+    }
+  }
+
+  .voice-status {
+    background: rgba(78, 205, 196, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.6);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  60% {
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes wave {
+  0%, 60%, 100% {
+    transform: scaleY(1);
+  }
+  30% {
+    transform: scaleY(1.5);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .voice-assistant {
+    bottom: 15px;
+    right: 15px;
+
+    .voice-assistant-btn {
+      width: 50px;
+      height: 50px;
+    }
+
+    .voice-transcript {
+      max-width: 200px;
+      font-size: 13px;
+    }
+  }
+}

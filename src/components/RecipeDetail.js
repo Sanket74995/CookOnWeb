@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/RecipeDetail.scss';
+import VoiceAssistant from './VoiceAssistant';
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -49,40 +50,107 @@ const RecipeDetail = () => {
         }
     }, []);
 
-    // Voice commands trigger existing playback controls.
-    useEffect(() => {
-        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Recognition) return;
+    // Enhanced voice command handler
+    const handleVoiceCommand = (command) => {
+        console.log('Recipe voice command:', command);
 
-        const recognition = new Recognition();
-        recognition.continuous = false;
-        recognition.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
-        recognition.interimResults = false;
-        recognition.onstart = () => setVoiceListening(true);
-        recognition.onend = () => setVoiceListening(false);
-        recognition.onresult = (event) => {
-            const transcript = event.results?.[0]?.[0]?.transcript?.toLowerCase() || '';
-            if (!transcript) return;
-
-            if (transcript.includes('next')) {
-                startReading();
-            } else if (transcript.includes('pause')) {
-                pauseReading();
-            } else if (transcript.includes('resume')) {
-                resumeReading();
-            } else if (transcript.includes('stop')) {
-                stopReading();
-            } else if (transcript.includes('repeat')) {
-                setCurrentStep((prev) => Math.max(prev - 1, 0));
+        // Reading controls
+        if (command.includes('start') || command.includes('begin') || command.includes('read')) {
+            startReading();
+        } else if (command.includes('pause') || command.includes('stop reading')) {
+            pauseReading();
+        } else if (command.includes('resume') || command.includes('continue')) {
+            resumeReading();
+        } else if (command.includes('stop') || command.includes('end')) {
+            stopReading();
+        } else if (command.includes('repeat') || command.includes('again')) {
+            setCurrentStep((prev) => Math.max(prev - 1, 0));
+            setWaitingForContinue(false);
+            setTimeout(() => startReading(), 100);
+        } else if (command.includes('next step') || command.includes('next')) {
+            if (waitingForContinue) {
                 setWaitingForContinue(false);
-                setTimeout(() => startReading(), 100);
+                speakNextInstruction();
             }
-        };
+        } else if (command.includes('previous') || command.includes('back')) {
+            setCurrentStep((prev) => Math.max(prev - 2, 0));
+            setWaitingForContinue(false);
+            setTimeout(() => startReading(), 100);
+        }
 
-        setVoiceAssistant(recognition);
-        return () => recognition.stop();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentLang]);
+        // Timer controls
+        else if (command.includes('skip timer') || command.includes('skip')) {
+            skipTimer();
+        }
+
+        // Servings adjustment
+        else if (command.includes('servings') || command.includes('serves')) {
+            const match = command.match(/(\d+)\s*(servings?|serves?)/i);
+            if (match) {
+                const newServings = parseInt(match[1], 10);
+                if (newServings > 0 && newServings <= 20) {
+                    setDesiredServings(newServings);
+                }
+            }
+        }
+
+        // Recipe information
+        else if (command.includes('ingredients') || command.includes('what do i need')) {
+            speakIngredients();
+        } else if (command.includes('nutrition') || command.includes('nutrients')) {
+            speakNutrition();
+        } else if (command.includes('time') || command.includes('how long')) {
+            speakTimeInfo();
+        }
+
+        // Navigation
+        else if (command.includes('edit') || command.includes('modify')) {
+            navigate(`/recipe/${id}/edit`);
+        } else if (command.includes('back') || command.includes('return')) {
+            navigate(-1);
+        }
+    };
+
+    const speakIngredients = () => {
+        if (!speechSynthesis || !recipe) return;
+
+        let text = 'Ingredients needed: ';
+        ingredients.forEach((ingredient, index) => {
+            const scaledQty = formatScaledQuantity(ingredient.quantity);
+            text += `${scaledQty || ''} ${ingredient.unit || ''} ${ingredient.name}`;
+            if (index < ingredients.length - 1) text += ', ';
+        });
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+    };
+
+    const speakNutrition = () => {
+        if (!speechSynthesis || !recipe) return;
+
+        const nutrition = recipe.nutrition || {};
+        let text = 'Nutrition information per serving: ';
+        if (nutrition.calories) text += `${nutrition.calories} calories, `;
+        if (nutrition.protein) text += `${nutrition.protein} grams protein, `;
+        if (nutrition.carbs) text += `${nutrition.carbs} grams carbs, `;
+        if (nutrition.fat) text += `${nutrition.fat} grams fat.`;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+    };
+
+    const speakTimeInfo = () => {
+        if (!speechSynthesis || !recipe) return;
+
+        const prepTime = Number(recipe.prepTime || 0);
+        const cookTime = Number(recipe.cookTime || 0);
+        const totalTime = prepTime + cookTime;
+
+        let text = `Preparation time: ${prepTime} minutes. Cooking time: ${cookTime} minutes. Total time: ${totalTime} minutes.`;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+    };
 
     useEffect(() => {
         if (timerActive && timerSeconds > 0) {
@@ -291,6 +359,45 @@ const RecipeDetail = () => {
             voiceAssistant.stop();
         } else {
             voiceAssistant.start();
+        }
+    };
+
+    const shareOnSocial = (platform, title, url) => {
+        const encodedTitle = encodeURIComponent(title);
+        const encodedUrl = encodeURIComponent(url);
+
+        let shareUrl = '';
+
+        switch (platform) {
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                break;
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+                break;
+            default:
+                return;
+        }
+
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    };
+
+    const copyToClipboard = async (url) => {
+        try {
+            await navigator.clipboard.writeText(url);
+            alert('Link copied to clipboard!');
+        } catch (error) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Link copied to clipboard!');
         }
     };
 
@@ -505,6 +612,36 @@ const RecipeDetail = () => {
                         </div>
                     </div>
 
+                    <div className="share-section">
+                        <h2>Share this Recipe</h2>
+                        <div className="share-buttons">
+                            <button
+                                className="share-btn facebook"
+                                onClick={() => shareOnSocial('facebook', recipe.title, window.location.href)}
+                            >
+                                Facebook
+                            </button>
+                            <button
+                                className="share-btn twitter"
+                                onClick={() => shareOnSocial('twitter', recipe.title, window.location.href)}
+                            >
+                                Twitter
+                            </button>
+                            <button
+                                className="share-btn whatsapp"
+                                onClick={() => shareOnSocial('whatsapp', recipe.title, window.location.href)}
+                            >
+                                WhatsApp
+                            </button>
+                            <button
+                                className="share-btn copy-link"
+                                onClick={() => copyToClipboard(window.location.href)}
+                            >
+                                Copy Link
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="reviews-section">
                         <div className="reviews-section__header">
                             <h2>Ratings & Reviews</h2>
@@ -552,6 +689,7 @@ const RecipeDetail = () => {
                     </div>
                 </div>
             </div>
+            <VoiceAssistant onCommand={handleVoiceCommand} />
         </div>
     );
 };

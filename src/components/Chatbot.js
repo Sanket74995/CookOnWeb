@@ -44,11 +44,11 @@ const Chatbot = () => {
     useEffect(() => {
         if (isOpen && messages.length === 0) {
             setMessages([{
-                text: "Hi. I can learn from your food plan, favorites, and feedback. Try 'gym lunch ideas' or 'diabetic Indian breakfast'.",
+                text: t('chatbot_initial_message'),
                 sender: 'bot'
             }]);
         }
-    }, [isOpen, messages.length]);
+    }, [isOpen, messages.length, t]);
 
     const sendFeedback = async ({ logId, helpful, clickedRecipeId }) => {
         if (!logId) return;
@@ -115,7 +115,7 @@ const Chatbot = () => {
             console.error(err);
             setError(`Error: ${err.message}`);
             setMessages((prev) => [...prev, {
-                text: 'Sorry, something went wrong. Please try again later.',
+                text: t('chatbot_error'),
                 sender: 'bot'
             }]);
         } finally {
@@ -155,18 +155,18 @@ const Chatbot = () => {
                             <div key={index} className={`message ${message.sender}`}>
                                 {message.sender === 'bot' && message.queryType && (
                                     <span className="query-type-badge">
-                                        {message.queryType === 'ingredients' && 'Ingredient-based'}
-                                        {message.queryType === 'dietary' && 'Dietary preference'}
-                                        {message.queryType === 'cuisine' && 'Cuisine'}
-                                        {message.queryType === 'category' && 'Meal type'}
-                                        {message.queryType === 'specific_recipe' && 'Specific dish'}
-                                        {message.queryType === 'preference' && 'Taste or mood'}
-                                        {message.queryType === 'conversation' && 'Assistant'}
-                                        {message.queryType === 'random' && 'Suggestions'}
-                                        {message.queryType === 'shopping_list' && 'Shopping list'}
-                                        {message.queryType === 'meal_plan' && 'Meal planner'}
-                                        {message.queryType === 'scale_recipe' && 'Recipe scaling'}
-                                        {message.queryType === 'generate_recipe' && 'Generated recipe'}
+                                        {message.queryType === 'ingredients' && t('query_type_ingredient')}
+                                        {message.queryType === 'dietary' && t('query_type_dietary')}
+                                        {message.queryType === 'cuisine' && t('query_type_cuisine')}
+                                        {message.queryType === 'category' && t('query_type_category')}
+                                        {message.queryType === 'specific_recipe' && t('query_type_specific_recipe')}
+                                        {message.queryType === 'preference' && t('query_type_preference')}
+                                        {message.queryType === 'conversation' && t('query_type_conversation')}
+                                        {message.queryType === 'random' && t('query_type_random')}
+                                        {message.queryType === 'shopping_list' && t('query_type_shopping_list')}
+                                        {message.queryType === 'meal_plan' && t('query_type_meal_plan')}
+                                        {message.queryType === 'scale_recipe' && t('query_type_scale_recipe')}
+                                        {message.queryType === 'generate_recipe' && t('query_type_generate_recipe')}
                                     </span>
                                 )}
 
@@ -174,13 +174,12 @@ const Chatbot = () => {
 
                                 {message.learnedFrom && (message.learnedFrom.foodProfileGoal || message.learnedFrom.topTags?.length > 0) && (
                                     <div className="chatbot-learning-note">
-                                        Learned from:
-                                        {' '}
+                                        {t('learned_from')} {' '}
                                         {message.learnedFrom.foodProfileGoal
                                             ? message.learnedFrom.source === 'query'
-                                                ? `your request (${formatGoalLabel(message.learnedFrom.foodProfileGoal)})`
-                                                : `food plan (${formatGoalLabel(message.learnedFrom.foodProfileGoal)})`
-                                            : `past likes (${message.learnedFrom.topTags.join(', ')})`}
+                                                ? `${t('learned_from_request')} (${formatGoalLabel(message.learnedFrom.foodProfileGoal)})`
+                                                : `${t('learned_from_food_plan')} (${formatGoalLabel(message.learnedFrom.foodProfileGoal)})`
+                                            : `${t('learned_from_past_likes')} (${message.learnedFrom.topTags.join(', ')})`}
                                     </div>
                                 )}
 

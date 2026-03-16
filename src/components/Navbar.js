@@ -76,23 +76,57 @@ const Navbar = () => {
     const navItems = [
         {
             id: 1,
+            key: 'home',
             label: t('home'),
             href: "/",
         },
         {
             id: 2,
+            key: 'recipes',
             label: t('recipes'),
             href: "/recipes",
         },
         {
             id: 3,
+            key: 'add_recipe',
             label: t('add_recipe'),
             href: "/add-recipe",
         },
         {
             id: 4,
-            label: 'Planner',
+            key: 'planner',
+            label: t('planner'),
             href: "/planner",
+        },
+        {
+            id: 5,
+            key: 'collections',
+            label: t('collections'),
+            href: "/collections",
+        },
+        {
+            id: 6,
+            key: 'ai_recommendations',
+            label: t('ai_recommendations'),
+            href: "/recommendations",
+        },
+        {
+            id: 7,
+            key: 'collaborate',
+            label: t('collaborate'),
+            href: "/collaborate",
+        },
+        {
+            id: 8,
+            key: 'nutrition',
+            label: t('nutrition'),
+            href: "/nutrition",
+        },
+        {
+            id: 9,
+            key: 'dashboard',
+            label: t('dashboard'),
+            href: "/dashboard",
         }
     ]
 
@@ -100,9 +134,7 @@ const Navbar = () => {
         <>
             <div className="navbar container">
                 <Link className="logo" to="/">
-                    <span className="cook">Cook</span>
-                    <span className="cook">on</span>
-                    <span className="cook">Web</span>
+                    <span className="cook">{t('app_name')}</span>
                 </Link>
                 <div className="navbar-items">
                     {navItems.map((item) => (
@@ -121,8 +153,8 @@ const Navbar = () => {
                                 onChange={(e) => i18n.changeLanguage(e.target.value)}
                                 className="language-dropdown"
                             >
-                                <option value="en">English</option>
-                                <option value="hi">हिंदी</option>
+                                <option value="en">{t('language_english')}</option>
+                                <option value="hi">{t('language_hindi')}</option>
                             </select>
                         </div>
                         {user ? (
