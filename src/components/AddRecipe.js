@@ -18,7 +18,7 @@ const emptyForm = {
   servings: "",
   tags: "",
 };
-const quickDietaryTags = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'high-protein', 'low-carb', 'diabetic-friendly', 'heart-healthy'];
+const quickDietaryTags = ['vegetarian', 'vegan', 'gluten_free', 'dairy_free', 'high_protein', 'low_carb', 'diabetic_friendly', 'heart_healthy'];
 
 const AddRecipe = () => {
   const navigate = useNavigate();
@@ -319,7 +319,7 @@ const AddRecipe = () => {
 
               <div className="time-serving-row">
                 <div className="form-group">
-                  <label>Prep time (minutes)</label>
+                  <label>{t('prep_time_minutes')}</label>
                   <input
                     type="number"
                     name="prepTime"
@@ -330,7 +330,7 @@ const AddRecipe = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Cook time (minutes)</label>
+                  <label>{t('cook_time_minutes')}</label>
                   <input
                     type="number"
                     name="cookTime"
@@ -341,7 +341,7 @@ const AddRecipe = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Servings</label>
+                  <label>{t('servings')}</label>
                   <input
                     type="number"
                     name="servings"
@@ -352,22 +352,22 @@ const AddRecipe = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Difficulty</label>
+                  <label>{t('difficulty')}</label>
                   <select name="difficulty" value={form.difficulty} onChange={handleChange}>
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
+                    <option value="easy">{t('easy')}</option>
+                    <option value="medium">{t('medium')}</option>
+                    <option value="hard">{t('hard')}</option>
                   </select>
                 </div>
               </div>
             </div>
 
             <div className="form-section form-section--divider">
-              <div className="form-section__title">Cover photo</div>
+              <div className="form-section__title">{t('cover_photo')}</div>
               <div className="form-section__hint">
                 {isEditMode
-                  ? "Upload a new image only if you want to replace the current one."
-                  : "A good photo makes people more likely to try your recipe."}
+                  ? t('upload_new_image_hint')
+                  : t('good_photo_hint')}
               </div>
 
               <div className="image-upload">
@@ -379,9 +379,9 @@ const AddRecipe = () => {
                     onChange={(e) => setImage(e.target.files?.[0] || null)}
                   />
                   <span>
-                    <strong>Click to upload</strong> or drag &amp; drop
+                    <strong>{t('click_to_upload')}</strong> {t('drag_drop')}
                     <br />
-                    JPG, PNG, WEBP
+                    {t('supported_formats')}
                   </span>
                 </label>
 
@@ -394,9 +394,9 @@ const AddRecipe = () => {
             </div>
 
             <div className="form-section form-section--divider">
-              <div className="form-section__title">Ingredients</div>
+              <div className="form-section__title">{t('ingredients')}</div>
               <div className="form-section__hint">
-                Write ingredients separated by commas.
+                {t('write_ingredients_hint')}
               </div>
               <div className="form-group">
                 <textarea
@@ -409,9 +409,9 @@ const AddRecipe = () => {
             </div>
 
             <div className="form-section form-section--divider">
-              <div className="form-section__title">Instructions</div>
+              <div className="form-section__title">{t('instructions')}</div>
               <div className="form-section__hint">
-                Put each step on a new line so the app can number them.
+                {t('put_steps_hint')}
               </div>
               <div className="form-group">
                 <textarea
@@ -424,9 +424,9 @@ const AddRecipe = () => {
             </div>
 
             <div className="form-section form-section--divider">
-              <div className="form-section__title">Tags</div>
+              <div className="form-section__title">{t('tags')}</div>
               <div className="form-section__hint">
-                Optional. Use commas like `quick, spicy, vegetarian`.
+                {t('optional_tags_hint')}
               </div>
               <div className="tags-list" style={{ marginBottom: '12px' }}>
                 {quickDietaryTags.map((tag) => (
@@ -437,7 +437,7 @@ const AddRecipe = () => {
                     style={{ marginRight: '8px', marginBottom: '8px' }}
                     onClick={() => addQuickTag(tag)}
                   >
-                    Add {tag}
+                    {t('add_tag', { tag: t(tag) })}
                   </button>
                 ))}
               </div>
@@ -453,12 +453,12 @@ const AddRecipe = () => {
 
             <div className="form-actions">
               <button type="button" className="btn-outlined" onClick={() => navigate("/profile")}>
-                Cancel
+                {t('cancel')}
               </button>
               <button type="submit" className="btn-primary">
                 {submitting
-                  ? isEditMode ? "Saving..." : "Publishing..."
-                  : isEditMode ? "Save changes" : "Publish recipe"}
+                  ? isEditMode ? t('saving') : t('publishing')
+                  : isEditMode ? t('save_changes') : t('publish_recipe')}
               </button>
             </div>
           </form>
@@ -466,20 +466,19 @@ const AddRecipe = () => {
 
         <div className="add-recipe-side">
           <div>
-            <div className="preview-header">Live preview</div>
+            <div className="preview-header">{t('live_preview')}</div>
             <div className="preview-card">
-              <div className="preview-title">{form.title || "Your recipe title"}</div>
+              <div className="preview-title">{form.title || t('your_recipe_title')}</div>
               <div className="preview-meta">
-                <span>{form.cuisine || "Cuisine"}</span>
-                <span>{form.cookTime ? `${form.cookTime} min` : "Cook time"}</span>
-                <span>{form.servings ? `${form.servings} servings` : "Servings"}</span>
+                <span>{form.cuisine || t('cuisine')}</span>
+                <span>{form.cookTime ? `${form.cookTime} min` : t('cook_time')}</span>
+                <span>{form.servings ? `${form.servings} ${t('servings')}` : t('servings')}</span>
               </div>
             </div>
           </div>
 
           <div className="tip-box">
-            Cloud image upload is supported when `CLOUDINARY_CLOUD_NAME` and
-            `CLOUDINARY_UPLOAD_PRESET` are configured in the backend.
+            {t('cloudinary_hint')}
           </div>
         </div>
       </div>

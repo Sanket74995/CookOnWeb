@@ -187,7 +187,7 @@ const Recipes = () => {
 
     const generateFromIngredients = async () => {
         if (!generatorInput.trim()) {
-            alert('Enter a few ingredients first.');
+            alert(t('enter_ingredients_first'));
             return;
         }
 
@@ -212,7 +212,7 @@ const Recipes = () => {
             setGeneratorResult(data);
         } catch (error) {
             console.error('Ingredient recipe generation failed:', error);
-            alert(error.message || 'Unable to generate recipe idea');
+            alert(error.message || t('unable_generate_recipe_idea'));
         } finally {
             setGenerating(false);
         }
@@ -232,10 +232,10 @@ const Recipes = () => {
             {localStorage.getItem('token') && recommended.length > 0 && (
                 <section className="cuisine-section">
                     <h2>
-                        Recommended For {foodProfile?.goal ? foodProfile.goal.replace(/-/g, ' ') : 'You'}
+                        {t('recommended_for_you')}
                     </h2>
                     <div className="recipes-empty" style={{ marginBottom: '20px', textAlign: 'left' }}>
-                        Personalized using your food plan, health conditions, and ingredient preferences from Settings.
+                        {t('personalized_using_food_plan')}
                     </div>
                     <div className="cuisine-recipes">
                         {recommended.map((recipe) => (
@@ -257,12 +257,12 @@ const Recipes = () => {
 
             <div className="filters-section filters-section--grid">
                 <div className="filter-item" style={{ gridColumn: '1 / -1' }}>
-                    <label>Pantry to recipe generator:</label>
+                    <label>{t('pantry_to_recipe_generator')}</label>
                     <input
                         type="text"
                         value={generatorInput}
                         onChange={(e) => setGeneratorInput(e.target.value)}
-                        placeholder="e.g. paneer, onion, capsicum, tomato"
+                        placeholder={t('example_ingredients')}
                     />
                     <div className="tags-list" style={{ marginTop: '10px' }}>
                         {DIETARY_OPTIONS.map((option) => (
@@ -277,22 +277,22 @@ const Recipes = () => {
                                 }}
                                 onClick={() => toggleDietaryOption(option)}
                             >
-                                {generatorDietary.includes(option) ? 'Selected:' : 'Add:'} {option}
+                                {generatorDietary.includes(option) ? t('selected') : t('add')} {option}
                             </button>
                         ))}
                     </div>
                     <button className="reset-button" type="button" onClick={generateFromIngredients} disabled={generating}>
-                        {generating ? 'Generating...' : 'Generate recipe idea'}
+                        {generating ? t('generating') : t('generate_recipe_idea')}
                     </button>
                 </div>
 
                 {generatorResult?.generatedRecipe && (
                     <div className="recipes-empty" style={{ gridColumn: '1 / -1', textAlign: 'left' }}>
-                        <strong>Generated idea:</strong> {generatorResult.generatedRecipe.title}
+                        <strong>{t('generated_idea')}</strong> {generatorResult.generatedRecipe.title}
                         <br />
                         {generatorResult.generatedRecipe.description}
                         <br />
-                        <strong>Ingredients:</strong> {generatorResult.generatedRecipe.ingredients.map((item) => `${item.quantity} ${item.unit} ${item.name}`.trim()).join(', ')}
+                        <strong>{t('ingredients')}:</strong> {generatorResult.generatedRecipe.ingredients.map((item) => `${item.quantity} ${item.unit} ${item.name}`.trim()).join(', ')}
                     </div>
                 )}
 
@@ -305,13 +305,13 @@ const Recipes = () => {
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                     />
-                    {isSearching && <div className="filter-status">Searching...</div>}
+                    {isSearching && <div className="filter-status">{t('searching')}</div>}
                 </div>
 
                 <div className="filter-item">
-                    <label>Cuisine:</label>
+                    <label>{t('cuisine_filter')}</label>
                     <select value={filters.cuisine} onChange={(e) => updateFilter('cuisine', e.target.value)}>
-                        <option value="">All cuisines</option>
+                        <option value="">{t('all_cuisines')}</option>
                         {cuisines.map((cuisine) => (
                             <option key={cuisine} value={cuisine}>{cuisine}</option>
                         ))}
@@ -319,19 +319,19 @@ const Recipes = () => {
                 </div>
 
                 <div className="filter-item">
-                    <label>Difficulty:</label>
+                    <label>{t('difficulty_filter')}</label>
                     <select value={filters.difficulty} onChange={(e) => updateFilter('difficulty', e.target.value)}>
-                        <option value="">All levels</option>
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
+                        <option value="">{t('all_levels')}</option>
+                        <option value="easy">{t('easy')}</option>
+                        <option value="medium">{t('medium')}</option>
+                        <option value="hard">{t('hard')}</option>
                     </select>
                 </div>
 
                 <div className="filter-item">
-                    <label>Dietary:</label>
+                    <label>{t('dietary_filter')}</label>
                     <select value={filters.dietary} onChange={(e) => updateFilter('dietary', e.target.value)}>
-                        <option value="">All dietary styles</option>
+                        <option value="">{t('all_dietary_styles')}</option>
                         {DIETARY_OPTIONS.map((option) => (
                             <option key={option} value={option}>{option}</option>
                         ))}
@@ -339,20 +339,20 @@ const Recipes = () => {
                 </div>
 
                 <div className="filter-item">
-                    <label>Max total time:</label>
+                    <label>{t('max_total_time')}</label>
                     <select value={filters.maxTime} onChange={(e) => updateFilter('maxTime', e.target.value)}>
-                        <option value="">Any time</option>
-                        <option value="15">15 min</option>
-                        <option value="30">30 min</option>
-                        <option value="45">45 min</option>
-                        <option value="60">60 min</option>
+                        <option value="">{t('any_time')}</option>
+                        <option value="15">15 {t('min')}</option>
+                        <option value="30">30 {t('min')}</option>
+                        <option value="45">45 {t('min')}</option>
+                        <option value="60">60 {t('min')}</option>
                     </select>
                 </div>
 
                 <div className="filter-item">
-                    <label>Min rating:</label>
+                    <label>{t('min_rating')}</label>
                     <select value={filters.minRating} onChange={(e) => updateFilter('minRating', e.target.value)}>
-                        <option value="">Any rating</option>
+                        <option value="">{t('any_rating')}</option>
                         <option value="4">4+</option>
                         <option value="3">3+</option>
                         <option value="2">2+</option>
@@ -360,12 +360,12 @@ const Recipes = () => {
                 </div>
 
                 <div className="filter-item">
-                    <label>Sort by:</label>
+                    <label>{t('sort_by')}</label>
                     <select value={filters.sort} onChange={(e) => updateFilter('sort', e.target.value)}>
-                        <option value="latest">Latest</option>
-                        <option value="rating">Top rated</option>
-                        <option value="popular">Most reviewed</option>
-                        <option value="time">Quickest</option>
+                        <option value="latest">{t('latest')}</option>
+                        <option value="rating">{t('top_rated')}</option>
+                        <option value="popular">{t('most_reviewed')}</option>
+                        <option value="time">{t('quickest')}</option>
                     </select>
                 </div>
 
@@ -377,7 +377,7 @@ const Recipes = () => {
                                 checked={showOnlyFavorites}
                                 onChange={(e) => setShowOnlyFavorites(e.target.checked)}
                             />
-                            Show only favorites
+                            {t('show_only_favorites')}
                         </label>
                     </div>
                 )}
@@ -390,7 +390,7 @@ const Recipes = () => {
                                 checked={useFoodPlan}
                                 onChange={(e) => setUseFoodPlan(e.target.checked)}
                             />
-                            Use my food plan
+                            {t('use_my_food_plan')}
                         </label>
                     </div>
                 )}
@@ -412,13 +412,13 @@ const Recipes = () => {
 
             {displayedRecipes.length === 0 ? (
                 <div className="recipes-empty">
-                    No recipes matched these filters. Try broadening the search.
+                    {t('no_recipes_matched')}
                 </div>
             ) : (
                 <>
                     {generatorResult?.matchedRecipes?.length > 0 && (
                         <section className="cuisine-section">
-                            <h2>Best pantry matches</h2>
+                            <h2>{t('best_pantry_matches')}</h2>
                             <div className="cuisine-recipes">
                                 {generatorResult.matchedRecipes.map((recipe) => (
                                     <div

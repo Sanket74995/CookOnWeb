@@ -121,7 +121,7 @@ const NutritionAnalytics = () => {
     return (
       <div className="nutrition-loading">
         <div className="loading-spinner"></div>
-        <p>Analyzing your nutrition data...</p>
+        <p>{t('analyzing_nutrition_data')}</p>
       </div>
     );
   }
@@ -129,8 +129,8 @@ const NutritionAnalytics = () => {
   return (
     <div className="nutrition-analytics">
       <div className="analytics-header">
-        <h1>Nutrition Analytics</h1>
-        <p>Detailed insights into your cooking and eating habits</p>
+        <h1>{t('nutrition_analytics')}</h1>
+        <p>{t('nutrition_analytics_subtitle')}</p>
       </div>
 
       <div className="period-selector">
@@ -138,19 +138,19 @@ const NutritionAnalytics = () => {
           className={selectedPeriod === 'week' ? 'active' : ''}
           onClick={() => setSelectedPeriod('week')}
         >
-          This Week
+          {t('this_week')}
         </button>
         <button
           className={selectedPeriod === 'month' ? 'active' : ''}
           onClick={() => setSelectedPeriod('month')}
         >
-          This Month
+          {t('this_month')}
         </button>
         <button
           className={selectedPeriod === '3months' ? 'active' : ''}
           onClick={() => setSelectedPeriod('3months')}
         >
-          3 Months
+          {t('three_months')}
         </button>
       </div>
 
@@ -158,7 +158,7 @@ const NutritionAnalytics = () => {
         <div className="overview-cards">
           <div className="metric-card">
             <div className="metric-header">
-              <h3>Calories</h3>
+              <h3>{t('calories')}</h3>
               <span className="metric-value">{nutritionData.summary.totalCalories}</span>
             </div>
             <div className="progress-bar">
@@ -171,16 +171,16 @@ const NutritionAnalytics = () => {
               />
             </div>
             <div className="metric-target">
-              Target: {goals.calories} kcal
+              {t('target_calories', { calories: goals.calories })}
               <span className={`status ${getStatusText(nutritionData.summary.totalCalories, goals.calories).toLowerCase()}`}>
-                {getStatusText(nutritionData.summary.totalCalories, goals.calories)}
+                {t(getStatusText(nutritionData.summary.totalCalories, goals.calories).toLowerCase())}
               </span>
             </div>
           </div>
 
           <div className="metric-card">
             <div className="metric-header">
-              <h3>Protein</h3>
+              <h3>{t('protein')}</h3>
               <span className="metric-value">{nutritionData.summary.totalProtein}g</span>
             </div>
             <div className="progress-bar">
@@ -195,14 +195,14 @@ const NutritionAnalytics = () => {
             <div className="metric-target">
               Target: {goals.protein}g
               <span className={`status ${getStatusText(nutritionData.summary.totalProtein, goals.protein).toLowerCase()}`}>
-                {getStatusText(nutritionData.summary.totalProtein, goals.protein)}
+                {t(getStatusText(nutritionData.summary.totalProtein, goals.protein).toLowerCase())}
               </span>
             </div>
           </div>
 
           <div className="metric-card">
             <div className="metric-header">
-              <h3>Carbohydrates</h3>
+              <h3>{t('carbohydrates')}</h3>
               <span className="metric-value">{nutritionData.summary.totalCarbs}g</span>
             </div>
             <div className="progress-bar">
@@ -217,14 +217,14 @@ const NutritionAnalytics = () => {
             <div className="metric-target">
               Target: {goals.carbs}g
               <span className={`status ${getStatusText(nutritionData.summary.totalCarbs, goals.carbs).toLowerCase()}`}>
-                {getStatusText(nutritionData.summary.totalCarbs, goals.carbs)}
+                {t(getStatusText(nutritionData.summary.totalCarbs, goals.carbs).toLowerCase())}
               </span>
             </div>
           </div>
 
           <div className="metric-card">
             <div className="metric-header">
-              <h3>Fat</h3>
+              <h3>{t('fat')}</h3>
               <span className="metric-value">{nutritionData.summary.totalFat}g</span>
             </div>
             <div className="progress-bar">
@@ -239,7 +239,7 @@ const NutritionAnalytics = () => {
             <div className="metric-target">
               Target: {goals.fat}g
               <span className={`status ${getStatusText(nutritionData.summary.totalFat, goals.fat).toLowerCase()}`}>
-                {getStatusText(nutritionData.summary.totalFat, goals.fat)}
+                {t(getStatusText(nutritionData.summary.totalFat, goals.fat).toLowerCase())}
               </span>
             </div>
           </div>
@@ -248,7 +248,7 @@ const NutritionAnalytics = () => {
 
       <div className="analytics-grid">
         <div className="chart-section">
-          <h2>Daily Calorie Trend</h2>
+          <h2>{t('daily_calorie_trend')}</h2>
           <div className="calorie-chart">
             <div className="chart-container">
               {nutritionData.dailyBreakdown.map((day, index) => (
@@ -268,7 +268,7 @@ const NutritionAnalytics = () => {
         </div>
 
         <div className="meal-distribution">
-          <h2>Meal Distribution</h2>
+          <h2>{t('meal_distribution')}</h2>
           <div className="distribution-chart">
             {Object.entries(nutritionData.mealDistribution).map(([meal, percentage]) => (
               <div key={meal} className="distribution-item">
@@ -288,7 +288,7 @@ const NutritionAnalytics = () => {
         </div>
 
         <div className="top-ingredients">
-          <h2>Most Used Ingredients</h2>
+          <h2>{t('most_used_ingredients')}</h2>
           <div className="ingredients-list">
             {nutritionData.topIngredients.map((ingredient, index) => (
               <div key={index} className="ingredient-item">
@@ -300,16 +300,16 @@ const NutritionAnalytics = () => {
                 </div>
                 <div className="ingredient-nutrition">
                   {ingredient.nutrition.calories && (
-                    <span>{ingredient.nutrition.calories} cal</span>
+                    <span>{ingredient.nutrition.calories} {t('cal')}</span>
                   )}
                   {ingredient.nutrition.protein && (
-                    <span>{ingredient.nutrition.protein}g protein</span>
+                    <span>{ingredient.nutrition.protein}g {t('protein_unit')}</span>
                   )}
                   {ingredient.nutrition.carbs && (
-                    <span>{ingredient.nutrition.carbs}g carbs</span>
+                    <span>{ingredient.nutrition.carbs}g {t('carbs_unit')}</span>
                   )}
                   {ingredient.nutrition.fat && (
-                    <span>{ingredient.nutrition.fat}g fat</span>
+                    <span>{ingredient.nutrition.fat}g {t('fat_unit')}</span>
                   )}
                 </div>
               </div>
@@ -318,14 +318,14 @@ const NutritionAnalytics = () => {
         </div>
 
         <div className="deficiencies-alert">
-          <h2>Nutrient Status</h2>
+          <h2>{t('nutrient_status')}</h2>
           <div className="deficiencies-list">
             {nutritionData.deficiencies.map((deficiency, index) => (
               <div key={index} className={`deficiency-item ${deficiency.status}`}>
                 <div className="deficiency-info">
                   <h4>{deficiency.nutrient}</h4>
                   <span className="current-value">
-                    {deficiency.current} / {deficiency.recommended} {deficiency.nutrient.includes('Vitamin') ? 'IU' : 'mg'}
+                    {deficiency.current} / {deficiency.recommended} {deficiency.nutrient.includes('Vitamin') ? t('iu') : t('mg')}
                   </span>
                 </div>
                 <div className="deficiency-status">
@@ -340,10 +340,10 @@ const NutritionAnalytics = () => {
       </div>
 
       <div className="goals-section">
-        <h2>Adjust Your Goals</h2>
+        <h2>{t('adjust_your_goals')}</h2>
         <div className="goals-form">
           <div className="goal-input">
-            <label>Daily Calories</label>
+            <label>{t('daily_calories')}</label>
             <input
               type="number"
               value={goals.calories}
@@ -351,7 +351,7 @@ const NutritionAnalytics = () => {
             />
           </div>
           <div className="goal-input">
-            <label>Protein (g)</label>
+            <label>{t('protein_g')}</label>
             <input
               type="number"
               value={goals.protein}
@@ -359,7 +359,7 @@ const NutritionAnalytics = () => {
             />
           </div>
           <div className="goal-input">
-            <label>Carbohydrates (g)</label>
+            <label>{t('carbohydrates_g')}</label>
             <input
               type="number"
               value={goals.carbs}
@@ -367,7 +367,7 @@ const NutritionAnalytics = () => {
             />
           </div>
           <div className="goal-input">
-            <label>Fat (g)</label>
+            <label>{t('fat_g')}</label>
             <input
               type="number"
               value={goals.fat}
@@ -378,7 +378,7 @@ const NutritionAnalytics = () => {
             className="update-goals-btn"
             onClick={() => updateGoals(goals)}
           >
-            Update Goals
+            {t('update_goals')}
           </button>
         </div>
       </div>

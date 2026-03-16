@@ -61,8 +61,8 @@ const RecipeCard = ({ recipe, isFavorited = false, onToggleFavorite }) => {
                                 e.stopPropagation();
                                 onToggleFavorite(recipe._id);
                             }}
-                            aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
-                            title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                            aria-label={isFavorited ? t('remove_from_favorites') : t('add_to_favorites')}
+                            title={isFavorited ? t('remove_from_favorites') : t('add_to_favorites')}
                         >
                             {isFavorited ? '\u2665' : '\u2661'}
                         </button>

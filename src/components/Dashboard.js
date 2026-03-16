@@ -130,48 +130,48 @@ const Dashboard = () => {
     };
 
     if (loading || !stats) {
-        return <div className="dashboard-page"><div className="loading">Loading your dashboard...</div></div>;
+        return <div className="dashboard-page"><div className="loading">{t('loading_dashboard')}</div></div>;
     }
 
     return (
         <div className="dashboard-page">
             <div className="dashboard-header">
-                <h1>Your Cooking Dashboard</h1>
-                <p>Track your culinary journey and discover insights about your cooking habits.</p>
+                <h1>{t('your_cooking_dashboard')}</h1>
+                <p>{t('dashboard_subtitle')}</p>
             </div>
 
             <div className="stats-grid">
                 <div className="stat-card">
                     <div className="stat-number">{stats.totalRecipes}</div>
-                    <div className="stat-label">Recipes Created</div>
+                    <div className="stat-label">{t('recipes_created')}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-number">{stats.totalFavorites}</div>
-                    <div className="stat-label">Favorite Recipes</div>
+                    <div className="stat-label">{t('favorite_recipes')}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-number">{stats.totalCollections}</div>
-                    <div className="stat-label">Collections</div>
+                    <div className="stat-label">{t('collections')}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-number">{stats.averageRating}</div>
-                    <div className="stat-label">Avg Rating</div>
+                    <div className="stat-label">{t('avg_rating')}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-number">{stats.totalReviews}</div>
-                    <div className="stat-label">Reviews Received</div>
+                    <div className="stat-label">{t('reviews_received')}</div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-number">{Math.round(((cookingHabits?.totalPrepTime || 0) + (cookingHabits?.totalCookTime || 0)) / 60)}h</div>
-                    <div className="stat-label">Total Cooking Time</div>
+                    <div className="stat-label">{t('total_cooking_time')}</div>
                 </div>
             </div>
 
             <div className="dashboard-content">
                 <div className="dashboard-section">
-                    <h2>Recent Recipes</h2>
+                    <h2>{t('recent_recipes')}</h2>
                     {recentRecipes.length === 0 ? (
-                        <p>You haven't created any recipes yet. <a href="/add-recipe">Create your first recipe!</a></p>
+                        <p>{t('no_recipes_yet')} <a href="/add-recipe">{t('create_first_recipe')}</a></p>
                     ) : (
                         <div className="recent-recipes">
                             {recentRecipes.map(recipe => (
@@ -182,7 +182,7 @@ const Dashboard = () => {
                                         <p>{recipe.cuisine} • {recipe.category}</p>
                                         <div className="recipe-meta">
                                             <span>★ {recipe.rating?.average?.toFixed(1) || 'N/A'}</span>
-                                            <span>{recipe.reviews?.length || 0} reviews</span>
+                                            <span>{recipe.reviews?.length || 0} {t('reviews')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -192,9 +192,9 @@ const Dashboard = () => {
                 </div>
 
                 <div className="dashboard-section">
-                    <h2>Favorite Cuisines</h2>
+                    <h2>{t('favorite_cuisines')}</h2>
                     {favoriteCuisines.length === 0 ? (
-                        <p>Add some recipes to your favorites to see your cuisine preferences!</p>
+                        <p>{t('add_favorites_to_see_cuisines')}</p>
                     ) : (
                         <div className="cuisine-chart">
                             {favoriteCuisines.map(({ cuisine, count }) => (
@@ -214,10 +214,10 @@ const Dashboard = () => {
                 </div>
 
                 <div className="dashboard-section">
-                    <h2>Cooking Habits</h2>
+                    <h2>{t('cooking_habits')}</h2>
                     <div className="habits-grid">
                         <div className="habit-item">
-                            <h4>Difficulty Distribution</h4>
+                            <h4>{t('difficulty_distribution')}</h4>
                             <div className="habit-stats">
                                 {Object.entries(cookingHabits?.difficultyBreakdown || {}).map(([difficulty, count]) => (
                                     <div key={difficulty} className="habit-stat">
@@ -228,7 +228,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="habit-item">
-                            <h4>Recipe Categories</h4>
+                            <h4>{t('recipe_categories')}</h4>
                             <div className="habit-stats">
                                 {Object.entries(cookingHabits?.categoryBreakdown || {}).map(([category, count]) => (
                                     <div key={category} className="habit-stat">

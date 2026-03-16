@@ -79,7 +79,7 @@ const Collections = () => {
     };
 
     const handleDeleteCollection = async (collectionId) => {
-        if (!window.confirm('Are you sure you want to delete this collection?')) return;
+        if (!window.confirm(t('delete_collection_confirmation'))) return;
 
         try {
             const token = localStorage.getItem('token');
@@ -101,54 +101,54 @@ const Collections = () => {
     };
 
     if (loading) {
-        return <div className="collections-page"><div className="loading">Loading collections...</div></div>;
+        return <div className="collections-page"><div className="loading">{t('loading_collections')}</div></div>;
     }
 
     return (
         <div className="collections-page">
             <div className="collections-header">
-                <h1>My Recipe Collections</h1>
+                <h1>{t('my_recipe_collections')}</h1>
                 <button
                     className="create-collection-btn"
                     onClick={() => setShowCreateForm(!showCreateForm)}
                 >
-                    {showCreateForm ? 'Cancel' : 'Create Collection'}
+                    {showCreateForm ? t('cancel') : t('create_collection')}
                 </button>
             </div>
 
             {showCreateForm && (
                 <form className="create-collection-form" onSubmit={handleCreateCollection}>
                     <div className="form-group">
-                        <label htmlFor="name">Collection Name *</label>
+                        <label htmlFor="name">{t('collection_name_required')}</label>
                         <input
                             type="text"
                             id="name"
                             value={newCollection.name}
                             onChange={(e) => setNewCollection(prev => ({ ...prev, name: e.target.value }))}
                             required
-                            placeholder="e.g., Italian Dishes, Quick Meals"
+                            placeholder={t('example_collection_name')}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="description">Description</label>
+                        <label htmlFor="description">{t('collection_description')}</label>
                         <textarea
                             id="description"
                             value={newCollection.description}
                             onChange={(e) => setNewCollection(prev => ({ ...prev, description: e.target.value }))}
-                            placeholder="Describe your collection..."
+                            placeholder={t('describe_collection')}
                             rows="3"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="tags">Tags (comma-separated)</label>
+                        <label htmlFor="tags">{t('tags_comma_separated')}</label>
                         <input
                             type="text"
                             id="tags"
                             value={newCollection.tags}
                             onChange={(e) => setNewCollection(prev => ({ ...prev, tags: e.target.value }))}
-                            placeholder="e.g., italian, pasta, quick"
+                            placeholder={t('example_tags')}
                         />
                     </div>
 
@@ -159,13 +159,13 @@ const Collections = () => {
                                 checked={newCollection.isPublic}
                                 onChange={(e) => setNewCollection(prev => ({ ...prev, isPublic: e.target.checked }))}
                             />
-                            Make this collection public
+                            {t('make_collection_public')}
                         </label>
                     </div>
 
                     <div className="form-actions">
                         <button type="submit" disabled={saving}>
-                            {saving ? 'Creating...' : 'Create Collection'}
+                            {saving ? t('creating') : t('create_collection')}
                         </button>
                     </div>
                 </form>
@@ -174,8 +174,8 @@ const Collections = () => {
             <div className="collections-grid">
                 {collections.length === 0 ? (
                     <div className="empty-state">
-                        <h3>No collections yet</h3>
-                        <p>Create your first collection to organize your favorite recipes!</p>
+                        <h3>{t('no_collections_yet')}</h3>
+                        <p>{t('create_first_collection')}</p>
                     </div>
                 ) : (
                     collections.map(collection => (
@@ -187,13 +187,13 @@ const Collections = () => {
                                         className="edit-btn"
                                         onClick={() => navigate(`/collections/${collection._id}`)}
                                     >
-                                        View
+                                        {t('view')}
                                     </button>
                                     <button
                                         className="delete-btn"
                                         onClick={() => handleDeleteCollection(collection._id)}
                                     >
-                                        Delete
+                                        {t('delete')}
                                     </button>
                                 </div>
                             </div>
@@ -203,8 +203,8 @@ const Collections = () => {
                             )}
 
                             <div className="collection-meta">
-                                <span>{collection.recipes.length} recipes</span>
-                                {collection.isPublic && <span className="public-badge">Public</span>}
+                                <span>{t('recipes_count', { count: collection.recipes.length })}</span>
+                                {collection.isPublic && <span className="public-badge">{t('public')}</span>}
                             </div>
 
                             {collection.tags.length > 0 && (
@@ -225,7 +225,7 @@ const Collections = () => {
                                     ))}
                                     {collection.recipes.length > 3 && (
                                         <div className="more-recipes">
-                                            +{collection.recipes.length - 3} more
+                                            {t('more_recipes', { count: collection.recipes.length - 3 })}
                                         </div>
                                     )}
                                 </div>

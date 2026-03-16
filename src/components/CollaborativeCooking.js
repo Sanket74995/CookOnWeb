@@ -47,7 +47,7 @@ const CollaborativeCooking = () => {
         },
         body: JSON.stringify({
           recipeId: 'sample-recipe-id', // In real app, this would come from props/params
-          title: 'Sample Collaborative Cooking Session'
+          title: t('sample_collaborative_session')
         })
       });
 
@@ -121,7 +121,7 @@ const CollaborativeCooking = () => {
           setIsTimerActive(false);
           clearInterval(timerIntervalRef.current);
           // Notify all participants that timer is done
-          sendSystemMessage('Timer finished! ⏰');
+          sendSystemMessage(t('timer_finished'));
           return 0;
         }
         return prev - 1;
@@ -151,14 +151,14 @@ const CollaborativeCooking = () => {
   const nextStep = () => {
     if (currentStep < (session?.recipe?.instructions?.length || 0) - 1) {
       setCurrentStep(prev => prev + 1);
-      sendSystemMessage(`Moving to step ${currentStep + 2}`);
+      sendSystemMessage(t('moving_to_step', { step: currentStep + 2 }));
     }
   };
 
   const previousStep = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
-      sendSystemMessage(`Going back to step ${currentStep}`);
+      sendSystemMessage(t('going_back_to_step', { step: currentStep }));
     }
   };
 
@@ -176,7 +176,7 @@ const CollaborativeCooking = () => {
     return (
       <div className="collaborative-loading">
         <div className="loading-spinner"></div>
-        <p>Loading cooking session...</p>
+        <p>{t('loading_cooking_session')}</p>
       </div>
     );
   }
@@ -189,9 +189,9 @@ const CollaborativeCooking = () => {
           <div className="session-meta">
             <span className="participants-count">
               <i className="fas fa-users"></i>
-              {participants.length} cooking together
+              {participants.length} {t('cooking_together')}
             </span>
-            {isHost && <span className="host-badge">Host</span>}
+            {isHost && <span className="host-badge">{t('host')}</span>}
           </div>
         </div>
 
@@ -199,13 +199,13 @@ const CollaborativeCooking = () => {
           <button
             className="share-btn"
             onClick={() => navigator.share?.({
-              title: 'Join my cooking session!',
-              text: 'Let\'s cook together!',
+              title: t('join_my_cooking_session'),
+              text: t('lets_cook_together'),
               url: window.location.href
             })}
           >
             <i className="fas fa-share"></i>
-            Share Session
+            {t('share_session')}
           </button>
         </div>
       </div>
@@ -215,7 +215,7 @@ const CollaborativeCooking = () => {
           <div className="recipe-header">
             <h2>{session.recipe?.title}</h2>
             <div className="recipe-meta">
-              <span>Step {currentStep + 1} of {session.recipe?.instructions?.length}</span>
+              <span>{t('step_of_total', { current: currentStep + 1, total: session.recipe?.instructions?.length })}</span>
               {isTimerActive && (
                 <div className="timer-display">
                   <i className="fas fa-clock"></i>
@@ -228,7 +228,7 @@ const CollaborativeCooking = () => {
           <div className="current-step">
             {session.recipe?.instructions?.[currentStep] && (
               <div className="step-content">
-                <h3>Step {session.recipe.instructions[currentStep].step}</h3>
+                <h3>{t('step_number', { number: session.recipe.instructions[currentStep].step })}</h3>
                 <p>{session.recipe.instructions[currentStep].description}</p>
 
                 {session.recipe.instructions[currentStep].description.toLowerCase().includes('minute') &&
@@ -243,7 +243,7 @@ const CollaborativeCooking = () => {
                     }}
                   >
                     <i className="fas fa-play"></i>
-                    Start Timer
+                    {t('start_timer')}
                   </button>
                 )}
               </div>
@@ -257,7 +257,7 @@ const CollaborativeCooking = () => {
               disabled={currentStep === 0}
             >
               <i className="fas fa-chevron-left"></i>
-              Previous
+              {t('previous')}
             </button>
 
             <div className="step-indicators">
@@ -274,7 +274,7 @@ const CollaborativeCooking = () => {
               onClick={nextStep}
               disabled={currentStep >= (session.recipe?.instructions?.length || 0) - 1}
             >
-              Next
+              {t('next')}
               <i className="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -282,8 +282,8 @@ const CollaborativeCooking = () => {
 
         <div className="chat-section">
           <div className="chat-header">
-            <h3>Cooking Chat</h3>
-            <span className="online-count">{participants.length} online</span>
+            <h3>{t('cooking_chat')}</h3>
+            <span className="online-count">{participants.length} {t('online')}</span>
           </div>
 
           <div className="messages-container">
@@ -319,7 +319,7 @@ const CollaborativeCooking = () => {
               value={currentMessage}
               onChange={(e) => setCurrentMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Type a message..."
+              placeholder={t('type_a_message')}
             />
             <button onClick={sendMessage} disabled={!currentMessage.trim()}>
               <i className="fas fa-paper-plane"></i>
@@ -329,7 +329,7 @@ const CollaborativeCooking = () => {
       </div>
 
       <div className="participants-list">
-        <h3>Participants</h3>
+        <h3>{t('participants')}</h3>
         <div className="participants">
           {participants.map((participant) => (
             <div key={participant._id} className="participant">
@@ -339,7 +339,7 @@ const CollaborativeCooking = () => {
               <div className="participant-info">
                 <div className="participant-name">{participant.name}</div>
                 <div className="participant-status">
-                  {participant.isOnline ? 'Online' : 'Offline'}
+                  {participant.isOnline ? t('online') : t('offline')}
                 </div>
               </div>
             </div>
