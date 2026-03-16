@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import '../styles/Account.scss';
 
 const AUTH_API = 'http://localhost:5000/api/auth';
@@ -7,6 +8,7 @@ const RECIPE_API = 'http://localhost:5000/api/recipes';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
   const [myRecipes, setMyRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(true);
@@ -69,15 +71,15 @@ const Profile = () => {
     });
     const data = await res.json();
     if (res.ok) {
-      alert('Profile updated');
+      alert(t('profile_updated'));
       localStorage.setItem('user', JSON.stringify(data.user));
     } else {
-      alert(data.message || 'Failed');
+      alert(data.message || t('failed'));
     }
   };
 
   const handleDeleteRecipe = async (recipeId) => {
-    const confirmed = window.confirm('Delete this recipe permanently?');
+    const confirmed = window.confirm(t('delete_recipe_confirmation'));
     if (!confirmed) return;
 
     try {
@@ -94,7 +96,7 @@ const Profile = () => {
       setMyRecipes((prev) => prev.filter((recipe) => recipe._id !== recipeId));
     } catch (error) {
       console.error('Delete recipe failed:', error);
-      alert(error.message || 'Unable to delete recipe');
+      alert(error.message || t('unable_delete_recipe'));
     }
   };
 
@@ -109,9 +111,9 @@ const Profile = () => {
         <div className="account-card account-card--highlight">
           <div className="account-header">
             <div>
-              <h2 className="account-header__title">Edit Profile</h2>
+              <h2 className="account-header__title">{t('edit_profile')}</h2>
               <p className="account-header__subtitle">
-                Update your name and email used across CookOnWeb.
+                {t('edit_profile_subtitle')}
               </p>
             </div>
           </div>

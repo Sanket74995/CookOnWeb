@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n'; // Import the i18n configuration
@@ -19,7 +19,26 @@ import CollectionDetail from './components/CollectionDetail';
 import Dashboard from './components/Dashboard';
 import AddRecipe from './components/AddRecipe';
 import MealPlanner from './components/MealPlanner';
+import PWAInstall from './components/PWAInstall';
+import VoiceAssistant from './components/VoiceAssistant';
+import BarcodeScanner from './components/BarcodeScanner';
+import AIRecommendations from './components/AIRecommendations';
+import CollaborativeCooking from './components/CollaborativeCooking';
+import NutritionAnalytics from './components/NutritionAnalytics';
 function App() {
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+
+  const handleBarcodeScan = (result) => {
+    console.log('Barcode scanned:', result);
+    // Handle the scanned barcode (add to pantry, shopping list, etc.)
+  };
+
+  const handleVoiceCommand = (command) => {
+    if (command.includes('scan') || command.includes('barcode') || command.includes('camera')) {
+      setShowBarcodeScanner(true);
+    }
+  };
+
   return (
     <I18nextProvider i18n={i18n}>
       <Router>
@@ -41,9 +60,21 @@ function App() {
             <Route path="/collections" element={<Collections />} />
             <Route path="/collections/:id" element={<CollectionDetail />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/recommendations" element={<AIRecommendations />} />
+            <Route path="/collaborate/:sessionId" element={<CollaborativeCooking />} />
+            <Route path="/collaborate" element={<CollaborativeCooking />} />
+            <Route path="/nutrition" element={<NutritionAnalytics />} />
           </Routes>
           <Chatbot />
           <Footer />
+          <PWAInstall />
+          <VoiceAssistant onCommand={handleVoiceCommand} />
+          {showBarcodeScanner && (
+            <BarcodeScanner
+              onScan={handleBarcodeScan}
+              onClose={() => setShowBarcodeScanner(false)}
+            />
+          )}
         </div>
       </Router>
     </I18nextProvider>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import "../styles/AddRecipe.scss";
 
 const API = "http://localhost:5000/api/recipes";
@@ -23,6 +24,7 @@ const AddRecipe = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = Boolean(id);
+  const { t } = useTranslation();
 
   const [form, setForm] = useState(emptyForm);
   const [image, setImage] = useState(null);
@@ -67,7 +69,7 @@ const AddRecipe = () => {
         setPreview(data.image || null);
       } catch (error) {
         console.error("Failed to load recipe for editing:", error);
-        alert("Unable to load this recipe.");
+        alert(t('unable_load_recipe'));
         navigate("/profile");
       } finally {
         setLoading(false);
@@ -113,7 +115,7 @@ const AddRecipe = () => {
 
   const validateForm = () => {
     if (!localStorage.getItem("token")) {
-      alert("Please log in before saving a recipe.");
+      alert(t('please_log_in_before_saving_recipe'));
       return false;
     }
 
@@ -128,7 +130,7 @@ const AddRecipe = () => {
       !form.servings ||
       (!isEditMode && !image && !preview)
     ) {
-      alert("Please fill in all required fields.");
+      alert(t('please_fill_required_fields'));
       return false;
     }
 
@@ -137,7 +139,7 @@ const AddRecipe = () => {
 
   const handleImport = async () => {
     if (!importUrl.trim()) {
-      alert("Paste a recipe URL or YouTube link first.");
+      alert(t('paste_recipe_url'));
       return;
     }
 
@@ -172,10 +174,10 @@ const AddRecipe = () => {
       if (imported.image) {
         setPreview(imported.image);
       }
-      alert(payload.message || "Recipe imported. Review and complete the details.");
+      alert(payload.message || t('recipe_imported'));
     } catch (error) {
       console.error("Import recipe failed:", error);
-      alert(error.message || "Unable to import recipe.");
+      alert(error.message || t('unable_import_recipe'));
     } finally {
       setImporting(false);
     }
@@ -206,18 +208,18 @@ const AddRecipe = () => {
         throw new Error(payload.message || "Failed to save recipe");
       }
 
-      alert(isEditMode ? "Recipe updated!" : "Recipe added!");
+      alert(isEditMode ? t('recipe_updated') : t('recipe_added'));
       navigate(isEditMode ? `/recipe/${id}` : "/profile");
     } catch (error) {
       console.error("Save recipe request failed:", error);
-      alert(error.message || "Unable to save recipe.");
+      alert(error.message || t('unable_save_recipe'));
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div className="page-container">Loading recipe editor...</div>;
+    return <div className="page-container">{t('loading_recipe_editor')}</div>;
   }
 
   return (
@@ -227,24 +229,24 @@ const AddRecipe = () => {
           <div className="add-recipe-header">
             <div>
               <h2 className="add-recipe-header__title">
-                {isEditMode ? "Edit Recipe" : "Add New Recipe"}
+                {isEditMode ? t('edit_recipe') : t('add_new_recipe')}
               </h2>
               <p className="add-recipe-header__subtitle">
                 {isEditMode
-                  ? "Update your recipe details, image, and instructions."
-                  : "Share your favourite dish with the CookOnWeb community."}
+                  ? t('update_recipe_details')
+                  : t('share_favorite_dish')}
               </p>
             </div>
             <span className="add-recipe-header__badge">
-              {isEditMode ? "Edit Mode" : "Creator Mode"}
+              {isEditMode ? t('edit_mode') : t('creator_mode')}
             </span>
           </div>
 
           <form className="add-recipe-form" onSubmit={handleSubmit}>
             <div className="form-section">
-              <div className="form-section__title">Import recipe draft</div>
+              <div className="form-section__title">{t('import_recipe_draft')}</div>
               <div className="form-section__hint">
-                Paste a recipe page or YouTube URL to prefill this form.
+                {t('paste_recipe_url_hint')}
               </div>
               <div className="form-grid">
                 <div className="form-group">
@@ -256,61 +258,61 @@ const AddRecipe = () => {
                 </div>
                 <div className="form-group">
                   <button type="button" className="btn-outlined" onClick={handleImport} disabled={importing}>
-                    {importing ? "Importing..." : "Import from URL"}
+                    {importing ? t('importing') : t('import_from_url')}
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="form-section">
-              <div className="form-section__title">Basic details</div>
+              <div className="form-section__title">{t('basic_details')}</div>
               <div className="form-section__hint">
-                Give your recipe a clear name and choose the right category.
+                {t('basic_details_hint')}
               </div>
 
               <div className="form-group">
-                <label>Recipe title</label>
+                <label>{t('recipe_title')}</label>
                 <input
                   name="title"
                   value={form.title}
                   onChange={handleChange}
-                  placeholder="e.g. Paneer Butter Masala"
+                  placeholder={t('example_recipe_title')}
                 />
               </div>
 
               <div className="form-group">
-                <label>Description</label>
+                <label>{t('description')}</label>
                 <textarea
                   name="description"
                   value={form.description}
                   onChange={handleChange}
-                  placeholder="A short summary of the recipe, taste, and style"
+                  placeholder={t('description_placeholder')}
                 />
               </div>
 
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Cuisine</label>
+                  <label>{t('cuisine')}</label>
                   <input
                     name="cuisine"
                     value={form.cuisine}
                     onChange={handleChange}
-                    placeholder="e.g. Indian"
+                    placeholder={t('example_cuisine')}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Category</label>
+                  <label>{t('category')}</label>
                   <select name="category" value={form.category} onChange={handleChange}>
-                    <option value="">Select category</option>
-                    <option value="appetizer">Appetizer</option>
-                    <option value="main course">Main course</option>
-                    <option value="dessert">Dessert</option>
-                    <option value="beverage">Beverage</option>
-                    <option value="snack">Snack</option>
-                    <option value="salad">Salad</option>
-                    <option value="soup">Soup</option>
-                    <option value="bread">Bread</option>
+                    <option value="">{t('select_category')}</option>
+                    <option value="appetizer">{t('appetizer')}</option>
+                    <option value="main course">{t('main course')}</option>
+                    <option value="dessert">{t('dessert')}</option>
+                    <option value="beverage">{t('beverage')}</option>
+                    <option value="snack">{t('snack')}</option>
+                    <option value="salad">{t('salad')}</option>
+                    <option value="soup">{t('soup')}</option>
+                    <option value="bread">{t('bread')}</option>
                   </select>
                 </div>
               </div>

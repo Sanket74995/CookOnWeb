@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import '../styles/MealPlanner.scss';
 
 const RECIPES_API = 'http://localhost:5000/api/recipes';
@@ -36,6 +37,7 @@ const getWeekDays = (weekStart) => {
 const emptyCell = { recipe: '', servings: 1, notes: '' };
 
 const MealPlanner = () => {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token');
   const [recipes, setRecipes] = useState([]);
   const [weekStart, setWeekStart] = useState(formatDate(getMonday()));
@@ -189,7 +191,7 @@ const MealPlanner = () => {
 
   const savePlan = async () => {
     if (!token) {
-      alert('Please log in to save your meal plan.');
+      alert(t('please_log_in_to_save_meal_plan'));
       return;
     }
 
@@ -212,10 +214,10 @@ const MealPlanner = () => {
         throw new Error(data.message || 'Failed to save meal plan');
       }
       setPlanEntries(data.entries || []);
-      alert('Meal plan saved.');
+      alert(t('meal_plan_saved'));
     } catch (error) {
       console.error('Failed to save meal plan:', error);
-      alert(error.message || 'Unable to save meal plan');
+      alert(error.message || t('unable_save_meal_plan'));
     } finally {
       setSaving(false);
     }
@@ -225,8 +227,8 @@ const MealPlanner = () => {
     return (
       <div className="planner-page">
         <div className="planner-card">
-          <h2>Meal Planner</h2>
-          <p>Please log in to build your weekly meal plan and shopping list.</p>
+          <h2>{t('meal_planner')}</h2>
+          <p>{t('please_log_in_to_build_meal_plan')}</p>
         </div>
       </div>
     );
@@ -236,12 +238,12 @@ const MealPlanner = () => {
     <div className="planner-page">
       <div className="planner-header">
         <div>
-          <h1>Meal Planner</h1>
-          <p>Plan your week, assign recipes by meal, and auto-build your shopping list.</p>
+          <h1>{t('meal_planner')}</h1>
+          <p>{t('meal_planner_subtitle')}</p>
         </div>
         <div className="planner-header__actions">
           <select value={familyGroupId} onChange={(e) => setFamilyGroupId(e.target.value)}>
-            <option value="">My personal planner</option>
+            <option value="">{t('my_personal_planner')}</option>
             {familyGroups.map((group) => (
               <option key={group._id} value={group._id}>{group.name}</option>
             ))}
@@ -252,13 +254,13 @@ const MealPlanner = () => {
             onChange={(e) => setWeekStart(e.target.value)}
           />
           <button type="button" className="btn-primary" onClick={savePlan} disabled={saving}>
-            {saving ? 'Saving...' : 'Save Week'}
+            {saving ? t('saving') : t('save_week')}
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="planner-card">Loading your meal plan...</div>
+        <div className="planner-card">{t('loading_meal_plan')}</div>
       ) : (
         <div className="planner-grid">
           {weekDays.map((date) => (
@@ -268,12 +270,12 @@ const MealPlanner = () => {
                 const entry = getCellEntry(date, mealType);
                 return (
                   <div key={`${date}-${mealType}`} className="planner-slot">
-                    <label>{mealType}</label>
+                    <label>{t(mealType)}</label>
                     <select
                       value={entry.recipe?._id || entry.recipe || ''}
                       onChange={(e) => updateCell(date, mealType, 'recipe', e.target.value)}
                     >
-                      <option value="">Choose recipe</option>
+                      <option value="">{t('choose_recipe')}</option>
                       {recipes.map((recipe) => (
                         <option key={recipe._id} value={recipe._id}>
                           {recipe.title}
@@ -285,13 +287,13 @@ const MealPlanner = () => {
                       min="1"
                       value={entry.servings || 1}
                       onChange={(e) => updateCell(date, mealType, 'servings', Number(e.target.value) || 1)}
-                      placeholder="Servings"
+                      placeholder={t('servings')}
                     />
                     <input
                       type="text"
                       value={entry.notes || ''}
                       onChange={(e) => updateCell(date, mealType, 'notes', e.target.value)}
-                      placeholder="Optional note"
+                      placeholder={t('optional_note')}
                     />
                   </div>
                 );
@@ -303,8 +305,8 @@ const MealPlanner = () => {
 
       <div className="planner-card">
         <div className="planner-card__header">
-          <h2>Nutrition Dashboard</h2>
-          <span>{nutrition ? 'Live from this plan' : 'No data yet'}</span>
+          <h2>{t('nutrition_dashboard')}</h2>
+          <span>{nutrition ? t('live_from_this_plan') : t('no_data_yet')}</span>
         </div>
         {nutrition ? (
           <div className="shopping-list">
@@ -320,11 +322,11 @@ const MealPlanner = () => {
 
       <div className="planner-card">
         <div className="planner-card__header">
-          <h2>Shopping List</h2>
-          <span>{shoppingList.length} items</span>
+          <h2>{t('shopping_list')}</h2>
+          <span>{shoppingList.length} {t('items')}</span>
         </div>
         {shoppingList.length === 0 ? (
-          <p>Add recipes to your week to generate a shopping list.</p>
+          <p>{t('add_recipes_to_generate_shopping_list')}</p>
         ) : (
           <div className="shopping-list">
             {shoppingList.map((item) => (

@@ -7,11 +7,22 @@ import '../styles/Dashboard.scss';
 const Dashboard = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const [stats, setStats] = useState(null);
+    const [stats, setStats] = useState({
+        totalRecipes: 0,
+        totalFavorites: 0,
+        totalCollections: 0,
+        totalReviews: 0,
+        averageRating: '0.0'
+    });
     const [loading, setLoading] = useState(true);
     const [recentRecipes, setRecentRecipes] = useState([]);
     const [favoriteCuisines, setFavoriteCuisines] = useState([]);
-    const [cookingHabits, setCookingHabits] = useState({});
+    const [cookingHabits, setCookingHabits] = useState({
+        totalPrepTime: 0,
+        totalCookTime: 0,
+        difficultyBreakdown: {},
+        categoryBreakdown: {}
+    });
 
     useEffect(() => {
         fetchDashboardData();
@@ -97,12 +108,28 @@ const Dashboard = () => {
 
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
+            // Set default values on error
+            setStats({
+                totalRecipes: 0,
+                totalFavorites: 0,
+                totalCollections: 0,
+                totalReviews: 0,
+                averageRating: '0.0'
+            });
+            setRecentRecipes([]);
+            setFavoriteCuisines([]);
+            setCookingHabits({
+                totalPrepTime: 0,
+                totalCookTime: 0,
+                difficultyBreakdown: {},
+                categoryBreakdown: {}
+            });
         } finally {
             setLoading(false);
         }
     };
 
-    if (loading) {
+    if (loading || !stats) {
         return <div className="dashboard-page"><div className="loading">Loading your dashboard...</div></div>;
     }
 
@@ -135,7 +162,7 @@ const Dashboard = () => {
                     <div className="stat-label">Reviews Received</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-number">{Math.round((cookingHabits.totalPrepTime + cookingHabits.totalCookTime) / 60)}h</div>
+                    <div className="stat-number">{Math.round(((cookingHabits?.totalPrepTime || 0) + (cookingHabits?.totalCookTime || 0)) / 60)}h</div>
                     <div className="stat-label">Total Cooking Time</div>
                 </div>
             </div>
@@ -176,7 +203,7 @@ const Dashboard = () => {
                                     <div className="cuisine-bar">
                                         <div
                                             className="cuisine-fill"
-                                            style={{ width: `${(count / favoriteCuisines[0].count) * 100}%` }}
+                                            style={{ width: `${favoriteCuisines.length > 0 ? (count / favoriteCuisines[0].count) * 100 : 0}%` }}
                                         ></div>
                                     </div>
                                     <span className="cuisine-count">{count}</span>
@@ -192,7 +219,7 @@ const Dashboard = () => {
                         <div className="habit-item">
                             <h4>Difficulty Distribution</h4>
                             <div className="habit-stats">
-                                {Object.entries(cookingHabits.difficultyBreakdown || {}).map(([difficulty, count]) => (
+                                {Object.entries(cookingHabits?.difficultyBreakdown || {}).map(([difficulty, count]) => (
                                     <div key={difficulty} className="habit-stat">
                                         <span className="habit-label">{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
                                         <span className="habit-value">{count}</span>
@@ -203,7 +230,7 @@ const Dashboard = () => {
                         <div className="habit-item">
                             <h4>Recipe Categories</h4>
                             <div className="habit-stats">
-                                {Object.entries(cookingHabits.categoryBreakdown || {}).map(([category, count]) => (
+                                {Object.entries(cookingHabits?.categoryBreakdown || {}).map(([category, count]) => (
                                     <div key={category} className="habit-stat">
                                         <span className="habit-label">{category.replace('-', ' ')}</span>
                                         <span className="habit-value">{count}</span>

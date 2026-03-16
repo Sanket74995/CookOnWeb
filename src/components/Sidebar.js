@@ -20,8 +20,8 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
     }, []);
 
     // Icon mapping for navigation items using FontAwesome
-    const getIcon = (label) => {
-        switch (label.toLowerCase()) {
+    const getIcon = (key) => {
+        switch (key) {
             case 'home':
                 return <FontAwesomeIcon icon={faHome} />;
             case 'recipes':
@@ -52,7 +52,7 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                             onClick={toggleSidebar}
                         >
                             <span className="icon-wrapper">
-                                {getIcon(item.label)}
+                                {getIcon(item.key)}
                             </span>
                             {item.label}
                         </Link>
@@ -90,7 +90,7 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                 </div>
             )}
             <div className="sidebar-footer">
-                <p>&copy; 2024 CookOnWeb</p>
+                <p>{t('footer_copyright')}</p>
             </div>
         </div>
     )
