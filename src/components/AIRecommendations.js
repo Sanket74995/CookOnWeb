@@ -156,7 +156,7 @@ const AIRecommendations = () => {
     return (
       <div className="ai-recommendations-loading">
         <div className="loading-spinner"></div>
-        <p>Analyzing your preferences and generating recommendations...</p>
+        <p>{t('analyzing_preferences')}</p>
       </div>
     );
   }
@@ -164,50 +164,50 @@ const AIRecommendations = () => {
   return (
     <div className="ai-recommendations">
       <div className="recommendations-header">
-        <h1>AI Recipe Recommendations</h1>
-        <p>Personalized recipes based on your preferences and cooking history</p>
+        <h1>{t('ai_recipe_recommendations')}</h1>
+        <p>{t('personalized_recipes_subtitle')}</p>
       </div>
 
       <div className="filters-section">
         <div className="filter-group">
-          <label>Cooking Time:</label>
+          <label>{t('cooking_time')}</label>
           <select
             value={currentFilters.time}
             onChange={(e) => handleFilterChange('time', e.target.value)}
           >
-            <option value="any">Any Time</option>
-            <option value="quick">Under 30 min</option>
-            <option value="medium">30-60 min</option>
-            <option value="long">Over 60 min</option>
+            <option value="any">{t('any_time')}</option>
+            <option value="quick">{t('under_30_min')}</option>
+            <option value="medium">{t('30_60_min')}</option>
+            <option value="long">{t('over_60_min')}</option>
           </select>
         </div>
 
         <div className="filter-group">
-          <label>Difficulty:</label>
+          <label>{t('difficulty')}</label>
           <select
             value={currentFilters.difficulty}
             onChange={(e) => handleFilterChange('difficulty', e.target.value)}
           >
-            <option value="any">Any Level</option>
-            <option value="easy">Easy</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="any">{t('any_level')}</option>
+            <option value="easy">{t('easy')}</option>
+            <option value="intermediate">{t('intermediate')}</option>
+            <option value="advanced">{t('advanced')}</option>
           </select>
         </div>
 
         <div className="filter-group">
-          <label>Cuisine:</label>
+          <label>{t('cuisine')}</label>
           <select
             value={currentFilters.cuisine}
             onChange={(e) => handleFilterChange('cuisine', e.target.value)}
           >
-            <option value="any">Any Cuisine</option>
-            <option value="Italian">Italian</option>
-            <option value="Indian">Indian</option>
-            <option value="Chinese">Chinese</option>
-            <option value="Mexican">Mexican</option>
-            <option value="Thai">Thai</option>
-            <option value="American">American</option>
+            <option value="any">{t('any_cuisine')}</option>
+            <option value="Italian">{t('italian')}</option>
+            <option value="Indian">{t('indian')}</option>
+            <option value="Chinese">{t('chinese')}</option>
+            <option value="Mexican">{t('mexican')}</option>
+            <option value="Thai">{t('thai')}</option>
+            <option value="American">{t('american')}</option>
           </select>
         </div>
       </div>
@@ -234,7 +234,7 @@ const AIRecommendations = () => {
               <div className="recipe-meta">
                 <span className="time">
                   <i className="fas fa-clock"></i>
-                  {recipe.prepTime + recipe.cookTime} min
+                  {recipe.prepTime + recipe.cookTime} {t('min')}
                 </span>
                 <span className="difficulty">
                   <i className="fas fa-chart-line"></i>
@@ -252,7 +252,7 @@ const AIRecommendations = () => {
               </div>
 
               <div className="ingredients-preview">
-                <strong>Key ingredients:</strong> {recipe.ingredients.slice(0, 3).join(', ')}
+                <strong>{t('key_ingredients')}</strong> {recipe.ingredients.slice(0, 3).join(', ')}
                 {recipe.ingredients.length > 3 && '...'}
               </div>
             </div>
@@ -263,16 +263,16 @@ const AIRecommendations = () => {
       {recommendations.length === 0 && (
         <div className="no-recommendations">
           <i className="fas fa-search"></i>
-          <h3>No recommendations found</h3>
-          <p>Try adjusting your filters or updating your preferences</p>
+          <h3>{t('no_recommendations_found')}</h3>
+          <p>{t('try_adjusting_filters')}</p>
         </div>
       )}
 
       <div className="preferences-section">
-        <h2>Update Your Preferences</h2>
+        <h2>{t('update_your_preferences')}</h2>
         <div className="preferences-form">
           <div className="preference-group">
-            <label>Dietary Restrictions:</label>
+            <label>{t('dietary_restrictions')}</label>
             <div className="checkbox-group">
               {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'].map(restriction => (
                 <label key={restriction} className="checkbox-label">
@@ -293,7 +293,7 @@ const AIRecommendations = () => {
           </div>
 
           <div className="preference-group">
-            <label>Favorite Cuisines:</label>
+            <label>{t('favorite_cuisines')}</label>
             <div className="checkbox-group">
               {['Italian', 'Indian', 'Chinese', 'Mexican', 'Thai', 'American', 'French', 'Japanese'].map(cuisine => (
                 <label key={cuisine} className="checkbox-label">
@@ -314,14 +314,14 @@ const AIRecommendations = () => {
           </div>
 
           <div className="preference-group">
-            <label>Cooking Skill Level:</label>
+            <label>{t('cooking_skill_level')}</label>
             <select
               value={userPreferences.skillLevel}
               onChange={(e) => updateUserPreferences({...userPreferences, skillLevel: e.target.value})}
             >
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="beginner">{t('beginner')}</option>
+              <option value="intermediate">{t('intermediate')}</option>
+              <option value="advanced">{t('advanced')}</option>
             </select>
           </div>
         </div>
