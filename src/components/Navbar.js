@@ -1,234 +1,147 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle, faEdit, faThumbsUp, faLock, faSignOutAlt, faCog } from '@fortawesome/free-solid-svg-icons';
-import './../styles/Navbar.scss'
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from "./Sidebar";
+import './../styles/Navbar.scss';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
     const [user, setUser] = useState(null);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const { t, i18n } = useTranslation();
-    const dropdownRef = useRef(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
-        // Check if user is logged in
-        const token = localStorage.getItem('token');
+        const handleResize = () => {
+            const desktop = window.innerWidth >= 1024;
+            setIsDesktop(desktop);
+            if (!desktop) {
+                setIsOpen(false); // keep sidebar closed by default on mobile / small screens
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
         const userData = localStorage.getItem('user');
-        if (token && userData) {
+        if (userData) {
             setUser(JSON.parse(userData));
         }
     }, []);
 
     useEffect(() => {
-        // Close dropdown if clicked outside
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setDropdownOpen(false);
+        const onOutsideClick = (e) => {
+            if (!e.target.closest('.profile-container')) {
+                setIsProfileOpen(false);
             }
         };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        document.addEventListener('click', onOutsideClick);
+        return () => document.removeEventListener('click', onOutsideClick);
     }, []);
+
+    const toggleSidebar = () => {
+        setIsOpen((prev) => !prev);
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
-        setDropdownOpen(false);
+        setIsProfileOpen(false);
         navigate('/');
     };
-    const handleEditProfile = () => {
-        navigate('/profile');
-        setDropdownOpen(false);
-    };
-
-    const handleSubscription = () => {
-        navigate('/subscription');
-        setDropdownOpen(false);
-    };
-
-    const handleChangePassword = () => {
-        navigate('/change-password');
-        setDropdownOpen(false);
-    };
-
-    const handleSettings = () => {
-        navigate('/settings');
-        setDropdownOpen(false);
-    };
-
-
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen)
-    }
-
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    }
 
     const navItems = [
-        {
-            id: 1,
-            key: 'home',
-            label: t('home'),
-            href: "/",
-        },
-        {
-            id: 2,
-            key: 'recipes',
-            label: t('recipes'),
-            href: "/recipes",
-        },
-        {
-            id: 3,
-            key: 'add_recipe',
-            label: t('add_recipe'),
-            href: "/add-recipe",
-        },
-        {
-            id: 4,
-            key: 'planner',
-            label: t('planner'),
-            href: "/planner",
-        },
-        {
-            id: 5,
-            key: 'collections',
-            label: t('collections'),
-            href: "/collections",
-        },
-        {
-            id: 6,
-            key: 'ai_recommendations',
-            label: t('ai_recommendations'),
-            href: "/recommendations",
-        },
-        {
-            id: 7,
-            key: 'collaborate',
-            label: t('collaborate'),
-            href: "/collaborate",
-        },
-        {
-            id: 8,
-            key: 'nutrition',
-            label: t('nutrition'),
-            href: "/nutrition",
-        },
-        {
-            id: 9,
-            key: 'dashboard',
-            label: t('dashboard'),
-            href: "/dashboard",
-        }
-    ]
+        { id: 1, key: 'home', label: t('home'), href: '/' },
+        { id: 2, key: 'recipes', label: t('recipes'), href: '/recipes' },
+        { id: 3, key: 'add_recipe', label: t('add_recipe'), href: '/add-recipe' },
+        { id: 4, key: 'planner', label: t('planner'), href: '/planner' },
+        { id: 5, key: 'collections', label: t('collections'), href: '/collections' },
+        { id: 6, key: 'ai_recommendations', label: t('ai_recommendations'), href: '/recommendations' },
+        { id: 7, key: 'collaborate', label: t('collaborate'), href: '/collaborate' },
+        { id: 8, key: 'nutrition', label: t('nutrition'), href: '/nutrition' },
+        { id: 9, key: 'dashboard', label: t('dashboard'), href: '/dashboard' }
+    ];
 
     return (
         <>
-            <div className="navbar container">
-                <Link className="logo" to="/">
-                    <span className="cook">{t('app_name')}</span>
-                </Link>
-                <div className="navbar-items">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.id}
-                            to={item.href}
-                            className={location.pathname === item.href ? "active" : ""}
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
-                    <div className="auth-buttons">
-                        <div className="language-selector">
-                            <select
-                                value={i18n.language}
-                                onChange={(e) => i18n.changeLanguage(e.target.value)}
-                                className="language-dropdown"
+            <div className={`navbar container ${isDesktop ? 'desktop' : ''}`}>
+                <div className="navbar-left">
+                    <button
+                        className={`sidebar-toggle ${isOpen ? 'active' : ''}`}
+                        aria-expanded={isOpen}
+                        onClick={toggleSidebar}
+                        aria-label="Toggle menu"
+                        onKeyDown={(e) => e.key === 'Enter' && toggleSidebar()}
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <Link className="logo" to="/">
+                        <span className="cook">{t('app_name')}</span>
+                    </Link>
+                </div>
+                <div className="navbar-right">
+
+                    {user && (
+                        <div className={`profile-container ${isProfileOpen ? 'open' : ''}`}>
+                            <button
+                                className="profile-icon"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsProfileOpen((prev) => !prev);
+                                }}
+                                aria-expanded={isProfileOpen}
+                                aria-label="User menu"
                             >
-                                <option value="en">{t('language_english')}</option>
-                                <option value="hi">{t('language_hindi')}</option>
-                            </select>
-                        </div>
-                        {user ? (
-                            <div className="profile-container" ref={dropdownRef}>
-                                <FontAwesomeIcon
-                                    icon={faUserCircle}
-                                    size="2x"
-                                    className="profile-icon"
-                                    onClick={toggleDropdown}
-                                />
-                                {dropdownOpen && (
-                                    <div className="profile-dropdown">
-                                        <div className="profile-header">
-                                            <FontAwesomeIcon icon={faUserCircle} size="3x" className="profile-image" />
-                                            <div className="profile-info">
-                                                <div className="profile-name">{user.firstName} {user.lastName}</div>
-                                                <div className="profile-email">{user.email}</div>
-                                            </div>
-                                        </div>
-                                        <hr />
-                                        <ul className="profile-menu">
-                                            <li onClick={handleEditProfile}><FontAwesomeIcon icon={faEdit} /> {t('edit_profile')}</li>
-                                            <li onClick={handleSubscription}><FontAwesomeIcon icon={faThumbsUp} /> {t('subscription')}</li>
-                                            <li onClick={handleChangePassword}><FontAwesomeIcon icon={faLock} /> {t('change_password')}</li>
-                                            <li onClick={handleSettings}><FontAwesomeIcon icon={faCog} /> {t('settings')}</li>
-                                        </ul>
+                                <FontAwesomeIcon icon={faUserCircle} size="lg" />
+                            </button>
 
-
-                                        <div className="profile-footer">
-                                            <span className="help-center">{t('help_center')}</span> |{' '}
-                                            <span className="signout" onClick={handleLogout}>
-                                                <FontAwesomeIcon icon={faSignOutAlt} /> {t('signout')}
-                                            </span>
+                            {isProfileOpen && (
+                                <div className="profile-dropdown">
+                                    <div className="profile-header">
+                                        <FontAwesomeIcon icon={faUserCircle} size="2x" />
+                                        <div>
+                                            <strong>{user.firstName} {user.lastName}</strong>
+                                            <p>{user.email}</p>
                                         </div>
                                     </div>
-                                )}
-                            </div>
-                        ) : (
-                            <>
-                                <Link
-                                    to="/login"
-                                    className={`login-btn ${location.pathname === '/login' ? 'active' : ''}`}
-                                >
-                                    {t('login')}
-                                </Link>
-                                <Link
-                                    to="/register"
-                                    className={`register-btn ${location.pathname === '/register' ? 'active' : ''}`}
-                                >
-                                    {t('register')}
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </div>
-                <div
-                    onClick={toggleSidebar}
-                    className={`sidebar_container ${isOpen ? "active" : ""}`}
-                >
-                    <div className="bar"></div>
-                    <div className="bar"></div>
-                    <div className="bar"></div>
+                                    <ul>
+                                        <li onClick={() => { setIsProfileOpen(false); navigate('/profile'); }}>
+                                            {t('edit_profile')}
+                                        </li>
+                                        <li onClick={() => { setIsProfileOpen(false); navigate('/subscription'); }}>
+                                            {t('subscription')}
+                                        </li>
+                                        <li onClick={() => { setIsProfileOpen(false); navigate('/change-password'); }}>
+                                            {t('change_password')}
+                                        </li>
+                                        <li onClick={() => { setIsProfileOpen(false); navigate('/settings'); }}>
+                                            {t('settings')}
+                                        </li>
+                                        <li onClick={handleLogout}>
+                                            {t('signout')}
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
-            <Sidebar
-                isOpen={isOpen}
-                toggleSidebar={toggleSidebar}
-                navItems={navItems}
-            />
-            <div
-                className={`sidebar-overlay ${isOpen ? "active" : ""}`}
-                onClick={toggleSidebar}
-            ></div>
+
+            <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} navItems={navItems} />
+            <div className={`sidebar-overlay ${isOpen ? 'active' : ''}`} onClick={toggleSidebar} />
         </>
-    )
-}
+    );
+};
+
 export default Navbar;

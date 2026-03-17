@@ -44,9 +44,10 @@ function App() {
       <Router>
         <div className="App">
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Hero />} />
-            <Route path="/register" element={<Register />} />
+          <main className="app-content">
+            <Routes>
+              <Route path="/" element={<Hero />} />
+              <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
@@ -75,6 +76,7 @@ function App() {
               onClose={() => setShowBarcodeScanner(false)}
             />
           )}
+          </main>
         </div>
       </Router>
     </I18nextProvider>

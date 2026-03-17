@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faBook, faCog, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import {
+    faHome,
+    faBook,
+    faCog,
+    faCalendarDays,
+    faUserCircle,
+    faSignOutAlt,
+    faLock,
+    faThumbsUp,
+    faEdit
+} from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import './../styles/Sidebar.scss'
 
 const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
     const location = useLocation();
-    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -18,6 +29,14 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
             setUser(JSON.parse(userData));
         }
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        toggleSidebar();
+        navigate('/');
+    };
 
     // Icon mapping for navigation items using FontAwesome
     const getIcon = (key) => {
@@ -71,7 +90,36 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                     </Link>
                 </li>
             </ul>
-            {!user && (
+            <div className="sidebar-language">
+                <label htmlFor="sidebar-language-select">{t('language')}:</label>
+                <select
+                    id="sidebar-language-select"
+                    value={i18n.language}
+                    onChange={(e) => i18n.changeLanguage(e.target.value)}
+                >
+                    <option value="en">{t('language_english')}</option>
+                    <option value="hi">{t('language_hindi')}</option>
+                </select>
+            </div>
+
+            {user ? (
+                <div className="sidebar-user-panel">
+                    <div className="user-header">
+                        <FontAwesomeIcon icon={faUserCircle} size="2x" />
+                        <div>
+                            <strong>{user.firstName} {user.lastName}</strong>
+                            <p>{user.email}</p>
+                        </div>
+                    </div>
+                    <ul className="profile-menu">
+                        <li onClick={() => { navigate('/profile'); toggleSidebar(); }}><FontAwesomeIcon icon={faEdit} /> {t('edit_profile')}</li>
+                        <li onClick={() => { navigate('/subscription'); toggleSidebar(); }}><FontAwesomeIcon icon={faThumbsUp} /> {t('subscription')}</li>
+                        <li onClick={() => { navigate('/change-password'); toggleSidebar(); }}><FontAwesomeIcon icon={faLock} /> {t('change_password')}</li>
+                        <li onClick={() => { navigate('/settings'); toggleSidebar(); }}><FontAwesomeIcon icon={faCog} /> {t('settings')}</li>
+                        <li onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt} /> {t('signout')}</li>
+                    </ul>
+                </div>
+            ) : (
                 <div className="sidebar-auth">
                     <Link
                         to="/login"
@@ -89,6 +137,7 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                     </Link>
                 </div>
             )}
+
             <div className="sidebar-footer">
                 <p>{t('footer_copyright')}</p>
             </div>
