@@ -33,10 +33,10 @@ const RecipeDetail = () => {
                     setRecipe(data);
                     setDesiredServings(Number(data.servings || 1));
                 } else {
-                    console.error('Failed to fetch recipe');
+                    setRecipe(null);
                 }
             } catch (error) {
-                console.error('Error fetching recipe:', error);
+                setRecipe(null);
             } finally {
                 setLoading(false);
             }
@@ -52,7 +52,7 @@ const RecipeDetail = () => {
 
     // Enhanced voice command handler
     const handleVoiceCommand = (command) => {
-        console.log('Recipe voice command:', command);
+        // Received a recipe voice command for navigation and controls
 
         // Reading controls
         if (command.includes('start') || command.includes('begin') || command.includes('read')) {

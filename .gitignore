@@ -18,6 +18,15 @@
 .env.test.local
 .env.production.local
 
+# local backend dependencies + generated artifacts
+backend/node_modules/
+
+# audit output files (not for version control)
+audit-backend.json
+audit-backend-updated.json
+audit-frontend.json
+audit-frontend-updated.json
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

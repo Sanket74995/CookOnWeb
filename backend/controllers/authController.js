@@ -2,12 +2,39 @@ const User = require('../models/User');
 const FamilyGroup = require('../models/FamilyGroup');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { z } = require('zod');
+
 const makeInviteCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+
+const logger = {
+  info: (message, data) => console.info('[AUTH]', message, data || ''),
+  warn: (message, data) => console.warn('[AUTH]', message, data || ''),
+  error: (message, data) => console.error('[AUTH]', message, data || '')
+};
+
+const registerSchema = z.object({
+  username: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1)
+});
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+});
+
 
 // Register a new user
 const register = async (req, res) => {
   try {
-    const { username, email, password, firstName, lastName } = req.body;
+    const payload = registerSchema.safeParse(req.body);
+    if (!payload.success) {
+      return res.status(400).json({ message: 'Invalid input', errors: payload.error.errors });
+    }
+
+    const { username, email, password, firstName, lastName } = payload.data;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -54,7 +81,7 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    logger.error('Registration error:', error);
     res.status(500).json({ message: 'Server error during registration' });
   }
 };
@@ -62,7 +89,12 @@ const register = async (req, res) => {
 // Login user
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const payload = loginSchema.safeParse(req.body);
+    if (!payload.success) {
+      return res.status(400).json({ message: 'Invalid input', errors: payload.error.errors });
+    }
+
+    const { email, password } = payload.data;
 
     // Find user by email
     const user = await User.findOne({ email });
@@ -95,7 +127,7 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
   }
 };
@@ -105,7 +137,7 @@ const getFavorites = async (req, res) => {
     const user = await User.findById(req.userId).populate('favorites');
     res.json(user.favorites);
   } catch (error) {
-    console.error('Get favorites error:', error);
+    logger.error('Get favorites error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -120,7 +152,7 @@ const addFavorite = async (req, res) => {
     }
     res.json({ message: 'Added to favorites' });
   } catch (error) {
-    console.error('Add favorite error:', error);
+    logger.error('Add favorite error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -133,7 +165,7 @@ const removeFavorite = async (req, res) => {
     await user.save();
     res.json({ message: 'Removed from favorites' });
   } catch (error) {
-    console.error('Remove favorite error:', error);
+    logger.error('Remove favorite error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -145,7 +177,7 @@ const getProfile = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
-    console.error('Get profile error:', err);
+    logger.error('Get profile error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -163,7 +195,7 @@ const updateProfile = async (req, res) => {
 
     res.json({ message: 'Profile updated successfully', user: updatedUser });
   } catch (err) {
-    console.error('Update profile error:', err);
+    logger.error('Update profile error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -187,7 +219,7 @@ const changePassword = async (req, res) => {
 
     res.json({ message: 'Password changed successfully' });
   } catch (err) {
-    console.error('Change password error:', err);
+    logger.error('Change password error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -198,7 +230,7 @@ const getSettings = async (req, res) => {
     const user = await User.findById(req.userId).select('settings');
     res.json(user?.settings || {});
   } catch (err) {
-    console.error('Get settings error:', err);
+    logger.error('Get settings error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -215,7 +247,7 @@ const updateSettings = async (req, res) => {
 
     res.json({ message: 'Settings updated', settings: user.settings });
   } catch (err) {
-    console.error('Update settings error:', err);
+    logger.error('Update settings error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -225,7 +257,7 @@ const getPantry = async (req, res) => {
     const user = await User.findById(req.userId).select('pantry');
     res.json(user?.pantry || []);
   } catch (err) {
-    console.error('Get pantry error:', err);
+    logger.error('Get pantry error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -241,7 +273,7 @@ const updatePantry = async (req, res) => {
 
     res.json({ message: 'Pantry updated', pantry: user?.pantry || [] });
   } catch (err) {
-    console.error('Update pantry error:', err);
+    logger.error('Update pantry error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -254,7 +286,7 @@ const getFamilyGroups = async (req, res) => {
 
     res.json(groups);
   } catch (err) {
-    console.error('Get family groups error:', err);
+    logger.error('Get family groups error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

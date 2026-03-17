@@ -29,7 +29,7 @@ function App() {
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   const handleBarcodeScan = (result) => {
-    console.log('Barcode scanned:', result);
+    // TODO: persist barcode scan results in user pantry or shopping list
     // Handle the scanned barcode (add to pantry, shopping list, etc.)
   };
 

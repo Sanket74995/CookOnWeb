@@ -52,8 +52,7 @@ const VoiceAssistant = ({ isVisible = true, onCommand }) => {
         }
       };
 
-      recognitionInstance.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
+      recognitionInstance.onerror = () => {
         setIsListening(false);
       };
 
@@ -68,7 +67,7 @@ const VoiceAssistant = ({ isVisible = true, onCommand }) => {
   }, [i18n.language]);
 
   const handleVoiceCommand = (command) => {
-    console.log('Voice command:', command);
+    // Process voice commands from speech recognition
 
     // Navigation commands
     if (command.includes('go to') || command.includes('open') || command.includes('show')) {
@@ -133,7 +132,7 @@ const VoiceAssistant = ({ isVisible = true, onCommand }) => {
       try {
         recognition.start();
       } catch (error) {
-        console.error('Error starting speech recognition:', error);
+        setIsListening(false);
       }
     }
   };
