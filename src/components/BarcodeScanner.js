@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/BarcodeScanner.scss';
+import Loader from './Loader';
 
 const BarcodeScanner = ({ onScan, onClose }) => {
   const [isScanning, setIsScanning] = useState(false);
@@ -240,8 +241,7 @@ const BarcodeScanner = ({ onScan, onClose }) => {
 
           {isLoading && (
             <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Fetching product information...</p>
+              <Loader label="Fetching product information..." variant="card" size="sm" />
             </div>
           )}
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/CollaborativeCooking.scss';
+import Loader from './Loader';
 
 const CollaborativeCooking = () => {
   const { sessionId } = useParams();
@@ -173,12 +174,7 @@ const CollaborativeCooking = () => {
   };
 
   if (!session) {
-    return (
-      <div className="collaborative-loading">
-        <div className="loading-spinner"></div>
-        <p>{t('loading_cooking_session')}</p>
-      </div>
-    );
+    return <Loader label={t('loading_cooking_session')} variant="page" />;
   }
 
   return (

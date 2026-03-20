@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Account.scss';
+import { applyTheme, getStoredTheme } from '../utils/theme';
 
 const API_BASE = 'http://localhost:5000/api/auth';
 
@@ -39,14 +40,16 @@ const Settings = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          setSettings({
+          const nextSettings = {
             ...defaultSettings,
             ...data,
             foodProfile: {
               ...defaultSettings.foodProfile,
               ...(data.foodProfile || {}),
             },
-          });
+          };
+          setSettings(nextSettings);
+          applyTheme(nextSettings.theme || getStoredTheme());
         }
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -91,7 +94,12 @@ const Settings = () => {
   };
 
   const handleChange = (e) => {
-    setSettings({ ...settings, [e.target.name]: e.target.value });
+    const nextSettings = { ...settings, [e.target.name]: e.target.value };
+    setSettings(nextSettings);
+
+    if (e.target.name === 'theme') {
+      applyTheme(e.target.value);
+    }
   };
 
   const handleFoodProfileChange = (e) => {
@@ -140,6 +148,7 @@ const Settings = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to save settings');
       }
+      applyTheme(settings.theme);
       alert('Settings saved');
     } catch (error) {
       console.error('Failed to save settings:', error);

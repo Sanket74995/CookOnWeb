@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import "../styles/AddRecipe.scss";
+import Loader from "./Loader";
 
 const API = "http://localhost:5000/api/recipes";
 
@@ -219,7 +220,7 @@ const AddRecipe = () => {
   };
 
   if (loading) {
-    return <div className="page-container">{t('loading_recipe_editor')}</div>;
+    return <Loader label={t('loading_recipe_editor')} variant="page" />;
   }
 
   return (

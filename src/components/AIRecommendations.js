@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/AIRecommendations.scss';
+import Loader from './Loader';
 
 const AIRecommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
@@ -153,12 +154,7 @@ const AIRecommendations = () => {
   };
 
   if (loading) {
-    return (
-      <div className="ai-recommendations-loading">
-        <div className="loading-spinner"></div>
-        <p>{t('analyzing_preferences')}</p>
-      </div>
-    );
+    return <Loader label={t('analyzing_preferences')} variant="page" />;
   }
 
   return (

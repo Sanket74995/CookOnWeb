@@ -1,26 +1,25 @@
 .ai-recommendations {
-  max-width: 1200px;
+  width: min(calc(100% - 32px), var(--page-width));
   margin: 0 auto;
-  padding: 20px;
+  padding: 28px 0 72px;
 
   .recommendations-header {
     text-align: center;
     margin-bottom: 30px;
 
     h1 {
-      color: #333;
-      font-size: 2.5rem;
+      color: var(--text);
+      font-size: clamp(2.4rem, 4vw, 4rem);
       margin-bottom: 10px;
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     p {
-      color: #666;
+      color: var(--text-soft);
       font-size: 1.1rem;
-      margin: 0;
     }
   }
 
@@ -30,6 +29,11 @@
     margin-bottom: 30px;
     flex-wrap: wrap;
     justify-content: center;
+    padding: 22px;
+    border-radius: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
 
     .filter-group {
       display: flex;
@@ -37,23 +41,23 @@
       gap: 8px;
 
       label {
-        font-weight: 600;
-        color: #333;
+        font-weight: 700;
+        color: var(--text);
         font-size: 0.9rem;
       }
 
       select {
-        padding: 8px 12px;
-        border: 2px solid #e1e1e1;
-        border-radius: 6px;
+        padding: 10px 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
         font-size: 0.9rem;
-        background: white;
-        cursor: pointer;
-        transition: border-color 0.3s ease;
+        background: var(--input-bg);
+        color: var(--text);
 
         &:focus {
           outline: none;
-          border-color: #ff6b6b;
+          border-color: rgba(197, 106, 27, 0.35);
+          box-shadow: 0 0 0 4px rgba(197, 106, 27, 0.08);
         }
       }
     }
@@ -66,17 +70,17 @@
     margin-bottom: 40px;
 
     .recommendation-card {
-      background: white;
-      border-radius: 12px;
+      background: var(--surface-strong);
+      border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-sm);
       cursor: pointer;
       transition: all 0.3s ease;
-      border: 1px solid #f0f0f0;
+      border: 1px solid var(--line);
 
       &:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: var(--shadow-md);
       }
 
       .recipe-image {
@@ -99,21 +103,22 @@
           position: absolute;
           top: 10px;
           right: 10px;
-          background: rgba(255, 255, 255, 0.9);
+          background: var(--surface);
           padding: 5px 8px;
           border-radius: 20px;
           display: flex;
           align-items: center;
           gap: 5px;
           font-size: 0.8rem;
+          border: 1px solid var(--line);
 
           .stars {
             color: #ffd700;
           }
 
           .rating-number {
-            font-weight: 600;
-            color: #333;
+            font-weight: 700;
+            color: var(--text);
           }
         }
       }
@@ -123,13 +128,13 @@
 
         h3 {
           margin: 0 0 10px 0;
-          color: #333;
+          color: var(--text);
           font-size: 1.3rem;
           line-height: 1.3;
         }
 
         .recipe-description {
-          color: #666;
+          color: var(--text-soft);
           margin: 0 0 15px 0;
           font-size: 0.9rem;
           line-height: 1.4;
@@ -140,42 +145,27 @@
           gap: 15px;
           margin-bottom: 15px;
           font-size: 0.85rem;
-          color: #777;
-
-          span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-
-            i {
-              color: #ff6b6b;
-            }
-          }
+          color: var(--text-soft);
         }
 
         .match-reason {
-          background: #f0f8ff;
+          background: var(--chip-bg);
           padding: 10px;
-          border-radius: 6px;
+          border-radius: 12px;
           margin-bottom: 15px;
           font-size: 0.85rem;
-          color: #555;
-          border-left: 3px solid #4ecdc4;
-
-          i {
-            color: #4ecdc4;
-            margin-right: 8px;
-          }
+          color: var(--text-soft);
+          border-left: 3px solid var(--accent);
         }
 
         .ingredients-preview {
           font-size: 0.85rem;
-          color: #666;
+          color: var(--text-soft);
           padding-top: 10px;
-          border-top: 1px solid #f0f0f0;
+          border-top: 1px solid var(--line);
 
           strong {
-            color: #333;
+            color: var(--text);
           }
         }
       }
@@ -185,91 +175,81 @@
   .no-recommendations {
     text-align: center;
     padding: 60px 20px;
-    color: #666;
-
-    i {
-      font-size: 3rem;
-      color: #ddd;
-      margin-bottom: 20px;
-    }
+    color: var(--text-soft);
 
     h3 {
       margin: 0 0 10px 0;
-      color: #333;
-    }
-
-    p {
-      margin: 0;
-      font-size: 0.9rem;
+      color: var(--text);
     }
   }
 
   .preferences-section {
-    background: #f8f9fa;
-    border-radius: 12px;
+    background: var(--surface-strong);
+    border-radius: 24px;
     padding: 30px;
     margin-top: 40px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
 
     h2 {
-      color: #333;
+      color: var(--text);
       margin-bottom: 25px;
       text-align: center;
       font-size: 1.8rem;
     }
 
-    .preferences-form {
-      .preference-group {
-        margin-bottom: 25px;
+    .preference-group {
+      margin-bottom: 25px;
 
-        label {
-          display: block;
-          font-weight: 600;
-          color: #333;
-          margin-bottom: 10px;
-          font-size: 1rem;
-        }
+      label {
+        display: block;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
 
-        .checkbox-group {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 10px;
+      .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
 
-          .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
-
-            &:hover {
-              background: rgba(255, 107, 107, 0.1);
-            }
-
-            input[type="checkbox"] {
-              width: 16px;
-              height: 16px;
-              accent-color: #ff6b6b;
-            }
-          }
-        }
-
-        select {
-          width: 100%;
-          max-width: 300px;
-          padding: 10px 12px;
-          border: 2px solid #e1e1e1;
-          border-radius: 6px;
-          font-size: 0.9rem;
-          background: white;
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           cursor: pointer;
-          transition: border-color 0.3s ease;
+          padding: 10px;
+          border-radius: 12px;
+          transition: background-color 0.2s ease;
+          color: var(--text-soft);
 
-          &:focus {
-            outline: none;
-            border-color: #ff6b6b;
+          &:hover {
+            background: rgba(197, 106, 27, 0.08);
           }
+
+          input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--brand);
+          }
+        }
+      }
+
+      select {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        background: var(--input-bg);
+        color: var(--text);
+
+        &:focus {
+          outline: none;
+          border-color: rgba(197, 106, 27, 0.35);
+          box-shadow: 0 0 0 4px rgba(197, 106, 27, 0.08);
         }
       }
     }
@@ -281,21 +261,24 @@
     align-items: center;
     justify-content: center;
     min-height: 400px;
-    color: #666;
+    color: var(--text-soft);
 
     .loading-spinner {
       width: 50px;
       height: 50px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #ff6b6b;
+      border: 4px solid rgba(124, 146, 174, 0.18);
+      border-top: 4px solid var(--brand);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
+  }
+}
 
-    p {
-      font-size: 1.1rem;
-      margin: 0;
+:root[data-theme='dark'] {
+  .ai-recommendations {
+    .filters-section {
+      box-shadow: var(--shadow-md);
     }
   }
 }
@@ -305,10 +288,10 @@
   100% { transform: rotate(360deg); }
 }
 
-// Mobile responsiveness
 @media (max-width: 768px) {
   .ai-recommendations {
-    padding: 15px;
+    width: min(calc(100% - 20px), var(--page-width));
+    padding: 20px 0 48px;
 
     .recommendations-header h1 {
       font-size: 2rem;
@@ -326,15 +309,10 @@
 
     .recommendations-grid {
       grid-template-columns: 1fr;
-      gap: 20px;
     }
 
     .preferences-section {
       padding: 20px;
-
-      .preferences-form .preference-group .checkbox-group {
-        grid-template-columns: 1fr;
-      }
     }
   }
 }

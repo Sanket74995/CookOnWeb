@@ -1,6 +1,6 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from "./Sidebar";
@@ -11,7 +11,6 @@ const Navbar = () => {
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
     const [user, setUser] = useState(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const location = useLocation();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -20,7 +19,7 @@ const Navbar = () => {
             const desktop = window.innerWidth >= 1024;
             setIsDesktop(desktop);
             if (!desktop) {
-                setIsOpen(false); // keep sidebar closed by default on mobile / small screens
+                setIsOpen(false);
             }
         };
 
@@ -90,7 +89,6 @@ const Navbar = () => {
                     </Link>
                 </div>
                 <div className="navbar-right">
-
                     {user && (
                         <div className={`profile-container ${isProfileOpen ? 'open' : ''}`}>
                             <button

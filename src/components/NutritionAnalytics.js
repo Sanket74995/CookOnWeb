@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/NutritionAnalytics.scss';
+import Loader from './Loader';
 
 const NutritionAnalytics = () => {
   const { t } = useTranslation();
@@ -118,12 +119,7 @@ const NutritionAnalytics = () => {
   };
 
   if (loading) {
-    return (
-      <div className="nutrition-loading">
-        <div className="loading-spinner"></div>
-        <p>{t('analyzing_nutrition_data')}</p>
-      </div>
-    );
+    return <Loader label={t('analyzing_nutrition_data')} variant="page" />;
   }
 
   return (

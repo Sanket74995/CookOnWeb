@@ -1,6 +1,7 @@
 // src/components/Subscription.js
 import React, { useEffect, useState } from 'react';
 import '../styles/Account.scss';
+import Loader from './Loader';
 
 const API_BASE = 'http://localhost:5000/api/auth';
 
@@ -66,7 +67,7 @@ const Subscription = () => {
       <div className="page-container">
         <div className="account-page account-page--full">
           <div className="account-card">
-            <p>Loading subscription...</p>
+            <Loader label="Loading subscription..." variant="card" />
           </div>
         </div>
       </div>

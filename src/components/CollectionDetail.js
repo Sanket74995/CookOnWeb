@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/CollectionDetail.scss';
+import Loader from './Loader';
 
 const CollectionDetail = () => {
     const { id } = useParams();
@@ -149,7 +150,11 @@ const CollectionDetail = () => {
     };
 
     if (loading) {
-        return <div className="collection-detail-page"><div className="loading">Loading collection...</div></div>;
+        return (
+            <div className="collection-detail-page">
+                <Loader label="Loading collection..." variant="section" />
+            </div>
+        );
     }
 
     if (!collection) {

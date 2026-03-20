@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/MealPlanner.scss';
+import Loader from './Loader';
 
 const RECIPES_API = 'http://localhost:5000/api/recipes';
 const PLANNER_API = 'http://localhost:5000/api/meal-plans';
@@ -226,7 +227,7 @@ const MealPlanner = () => {
   if (!token) {
     return (
       <div className="planner-page">
-        <div className="planner-card">
+        <div className="planner-card planner-card--empty">
           <h2>{t('meal_planner')}</h2>
           <p>{t('please_log_in_to_build_meal_plan')}</p>
         </div>
@@ -236,113 +237,151 @@ const MealPlanner = () => {
 
   return (
     <div className="planner-page">
-      <div className="planner-header">
-        <div>
+      <section className="planner-hero">
+        <div className="planner-hero__content">
+          <span className="planner-kicker">{t('meal_planner')}</span>
           <h1>{t('meal_planner')}</h1>
           <p>{t('meal_planner_subtitle')}</p>
         </div>
-        <div className="planner-header__actions">
-          <select value={familyGroupId} onChange={(e) => setFamilyGroupId(e.target.value)}>
-            <option value="">{t('my_personal_planner')}</option>
-            {familyGroups.map((group) => (
-              <option key={group._id} value={group._id}>{group.name}</option>
-            ))}
-          </select>
-          <input
-            type="date"
-            value={weekStart}
-            onChange={(e) => setWeekStart(e.target.value)}
-          />
-          <button type="button" className="btn-primary" onClick={savePlan} disabled={saving}>
+        <div className="planner-hero__actions">
+          <div className="planner-control">
+            <span>{t('planner_scope')}</span>
+            <select value={familyGroupId} onChange={(e) => setFamilyGroupId(e.target.value)}>
+              <option value="">{t('my_personal_planner')}</option>
+              {familyGroups.map((group) => (
+                <option key={group._id} value={group._id}>{group.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="planner-control">
+            <span>{t('week_start')}</span>
+            <input
+              type="date"
+              value={weekStart}
+              onChange={(e) => setWeekStart(e.target.value)}
+            />
+          </div>
+          <button type="button" className="btn-primary planner-save" onClick={savePlan} disabled={saving}>
             {saving ? t('saving') : t('save_week')}
           </button>
         </div>
-      </div>
+      </section>
 
       {loading ? (
-        <div className="planner-card">{t('loading_meal_plan')}</div>
+        <Loader label={t('loading_meal_plan')} variant="section" />
       ) : (
-        <div className="planner-grid">
+        <section className="planner-board">
           {weekDays.map((date) => (
-            <section key={date} className="planner-day">
-              <h3>{prettyDate(date)}</h3>
-              {MEAL_TYPES.map((mealType) => {
-                const entry = getCellEntry(date, mealType);
-                return (
-                  <div key={`${date}-${mealType}`} className="planner-slot">
-                    <label>{t(mealType)}</label>
-                    <select
-                      value={entry.recipe?._id || entry.recipe || ''}
-                      onChange={(e) => updateCell(date, mealType, 'recipe', e.target.value)}
-                    >
-                      <option value="">{t('choose_recipe')}</option>
-                      {recipes.map((recipe) => (
-                        <option key={recipe._id} value={recipe._id}>
-                          {recipe.title}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      min="1"
-                      value={entry.servings || 1}
-                      onChange={(e) => updateCell(date, mealType, 'servings', Number(e.target.value) || 1)}
-                      placeholder={t('servings')}
-                    />
-                    <input
-                      type="text"
-                      value={entry.notes || ''}
-                      onChange={(e) => updateCell(date, mealType, 'notes', e.target.value)}
-                      placeholder={t('optional_note')}
-                    />
-                  </div>
-                );
-              })}
-            </section>
+            <article key={date} className="planner-day">
+              <div className="planner-day__header">
+                <h3>{prettyDate(date)}</h3>
+                <span>{MEAL_TYPES.length} {t('meals')}</span>
+              </div>
+
+              <div className="planner-day__meals">
+                {MEAL_TYPES.map((mealType) => {
+                  const entry = getCellEntry(date, mealType);
+                  return (
+                    <div key={`${date}-${mealType}`} className="planner-slot">
+                      <div className="planner-slot__header">
+                        <label>{t(mealType)}</label>
+                        <span>{t('plan_meal')}</span>
+                      </div>
+
+                      <select
+                        value={entry.recipe?._id || entry.recipe || ''}
+                        onChange={(e) => updateCell(date, mealType, 'recipe', e.target.value)}
+                      >
+                        <option value="">{t('choose_recipe')}</option>
+                        {recipes.map((recipe) => (
+                          <option key={recipe._id} value={recipe._id}>
+                            {recipe.title}
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="planner-slot__meta">
+                        <input
+                          type="number"
+                          min="1"
+                          value={entry.servings || 1}
+                          onChange={(e) => updateCell(date, mealType, 'servings', Number(e.target.value) || 1)}
+                          placeholder={t('servings')}
+                        />
+                        <input
+                          type="text"
+                          value={entry.notes || ''}
+                          onChange={(e) => updateCell(date, mealType, 'notes', e.target.value)}
+                          placeholder={t('optional_note')}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
           ))}
-        </div>
+        </section>
       )}
 
-      <div className="planner-card">
-        <div className="planner-card__header">
-          <h2>{t('nutrition_dashboard')}</h2>
-          <span>{nutrition ? t('live_from_this_plan') : t('no_data_yet')}</span>
-        </div>
-        {nutrition ? (
-          <div className="shopping-list">
-            <div className="shopping-item"><strong>Calories</strong><span>{Math.round(nutrition.totals.calories || 0)}</span></div>
-            <div className="shopping-item"><strong>Protein</strong><span>{Math.round(nutrition.totals.protein || 0)} g</span></div>
-            <div className="shopping-item"><strong>Carbs</strong><span>{Math.round(nutrition.totals.carbs || 0)} g</span></div>
-            <div className="shopping-item"><strong>Fat</strong><span>{Math.round(nutrition.totals.fat || 0)} g</span></div>
+      <section className="planner-summary">
+        <div className="planner-card">
+          <div className="planner-card__header">
+            <div>
+              <h2>{t('nutrition_dashboard')}</h2>
+              <p>{nutrition ? t('live_from_this_plan') : t('no_data_yet')}</p>
+            </div>
           </div>
-        ) : (
-          <p>Add recipes to the planner to see nutrition totals.</p>
-        )}
-      </div>
-
-      <div className="planner-card">
-        <div className="planner-card__header">
-          <h2>{t('shopping_list')}</h2>
-          <span>{shoppingList.length} {t('items')}</span>
-        </div>
-        {shoppingList.length === 0 ? (
-          <p>{t('add_recipes_to_generate_shopping_list')}</p>
-        ) : (
-          <div className="shopping-list">
-            {shoppingList.map((item) => (
-              <div key={`${item.name}-${item.unit}`} className="shopping-item">
-                <div>
-                  <strong>{item.name}</strong>
-                  <div className="shopping-item__meta">
-                    {item.sources.slice(0, 2).map((source) => source.recipeTitle).join(', ')}
-                  </div>
-                </div>
-                <span>{item.quantity} {item.unit}</span>
+          {nutrition ? (
+            <div className="planner-stats">
+              <div className="planner-stat">
+                <span>Calories</span>
+                <strong>{Math.round(nutrition.totals.calories || 0)}</strong>
               </div>
-            ))}
+              <div className="planner-stat">
+                <span>Protein</span>
+                <strong>{Math.round(nutrition.totals.protein || 0)} g</strong>
+              </div>
+              <div className="planner-stat">
+                <span>Carbs</span>
+                <strong>{Math.round(nutrition.totals.carbs || 0)} g</strong>
+              </div>
+              <div className="planner-stat">
+                <span>Fat</span>
+                <strong>{Math.round(nutrition.totals.fat || 0)} g</strong>
+              </div>
+            </div>
+          ) : (
+            <p>Add recipes to the planner to see nutrition totals.</p>
+          )}
+        </div>
+
+        <div className="planner-card">
+          <div className="planner-card__header">
+            <div>
+              <h2>{t('shopping_list')}</h2>
+              <p>{shoppingList.length} {t('items')}</p>
+            </div>
           </div>
-        )}
-      </div>
+          {shoppingList.length === 0 ? (
+            <p>{t('add_recipes_to_generate_shopping_list')}</p>
+          ) : (
+            <div className="shopping-list">
+              {shoppingList.map((item) => (
+                <div key={`${item.name}-${item.unit}`} className="shopping-item">
+                  <div>
+                    <strong>{item.name}</strong>
+                    <div className="shopping-item__meta">
+                      {item.sources.slice(0, 2).map((source) => source.recipeTitle).join(', ')}
+                    </div>
+                  </div>
+                  <span>{item.quantity} {item.unit}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

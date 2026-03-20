@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/RecipeDetail.scss';
 import VoiceAssistant from './VoiceAssistant';
+import Loader from './Loader';
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -171,7 +172,7 @@ const RecipeDetail = () => {
     }, [timerActive, timerSeconds]);
 
     if (loading) {
-        return <div className="recipe-detail-loading">Loading recipe...</div>;
+        return <Loader label="Loading recipe..." variant="page" />;
     }
 
     if (!recipe) {

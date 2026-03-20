@@ -3,11 +3,11 @@
   bottom: 20px;
   left: 20px;
   right: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: var(--surface-strong);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--line);
   animation: slideUp 0.3s ease-out;
 
   @media (min-width: 768px) {
@@ -33,15 +33,14 @@
       h3 {
         margin: 0 0 4px 0;
         font-size: 16px;
-        font-weight: 600;
-        color: #2c3e50;
+        font-weight: 700;
+        color: var(--text);
       }
 
       p {
         margin: 0;
         font-size: 14px;
-        color: #6c757d;
-        line-height: 1.4;
+        color: var(--text-soft);
       }
     }
 
@@ -53,92 +52,41 @@
 
       button {
         padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
+        border-radius: 10px;
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
 
         &.install-btn {
-          background: #3498db;
+          background: linear-gradient(135deg, var(--brand), var(--brand-strong));
           color: white;
-
-          &:hover {
-            background: #2980b9;
-            transform: translateY(-1px);
-          }
-
-          &:active {
-            transform: translateY(0);
-          }
+          border: none;
         }
 
         &.dismiss-btn {
           background: transparent;
-          color: #6c757d;
-          border: 1px solid #dee2e6;
-
-          &:hover {
-            background: #f8f9fa;
-            border-color: #adb5bd;
-          }
+          color: var(--text-soft);
+          border: 1px solid var(--line);
         }
       }
 
       @media (min-width: 480px) {
         flex-direction: row;
-
-        button {
-          flex: 1;
-        }
       }
     }
   }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-// Hide on very small screens
 @media (max-width: 360px) {
   .pwa-install-prompt {
     left: 10px;
     right: 10px;
     bottom: 10px;
-
-    .pwa-install-content {
-      padding: 12px;
-      gap: 8px;
-
-      .pwa-install-icon {
-        font-size: 28px;
-      }
-
-      .pwa-install-text {
-        h3 {
-          font-size: 15px;
-        }
-
-        p {
-          font-size: 13px;
-        }
-      }
-
-      .pwa-install-actions {
-        button {
-          padding: 6px 12px;
-          font-size: 13px;
-        }
-      }
-    }
   }
 }

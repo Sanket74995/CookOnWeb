@@ -1,10 +1,7 @@
 .barcode-scanner-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  inset: 0;
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,14 +10,15 @@
 }
 
 .barcode-scanner-modal {
-  background: white;
-  border-radius: 12px;
+  background: var(--surface-strong);
+  border-radius: 20px;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
   animation: modalSlideIn 0.3s ease-out;
+  border: 1px solid var(--line);
 }
 
 .scanner-header {
@@ -28,11 +26,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--line);
 
   h2 {
     margin: 0;
-    color: #333;
+    color: var(--text);
     font-size: 1.5rem;
   }
 
@@ -41,19 +39,17 @@
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #666;
-    padding: 0;
+    color: var(--text-soft);
     width: 30px;
     height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: all 0.2s ease;
 
     &:hover {
-      background: #f0f0f0;
-      color: #333;
+      background: var(--surface-muted);
+      color: var(--text);
     }
   }
 }
@@ -62,101 +58,89 @@
   padding: 20px;
 }
 
-.permission-prompt {
+.permission-prompt,
+.loading-state,
+.error-message {
   text-align: center;
   padding: 40px 20px;
 
   p {
     margin-bottom: 20px;
-    color: #666;
+    color: var(--text-soft);
     font-size: 1.1rem;
   }
 }
 
-.scanner-view {
-  .video-container {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    background: #000;
+.scanner-view .video-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .scan-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 150px;
+    border: 2px solid var(--accent);
     border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 20px;
-
-    .scanner-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .scan-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      .scan-frame {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 250px;
-        height: 150px;
-        border: 2px solid #4ecdc4;
-        border-radius: 8px;
-        box-shadow: 0 0 0 1000px rgba(78, 205, 196, 0.1);
-      }
-
-      .scan-line {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 250px;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #ff6b6b, transparent);
-        animation: scanAnimation 2s infinite;
-      }
-    }
+    box-shadow: 0 0 0 1000px rgba(78, 205, 196, 0.08);
   }
 
-  .scanner-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .scanning-text {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    animation: pulse 2s infinite;
+  .scan-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--brand), transparent);
+    animation: scanAnimation 2s infinite;
   }
 }
 
-.loading-state {
-  text-align: center;
-  padding: 40px 20px;
+.scanner-controls,
+.product-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
 
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #ff6b6b;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-  }
+.scanning-text,
+.loading-state p,
+.product-result .brand,
+.product-result .category {
+  color: var(--text-soft);
+}
 
-  p {
-    color: #666;
-    margin: 0;
-  }
+.loading-state .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(124, 146, 174, 0.18);
+  border-top: 4px solid var(--brand);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
 }
 
 .product-result {
@@ -165,31 +149,20 @@
 
     h3 {
       margin: 0 0 5px 0;
-      color: #333;
+      color: var(--text);
       font-size: 1.3rem;
     }
 
-    .brand {
-      color: #666;
-      margin: 0 0 10px 0;
-      font-style: italic;
-    }
-
-    .category {
-      color: #888;
-      margin: 0 0 20px 0;
-      font-size: 0.9rem;
-    }
-
     .nutrition-info {
-      background: #f9f9f9;
+      background: var(--surface-muted);
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 12px;
       margin-top: 15px;
+      border: 1px solid var(--line);
 
       h4 {
         margin: 0 0 10px 0;
-        color: #333;
+        color: var(--text);
         font-size: 1rem;
       }
 
@@ -200,93 +173,49 @@
         font-size: 0.9rem;
 
         div {
-          color: #555;
+          color: var(--text-soft);
         }
       }
     }
   }
-
-  .product-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
 }
 
-.error-message {
-  text-align: center;
-  padding: 40px 20px;
+.error-message p {
+  color: var(--danger);
+}
 
-  p {
-    color: #e74c3c;
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-  }
+.primary-btn,
+.secondary-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 120px;
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  flex: 1;
-  min-width: 120px;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
 }
 
 .secondary-btn {
-  background: #f8f9fa;
-  color: #333;
-  border: 1px solid #ddd;
-  padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  flex: 1;
-  min-width: 120px;
-
-  &:hover {
-    background: #e9ecef;
-    border-color: #bbb;
-  }
+  background: var(--surface-muted);
+  color: var(--text);
+  border: 1px solid var(--line);
 }
 
 @keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes scanAnimation {
-  0% {
-    transform: translate(-50%, -50%) translateX(-125px);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) translateX(125px);
-    opacity: 0;
-  }
+  0% { transform: translate(-50%, -50%) translateX(-125px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) translateX(125px); opacity: 0; }
 }
 
 @keyframes spin {
@@ -294,42 +223,20 @@
   100% { transform: rotate(360deg); }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-// Mobile responsiveness
 @media (max-width: 768px) {
   .barcode-scanner-modal {
     width: 95%;
     margin: 10px;
   }
 
-  .scanner-header {
-    padding: 15px;
-  }
-
+  .scanner-header,
   .scanner-content {
     padding: 15px;
   }
 
-  .scanner-controls {
-    flex-direction: column;
-
-    .primary-btn,
-    .secondary-btn {
-      width: 100%;
-    }
-  }
-
+  .scanner-controls,
   .product-actions {
     flex-direction: column;
-
-    .primary-btn,
-    .secondary-btn {
-      width: 100%;
-    }
   }
 
   .video-container {

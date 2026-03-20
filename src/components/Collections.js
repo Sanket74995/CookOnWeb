@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/Collections.scss';
+import Loader from './Loader';
 
 const Collections = () => {
     const navigate = useNavigate();
@@ -101,7 +102,11 @@ const Collections = () => {
     };
 
     if (loading) {
-        return <div className="collections-page"><div className="loading">{t('loading_collections')}</div></div>;
+        return (
+            <div className="collections-page">
+                <Loader label={t('loading_collections')} variant="section" />
+            </div>
+        );
     }
 
     return (

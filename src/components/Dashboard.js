@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/Dashboard.scss';
+import Loader from './Loader';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -130,7 +131,11 @@ const Dashboard = () => {
     };
 
     if (loading || !stats) {
-        return <div className="dashboard-page"><div className="loading">{t('loading_dashboard')}</div></div>;
+        return (
+            <div className="dashboard-page">
+                <Loader label={t('loading_dashboard')} variant="section" />
+            </div>
+        );
     }
 
     return (
