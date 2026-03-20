@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/CollectionDetail.scss';
 import Loader from './Loader';
+import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from '../utils/subscription';
 
 const CollectionDetail = () => {
     const { id } = useParams();
@@ -21,10 +22,12 @@ const CollectionDetail = () => {
     const [saving, setSaving] = useState(false);
     const [availableRecipes, setAvailableRecipes] = useState([]);
     const [showAddRecipes, setShowAddRecipes] = useState(false);
+    const [subscription, setSubscription] = useState(null);
 
     useEffect(() => {
         fetchCollection();
         fetchAvailableRecipes();
+        fetchSubscriptionDetails().then(setSubscription).catch(() => null);
     }, [id]);
 
     const fetchCollection = async () => {
@@ -68,7 +71,7 @@ const CollectionDetail = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setAvailableRecipes(data.recipes || []);
+                setAvailableRecipes(Array.isArray(data) ? data : (data.recipes || []));
             }
         } catch (error) {
             console.error('Error fetching recipes:', error);
@@ -105,6 +108,11 @@ const CollectionDetail = () => {
     };
 
     const handleAddRecipe = async (recipeId) => {
+        if (!isPremiumSubscription(subscription)) {
+            alert(getPremiumFeatureMessage('Saving recipes to collections'));
+            return;
+        }
+
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE}/api/collections/${id}/recipes`, {
@@ -180,6 +188,12 @@ const CollectionDetail = () => {
                     </button>
                 </div>
             </div>
+
+            {!isPremiumSubscription(subscription) && (
+                <div className="empty-state">
+                    <p>Premium plan required to add recipes into collections.</p>
+                </div>
+            )}
 
             {editing ? (
                 <form className="edit-collection-form" onSubmit={handleUpdateCollection}>

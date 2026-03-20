@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/Register.scss';
+import { API_BASE } from '../config';
 
 const Register = () => {
     const { t } = useTranslation();
@@ -92,7 +93,7 @@ const Register = () => {
 
         try {
             // Call backend registration endpoint
-            const response = await fetch('http://localhost:5000/api/auth/register', {
+            const response = await fetch(`${API_BASE}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

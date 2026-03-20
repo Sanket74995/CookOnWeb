@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/Account.scss';
-
-const API_BASE = 'http://localhost:5000/api/auth';
+import { API_BASE } from '../config';
 
 const ChangePassword = () => {
   const [form, setForm] = useState({
@@ -24,7 +23,7 @@ const ChangePassword = () => {
     }
 
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE}/change-password`, {
+    const res = await fetch(`${API_BASE}/api/auth/change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

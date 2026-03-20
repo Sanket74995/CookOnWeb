@@ -3,6 +3,47 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/AIRecommendations.scss';
 import Loader from './Loader';
+import { API_BASE } from '../config';
+
+const SETTINGS_API = `${API_BASE}/api/auth/settings`;
+const RECOMMENDATIONS_API = `${API_BASE}/api/recipes/recommended`;
+
+const mapSettingsToPreferences = (settings = {}) => ({
+  dietaryRestrictions: settings.foodProfile?.conditions || [],
+  cuisinePreferences: settings.foodProfile?.preferredCuisines || [],
+  skillLevel: settings.recommendationProfile?.skillLevel || 'intermediate',
+  availableIngredients: []
+});
+
+const normalizeDifficulty = (value) => String(value || '').toLowerCase();
+const normalizeCuisine = (value) => String(value || '').toLowerCase();
+
+const getRatingValue = (rating) => {
+  if (typeof rating === 'number') return rating;
+  if (rating && typeof rating === 'object') return Number(rating.average || 0);
+  return 0;
+};
+
+const getMatchReason = (recipe) => {
+  if (recipe.matchReason) return recipe.matchReason;
+  if (Array.isArray(recipe.recommendationReasons) && recipe.recommendationReasons.length > 0) {
+    return recipe.recommendationReasons.join(', ');
+  }
+  return 'Recommended for your current food profile and filters.';
+};
+
+const getIngredientPreview = (ingredients) => {
+  if (!Array.isArray(ingredients)) return [];
+  return ingredients
+    .map((item) => {
+      if (typeof item === 'string') return item;
+      if (item && typeof item === 'object') {
+        return [item.quantity, item.unit, item.name].filter(Boolean).join(' ');
+      }
+      return '';
+    })
+    .filter(Boolean);
+};
 
 const AIRecommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
@@ -30,14 +71,15 @@ const AIRecommendations = () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const response = await fetch('http://localhost:5000/api/user/preferences', {
+        const response = await fetch(SETTINGS_API, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
+
         if (response.ok) {
-          const preferences = await response.json();
-          setUserPreferences(preferences);
+          const settings = await response.json();
+          setUserPreferences(mapSettingsToPreferences(settings));
         }
       }
     } catch (error) {
@@ -49,23 +91,33 @@ const AIRecommendations = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/recipes/recommendations', {
-        method: 'POST',
+      const response = await fetch(RECOMMENDATIONS_API, {
         headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` })
-        },
-        body: JSON.stringify({
-          preferences: userPreferences,
-          filters: currentFilters
-        })
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
       });
 
       if (response.ok) {
         const data = await response.json();
-        setRecommendations(data.recommendations || []);
+        const filteredRecommendations = (data.recipes || []).filter((recipe) => {
+          const totalTime = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
+          const matchesTime =
+            currentFilters.time === 'any' ||
+            (currentFilters.time === 'quick' && totalTime < 30) ||
+            (currentFilters.time === 'medium' && totalTime >= 30 && totalTime <= 60) ||
+            (currentFilters.time === 'long' && totalTime > 60);
+          const matchesDifficulty =
+            currentFilters.difficulty === 'any' ||
+            normalizeDifficulty(recipe.difficulty) === normalizeDifficulty(currentFilters.difficulty);
+          const matchesCuisine =
+            currentFilters.cuisine === 'any' ||
+            normalizeCuisine(recipe.cuisine) === normalizeCuisine(currentFilters.cuisine);
+
+          return matchesTime && matchesDifficulty && matchesCuisine;
+        });
+
+        setRecommendations(filteredRecommendations);
       } else {
-        // Fallback to mock recommendations
         setRecommendations(getMockRecommendations());
       }
     } catch (error) {
@@ -76,56 +128,54 @@ const AIRecommendations = () => {
     }
   };
 
-  const getMockRecommendations = () => {
-    return [
-      {
-        _id: '1',
-        title: 'Creamy Mushroom Risotto',
-        description: 'A rich and creamy Italian rice dish perfect for dinner',
-        image: '/images/recipe1.jpg',
-        prepTime: 15,
-        cookTime: 30,
-        difficulty: 'intermediate',
-        cuisine: 'Italian',
-        rating: 4.8,
-        matchReason: 'Based on your preference for Italian cuisine and available mushrooms',
-        ingredients: ['Arborio rice', 'Mushrooms', 'Parmesan', 'White wine', 'Onion']
-      },
-      {
-        _id: '2',
-        title: 'Thai Green Curry',
-        description: 'Aromatic and spicy Thai curry with coconut milk',
-        image: '/images/recipe2.jpg',
-        prepTime: 20,
-        cookTime: 25,
-        difficulty: 'intermediate',
-        cuisine: 'Thai',
-        rating: 4.6,
-        matchReason: 'Matches your spice tolerance and includes vegetables you enjoy',
-        ingredients: ['Green curry paste', 'Coconut milk', 'Chicken', 'Thai basil', 'Bell peppers']
-      },
-      {
-        _id: '3',
-        title: 'Classic Chocolate Chip Cookies',
-        description: 'Soft and chewy cookies perfect for dessert',
-        image: '/images/recipe3.jpg',
-        prepTime: 15,
-        cookTime: 12,
-        difficulty: 'easy',
-        cuisine: 'American',
-        rating: 4.9,
-        matchReason: 'Quick and easy recipe that matches your baking preferences',
-        ingredients: ['Flour', 'Butter', 'Chocolate chips', 'Brown sugar', 'Vanilla extract']
-      }
-    ];
-  };
+  const getMockRecommendations = () => [
+    {
+      _id: '1',
+      title: 'Creamy Mushroom Risotto',
+      description: 'A rich and creamy Italian rice dish perfect for dinner',
+      image: '/images/recipe1.jpg',
+      prepTime: 15,
+      cookTime: 30,
+      difficulty: 'intermediate',
+      cuisine: 'Italian',
+      rating: 4.8,
+      matchReason: 'Based on your preference for Italian cuisine and available mushrooms',
+      ingredients: ['Arborio rice', 'Mushrooms', 'Parmesan', 'White wine', 'Onion']
+    },
+    {
+      _id: '2',
+      title: 'Thai Green Curry',
+      description: 'Aromatic and spicy Thai curry with coconut milk',
+      image: '/images/recipe2.jpg',
+      prepTime: 20,
+      cookTime: 25,
+      difficulty: 'intermediate',
+      cuisine: 'Thai',
+      rating: 4.6,
+      matchReason: 'Matches your spice tolerance and includes vegetables you enjoy',
+      ingredients: ['Green curry paste', 'Coconut milk', 'Chicken', 'Thai basil', 'Bell peppers']
+    },
+    {
+      _id: '3',
+      title: 'Classic Chocolate Chip Cookies',
+      description: 'Soft and chewy cookies perfect for dessert',
+      image: '/images/recipe3.jpg',
+      prepTime: 15,
+      cookTime: 12,
+      difficulty: 'easy',
+      cuisine: 'American',
+      rating: 4.9,
+      matchReason: 'Quick and easy recipe that matches your baking preferences',
+      ingredients: ['Flour', 'Butter', 'Chocolate chips', 'Brown sugar', 'Vanilla extract']
+    }
+  ];
 
   const handleFilterChange = (filterType, value) => {
-    setCurrentFilters(prev => ({
+    setCurrentFilters((prev) => ({
       ...prev,
       [filterType]: value
     }));
-    // Regenerate recommendations with new filters
+
     setTimeout(() => generateRecommendations(), 300);
   };
 
@@ -137,14 +187,35 @@ const AIRecommendations = () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        await fetch('http://localhost:5000/api/user/preferences', {
+        const settingsResponse = await fetch(SETTINGS_API, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const currentSettings = settingsResponse.ok ? await settingsResponse.json() : {};
+
+        await fetch(SETTINGS_API, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(newPreferences)
+          body: JSON.stringify({
+            settings: {
+              ...currentSettings,
+              foodProfile: {
+                ...(currentSettings.foodProfile || {}),
+                conditions: newPreferences.dietaryRestrictions || [],
+                preferredCuisines: newPreferences.cuisinePreferences || []
+              },
+              recommendationProfile: {
+                ...(currentSettings.recommendationProfile || {}),
+                skillLevel: newPreferences.skillLevel || 'intermediate'
+              }
+            }
+          })
         });
+
         setUserPreferences(newPreferences);
         generateRecommendations();
       }
@@ -209,51 +280,56 @@ const AIRecommendations = () => {
       </div>
 
       <div className="recommendations-grid">
-        {recommendations.map((recipe) => (
-          <div
-            key={recipe._id}
-            className="recommendation-card"
-            onClick={() => handleRecipeClick(recipe._id)}
-          >
-            <div className="recipe-image">
-              <img src={recipe.image} alt={recipe.title} />
-              <div className="recipe-rating">
-                <span className="stars">{'★'.repeat(Math.floor(recipe.rating))}</span>
-                <span className="rating-number">{recipe.rating}</span>
+        {recommendations.map((recipe) => {
+          const ratingValue = getRatingValue(recipe.rating);
+          const ingredientPreview = getIngredientPreview(recipe.ingredients);
+
+          return (
+            <div
+              key={recipe._id}
+              className="recommendation-card"
+              onClick={() => handleRecipeClick(recipe._id)}
+            >
+              <div className="recipe-image">
+                <img src={recipe.image} alt={recipe.title} />
+                <div className="recipe-rating">
+                  <span className="stars">{'★'.repeat(Math.max(Math.floor(ratingValue), 1))}</span>
+                  <span className="rating-number">{ratingValue.toFixed(1)}</span>
+                </div>
+              </div>
+
+              <div className="recipe-content">
+                <h3>{recipe.title}</h3>
+                <p className="recipe-description">{recipe.description}</p>
+
+                <div className="recipe-meta">
+                  <span className="time">
+                    <i className="fas fa-clock"></i>
+                    {recipe.prepTime + recipe.cookTime} {t('min')}
+                  </span>
+                  <span className="difficulty">
+                    <i className="fas fa-chart-line"></i>
+                    {recipe.difficulty}
+                  </span>
+                  <span className="cuisine">
+                    <i className="fas fa-globe"></i>
+                    {recipe.cuisine}
+                  </span>
+                </div>
+
+                <div className="match-reason">
+                  <i className="fas fa-lightbulb"></i>
+                  <span>{getMatchReason(recipe)}</span>
+                </div>
+
+                <div className="ingredients-preview">
+                  <strong>{t('key_ingredients')}</strong> {ingredientPreview.slice(0, 3).join(', ')}
+                  {ingredientPreview.length > 3 && '...'}
+                </div>
               </div>
             </div>
-
-            <div className="recipe-content">
-              <h3>{recipe.title}</h3>
-              <p className="recipe-description">{recipe.description}</p>
-
-              <div className="recipe-meta">
-                <span className="time">
-                  <i className="fas fa-clock"></i>
-                  {recipe.prepTime + recipe.cookTime} {t('min')}
-                </span>
-                <span className="difficulty">
-                  <i className="fas fa-chart-line"></i>
-                  {recipe.difficulty}
-                </span>
-                <span className="cuisine">
-                  <i className="fas fa-globe"></i>
-                  {recipe.cuisine}
-                </span>
-              </div>
-
-              <div className="match-reason">
-                <i className="fas fa-lightbulb"></i>
-                <span>{recipe.matchReason}</span>
-              </div>
-
-              <div className="ingredients-preview">
-                <strong>{t('key_ingredients')}</strong> {recipe.ingredients.slice(0, 3).join(', ')}
-                {recipe.ingredients.length > 3 && '...'}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {recommendations.length === 0 && (
@@ -270,7 +346,7 @@ const AIRecommendations = () => {
           <div className="preference-group">
             <label>{t('dietary_restrictions')}</label>
             <div className="checkbox-group">
-              {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'].map(restriction => (
+              {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'].map((restriction) => (
                 <label key={restriction} className="checkbox-label">
                   <input
                     type="checkbox"
@@ -278,8 +354,8 @@ const AIRecommendations = () => {
                     onChange={(e) => {
                       const updated = e.target.checked
                         ? [...userPreferences.dietaryRestrictions, restriction]
-                        : userPreferences.dietaryRestrictions.filter(r => r !== restriction);
-                      updateUserPreferences({...userPreferences, dietaryRestrictions: updated});
+                        : userPreferences.dietaryRestrictions.filter((r) => r !== restriction);
+                      updateUserPreferences({ ...userPreferences, dietaryRestrictions: updated });
                     }}
                   />
                   {restriction}
@@ -291,7 +367,7 @@ const AIRecommendations = () => {
           <div className="preference-group">
             <label>{t('favorite_cuisines')}</label>
             <div className="checkbox-group">
-              {['Italian', 'Indian', 'Chinese', 'Mexican', 'Thai', 'American', 'French', 'Japanese'].map(cuisine => (
+              {['Italian', 'Indian', 'Chinese', 'Mexican', 'Thai', 'American', 'French', 'Japanese'].map((cuisine) => (
                 <label key={cuisine} className="checkbox-label">
                   <input
                     type="checkbox"
@@ -299,8 +375,8 @@ const AIRecommendations = () => {
                     onChange={(e) => {
                       const updated = e.target.checked
                         ? [...userPreferences.cuisinePreferences, cuisine]
-                        : userPreferences.cuisinePreferences.filter(c => c !== cuisine);
-                      updateUserPreferences({...userPreferences, cuisinePreferences: updated});
+                        : userPreferences.cuisinePreferences.filter((c) => c !== cuisine);
+                      updateUserPreferences({ ...userPreferences, cuisinePreferences: updated });
                     }}
                   />
                   {cuisine}
@@ -313,7 +389,7 @@ const AIRecommendations = () => {
             <label>{t('cooking_skill_level')}</label>
             <select
               value={userPreferences.skillLevel}
-              onChange={(e) => updateUserPreferences({...userPreferences, skillLevel: e.target.value})}
+              onChange={(e) => updateUserPreferences({ ...userPreferences, skillLevel: e.target.value })}
             >
               <option value="beginner">{t('beginner')}</option>
               <option value="intermediate">{t('intermediate')}</option>

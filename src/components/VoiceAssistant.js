@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/VoiceAssistant.scss';
 
-const VoiceAssistant = ({ isVisible = true, onCommand }) => {
+const VoiceAssistant = ({ isVisible = true, onCommand, onReady, onListeningChange }) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
@@ -14,10 +14,11 @@ const VoiceAssistant = ({ isVisible = true, onCommand }) => {
   useEffect(() => {
     // Check if speech recognition is supported
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognitionInstance = null;
 
     if (SpeechRecognition) {
       setIsSupported(true);
-      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance = new SpeechRecognition();
 
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = true;
@@ -26,10 +27,12 @@ const VoiceAssistant = ({ isVisible = true, onCommand }) => {
       recognitionInstance.onstart = () => {
         setIsListening(true);
         setTranscript('');
+        onListeningChange?.(true);
       };
 
       recognitionInstance.onend = () => {
         setIsListening(false);
+        onListeningChange?.(false);
       };
 
       recognitionInstance.onresult = (event) => {
@@ -54,17 +57,21 @@ const VoiceAssistant = ({ isVisible = true, onCommand }) => {
 
       recognitionInstance.onerror = () => {
         setIsListening(false);
+        onListeningChange?.(false);
       };
 
       setRecognition(recognitionInstance);
+      onReady?.(recognitionInstance);
     }
 
     return () => {
-      if (recognition) {
-        recognition.stop();
+      if (recognitionInstance) {
+        recognitionInstance.stop();
       }
+      onReady?.(null);
+      onListeningChange?.(false);
     };
-  }, [i18n.language]);
+  }, [i18n.language, onListeningChange, onReady]);
 
   const handleVoiceCommand = (command) => {
     // Process voice commands from speech recognition

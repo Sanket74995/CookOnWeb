@@ -268,7 +268,137 @@
       color: var(--accent);
       border: 1px solid rgba(98, 198, 149, 0.18);
     }
+
+    span.status-pill--warning {
+      background: rgba(197, 106, 27, 0.14);
+      color: var(--brand);
+      border-color: rgba(197, 106, 27, 0.2);
+    }
   }
+}
+
+.account-meta {
+  font-size: 0.92rem;
+  color: var(--text-soft);
+
+  span {
+    color: var(--text);
+    font-weight: 700;
+  }
+}
+
+.subscription-hero {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--surface-muted), rgba(197, 106, 27, 0.08));
+}
+
+.subscription-plan-title {
+  margin-top: 0.35rem;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.subscription-plan-copy {
+  margin-top: 0.35rem;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.subscription-price-pill {
+  white-space: nowrap;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(197, 106, 27, 0.22);
+}
+
+.subscription-badges {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.badge--primary {
+  background: rgba(197, 106, 27, 0.14);
+  color: var(--brand);
+  border-color: rgba(197, 106, 27, 0.2);
+}
+
+.subscription-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.subscription-plan-card {
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+
+  &--current {
+    border-color: rgba(197, 106, 27, 0.35);
+    box-shadow: 0 10px 24px rgba(197, 106, 27, 0.12);
+  }
+}
+
+.subscription-plan-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h4 {
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+
+  p {
+    color: var(--text-soft);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+.subscription-plan-card__price {
+  white-space: nowrap;
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.subscription-feature-list {
+  margin: 1rem 0 0;
+  padding-left: 1rem;
+  color: var(--text-soft);
+
+  li + li {
+    margin-top: 0.45rem;
+  }
+}
+
+.subscription-plan-card__footer {
+  margin-top: 1rem;
 }
 
 .settings-toggle-group {
@@ -423,6 +553,15 @@
 }
 
 @media (max-width: 768px) {
+  .subscription-hero,
+  .subscription-plan-card__top {
+    flex-direction: column;
+  }
+
+  .subscription-plan-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .dashboard-recipe-card {
     grid-template-columns: minmax(0, 1fr);
   }

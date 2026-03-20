@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/Chatbot.scss';
+import { API_BASE } from '../config';
+
+const CHATBOT_API = `${API_BASE}/api/chatbot`;
 
 const commonQueries = [
     'Gym breakfast ideas',
@@ -55,7 +58,7 @@ const Chatbot = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await fetch('http://localhost:5000/api/chatbot/feedback', {
+            await fetch(`${CHATBOT_API}/feedback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,7 +82,7 @@ const Chatbot = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/chatbot/query', {
+            const response = await fetch(`${CHATBOT_API}/query`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -2,10 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/MealPlanner.scss';
 import Loader from './Loader';
+import { API_BASE } from '../config';
 
-const RECIPES_API = 'http://localhost:5000/api/recipes';
-const PLANNER_API = 'http://localhost:5000/api/meal-plans';
-const AUTH_API = 'http://localhost:5000/api/auth';
+const RECIPES_API = `${API_BASE}/api/recipes`;
+const PLANNER_API = `${API_BASE}/api/meal-plans`;
+const AUTH_API = `${API_BASE}/api/auth`;
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 const pad = (value) => String(value).padStart(2, '0');

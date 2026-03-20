@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Account.scss';
 import { applyTheme, getStoredTheme } from '../utils/theme';
-
-const API_BASE = 'http://localhost:5000/api/auth';
+import { API_BASE } from '../config';
+import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from '../utils/subscription';
 
 const defaultSettings = {
   language: 'en',
@@ -26,6 +26,7 @@ const Settings = () => {
   const [familyGroups, setFamilyGroups] = useState([]);
   const [familyName, setFamilyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  const [subscription, setSubscription] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,7 +36,7 @@ const Settings = () => {
 
     const loadSettings = async () => {
       try {
-        const response = await fetch(`${API_BASE}/settings`, {
+        const response = await fetch(`${API_BASE}/api/auth/settings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -58,7 +59,7 @@ const Settings = () => {
 
     const loadPantry = async () => {
       try {
-        const response = await fetch(`${API_BASE}/pantry`, {
+        const response = await fetch(`${API_BASE}/api/auth/pantry`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -72,7 +73,7 @@ const Settings = () => {
 
     const loadFamilyGroups = async () => {
       try {
-        const response = await fetch(`${API_BASE}/family-groups`, {
+        const response = await fetch(`${API_BASE}/api/auth/family-groups`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -84,10 +85,11 @@ const Settings = () => {
       }
     };
 
-    loadSettings();
-    loadPantry();
-    loadFamilyGroups();
-  }, []);
+	    loadSettings();
+	    loadPantry();
+	    loadFamilyGroups();
+      fetchSubscriptionDetails().then(setSubscription).catch(() => null);
+	  }, []);
 
   const handleToggle = (key) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -136,7 +138,7 @@ const Settings = () => {
 
     try {
       setSaving(true);
-      const response = await fetch(`${API_BASE}/settings`, {
+      const response = await fetch(`${API_BASE}/api/auth/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +165,7 @@ const Settings = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`${API_BASE}/pantry`, {
+      const response = await fetch(`${API_BASE}/api/auth/pantry`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -197,9 +199,13 @@ const Settings = () => {
   const createFamilyGroup = async () => {
     const token = localStorage.getItem('token');
     if (!token || !familyName.trim()) return;
+    if (!isPremiumSubscription(subscription)) {
+      alert(getPremiumFeatureMessage('Family groups'));
+      return;
+    }
 
     try {
-      const response = await fetch(`${API_BASE}/family-groups`, {
+      const response = await fetch(`${API_BASE}/api/auth/family-groups`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -222,9 +228,13 @@ const Settings = () => {
   const joinFamilyGroup = async () => {
     const token = localStorage.getItem('token');
     if (!token || !inviteCode.trim()) return;
+    if (!isPremiumSubscription(subscription)) {
+      alert(getPremiumFeatureMessage('Family groups'));
+      return;
+    }
 
     try {
-      const response = await fetch(`${API_BASE}/family-groups/join`, {
+      const response = await fetch(`${API_BASE}/api/auth/family-groups/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -439,26 +449,29 @@ const Settings = () => {
             )}
           </div>
 
-          <div className="dashboard-section">
-            <div className="dashboard-header">
-              <h3>Family / Shared Planner</h3>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder="Create family group" />
-              </div>
-              <div className="form-group">
-                <button type="button" className="btn-primary" onClick={createFamilyGroup}>Create Group</button>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Join with invite code" />
-              </div>
-              <div className="form-group">
-                <button type="button" className="btn-outlined" onClick={joinFamilyGroup}>Join Group</button>
-              </div>
-            </div>
+	          <div className="dashboard-section">
+	            <div className="dashboard-header">
+	              <h3>Family / Shared Planner</h3>
+	            </div>
+              {!isPremiumSubscription(subscription) && (
+                <div className="dashboard-empty">Premium plan required to create or join family groups.</div>
+              )}
+	            <div className="form-row">
+	              <div className="form-group">
+	                <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder="Create family group" />
+	              </div>
+	              <div className="form-group">
+	                <button type="button" className="btn-primary" onClick={createFamilyGroup} disabled={!isPremiumSubscription(subscription)}>Create Group</button>
+	              </div>
+	            </div>
+	            <div className="form-row">
+	              <div className="form-group">
+	                <input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Join with invite code" />
+	              </div>
+	              <div className="form-group">
+	                <button type="button" className="btn-outlined" onClick={joinFamilyGroup} disabled={!isPremiumSubscription(subscription)}>Join Group</button>
+	              </div>
+	            </div>
             {familyGroups.length === 0 ? (
               <div className="dashboard-empty">No family groups yet.</div>
             ) : (

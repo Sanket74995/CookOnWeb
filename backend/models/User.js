@@ -113,6 +113,34 @@ const userSchema = new mongoose.Schema({
                 type: Number,
                 default: 0
             }
+        },
+        nutritionGoals: {
+            calories: {
+                type: Number,
+                default: 2000
+            },
+            protein: {
+                type: Number,
+                default: 150
+            },
+            carbs: {
+                type: Number,
+                default: 250
+            },
+            fat: {
+                type: Number,
+                default: 67
+            },
+            fiber: {
+                type: Number,
+                default: 25
+            }
+        },
+        recommendationProfile: {
+            skillLevel: {
+                type: String,
+                default: 'intermediate'
+            }
         }
     },
     subscription: {
@@ -127,6 +155,16 @@ const userSchema = new mongoose.Schema({
         startedAt: {
             type: Date,
             default: Date.now
+        },
+        billingCycle: {
+            type: String,
+            default: 'monthly'
+        },
+        renewalAt: {
+            type: Date
+        },
+        cancelledAt: {
+            type: Date
         },
         expiresAt: {
             type: Date

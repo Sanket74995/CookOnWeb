@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import '../styles/RecipeDetail.scss';
 import VoiceAssistant from './VoiceAssistant';
 import Loader from './Loader';
+import { API_BASE } from '../config';
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -28,7 +29,7 @@ const RecipeDetail = () => {
     useEffect(() => {
         const fetchRecipe = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/recipes/${id}`);
+                const response = await fetch(`${API_BASE}/api/recipes/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setRecipe(data);
@@ -412,7 +413,7 @@ const RecipeDetail = () => {
 
         try {
             setSavingReview(true);
-            const response = await fetch(`http://localhost:5000/api/recipes/${id}/reviews`, {
+            const response = await fetch(`${API_BASE}/api/recipes/${id}/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -690,7 +691,11 @@ const RecipeDetail = () => {
                     </div>
                 </div>
             </div>
-            <VoiceAssistant onCommand={handleVoiceCommand} />
+            <VoiceAssistant
+                onCommand={handleVoiceCommand}
+                onReady={setVoiceAssistant}
+                onListeningChange={setVoiceListening}
+            />
         </div>
     );
 };

@@ -142,6 +142,9 @@ const Recipes = () => {
             });
             if (response.ok) {
                 setFavorites((prev) => isFav ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]);
+            } else {
+                const data = await response.json().catch(() => ({}));
+                alert(data.message || 'Unable to save recipe');
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);

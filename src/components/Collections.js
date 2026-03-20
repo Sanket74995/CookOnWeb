@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/Collections.scss';
 import Loader from './Loader';
+import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from '../utils/subscription';
 
 const Collections = () => {
     const navigate = useNavigate();
@@ -18,9 +19,11 @@ const Collections = () => {
         tags: ''
     });
     const [saving, setSaving] = useState(false);
+    const [subscription, setSubscription] = useState(null);
 
     useEffect(() => {
         fetchCollections();
+        fetchSubscriptionDetails().then(setSubscription).catch(() => null);
     }, []);
 
     const fetchCollections = async () => {
@@ -48,6 +51,10 @@ const Collections = () => {
     const handleCreateCollection = async (e) => {
         e.preventDefault();
         if (!newCollection.name.trim()) return;
+        if (!isPremiumSubscription(subscription)) {
+            alert(getPremiumFeatureMessage('Saving recipe collections'));
+            return;
+        }
 
         setSaving(true);
         try {
@@ -116,10 +123,17 @@ const Collections = () => {
                 <button
                     className="create-collection-btn"
                     onClick={() => setShowCreateForm(!showCreateForm)}
+                    disabled={!isPremiumSubscription(subscription)}
                 >
                     {showCreateForm ? t('cancel') : t('create_collection')}
                 </button>
             </div>
+
+            {!isPremiumSubscription(subscription) && (
+                <div className="empty-state" style={{ marginBottom: '1rem' }}>
+                    <p>Premium plan required to create and save recipe collections.</p>
+                </div>
+            )}
 
             {showCreateForm && (
                 <form className="create-collection-form" onSubmit={handleCreateCollection}>

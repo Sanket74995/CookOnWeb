@@ -25,6 +25,71 @@ const loginSchema = z.object({
   password: z.string().min(8)
 });
 
+const SUBSCRIPTION_PLANS = {
+  free: {
+    id: 'free',
+    name: 'Free',
+    priceMonthly: 0,
+    description: 'Good for exploring recipes and core planning tools.',
+    features: [
+      'Browse and save recipes',
+      'Weekly meal planner',
+      'Basic AI help',
+      'Collections and favorites'
+    ]
+  },
+  premium: {
+    id: 'premium',
+    name: 'Premium',
+    priceMonthly: 199,
+    description: 'Best for daily cooking, planning, and AI-powered help.',
+    features: [
+      'Unlimited AI chatbot help',
+      'Smarter recipe ideas from pantry',
+      'Priority access to new features',
+      'Full planner and profile personalization'
+    ]
+  }
+};
+
+const normalizeSubscription = (subscription = {}) => {
+  const planId = SUBSCRIPTION_PLANS[subscription.plan] ? subscription.plan : 'free';
+  const status = String(subscription.status || 'active').trim().toLowerCase() || 'active';
+  const startedAt = subscription.startedAt || null;
+  const expiresAt = subscription.expiresAt || null;
+  const cancelledAt = subscription.cancelledAt || null;
+  const renewalAt = subscription.renewalAt || null;
+  const billingCycle = subscription.billingCycle || 'monthly';
+  const basePlan = SUBSCRIPTION_PLANS[planId];
+
+  return {
+    plan: planId,
+    planName: basePlan.name,
+    status,
+    billingCycle,
+    startedAt,
+    expiresAt,
+    renewalAt,
+    cancelledAt,
+    priceMonthly: basePlan.priceMonthly,
+    description: basePlan.description,
+    features: basePlan.features,
+    limits: {
+      aiChats: planId === 'premium' ? 'Unlimited' : 'Limited',
+      premiumRecipes: planId === 'premium',
+      plannerSync: true,
+      support: planId === 'premium' ? 'Priority' : 'Standard'
+    }
+  };
+};
+
+const buildSubscriptionPayload = (user) => ({
+  subscription: normalizeSubscription(user?.subscription || {}),
+  plans: Object.values(SUBSCRIPTION_PLANS),
+  canUpgrade: normalizeSubscription(user?.subscription || {}).plan !== 'premium',
+  canCancel: normalizeSubscription(user?.subscription || {}).plan === 'premium'
+});
+
 
 // Register a new user
 const register = async (req, res) => {
@@ -345,14 +410,7 @@ const getSubscription = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('subscription');
     if (!user) return res.status(404).json({ message: 'User not found' });
-
-    // if subscription not set, return default
-    const sub = user.subscription || {
-      plan: 'free',
-      status: 'active',
-    };
-
-    res.json(sub);
+    res.json(buildSubscriptionPayload(user));
   } catch (err) {
     console.error('Get subscription error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -369,17 +427,77 @@ const upgradeSubscription = async (req, res) => {
       plan: 'premium',
       status: 'active',
       startedAt: new Date(),
-      expiresAt: null, // or set 30 days later if you want
+      renewalAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      expiresAt: null,
+      cancelledAt: null,
+      billingCycle: 'monthly'
     };
 
     await user.save();
 
     res.json({
       message: 'Upgraded to premium successfully',
-      subscription: user.subscription,
+      ...buildSubscriptionPayload(user)
     });
   } catch (err) {
     console.error('Upgrade subscription error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const cancelSubscription = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (String(user.subscription?.plan || 'free') !== 'premium') {
+      return res.status(400).json({ message: 'Only premium subscriptions can be cancelled' });
+    }
+
+    user.subscription = {
+      ...user.subscription.toObject?.() || user.subscription,
+      status: 'cancelled',
+      cancelledAt: new Date(),
+      expiresAt: user.subscription?.renewalAt || null
+    };
+
+    await user.save();
+
+    res.json({
+      message: 'Subscription cancelled. Premium access stays active until the current period ends.',
+      ...buildSubscriptionPayload(user)
+    });
+  } catch (err) {
+    console.error('Cancel subscription error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const reactivateSubscription = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (String(user.subscription?.plan || 'free') !== 'premium') {
+      return res.status(400).json({ message: 'Only premium subscriptions can be reactivated' });
+    }
+
+    user.subscription = {
+      ...user.subscription.toObject?.() || user.subscription,
+      status: 'active',
+      cancelledAt: null,
+      expiresAt: null,
+      renewalAt: user.subscription?.renewalAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    };
+
+    await user.save();
+
+    res.json({
+      message: 'Subscription reactivated successfully',
+      ...buildSubscriptionPayload(user)
+    });
+  } catch (err) {
+    console.error('Reactivate subscription error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -417,4 +535,6 @@ module.exports = {
   joinFamilyGroup,
   getSubscription,
   upgradeSubscription,
+  cancelSubscription,
+  reactivateSubscription,
 };

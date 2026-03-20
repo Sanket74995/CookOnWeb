@@ -1,20 +1,15 @@
 .pwa-install-prompt {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  top: 96px;
   right: 20px;
+  left: auto;
+  width: min(400px, calc(100vw - 40px));
   background: var(--surface-strong);
   border-radius: 16px;
   box-shadow: var(--shadow-lg);
   z-index: 1000;
   border: 1px solid var(--line);
-  animation: slideUp 0.3s ease-out;
-
-  @media (min-width: 768px) {
-    left: auto;
-    right: 20px;
-    max-width: 400px;
-  }
+  animation: slideInTopRight 0.3s ease-out;
 
   .pwa-install-content {
     display: flex;
@@ -83,10 +78,23 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes slideInTopRight {
+  from { transform: translateY(-24px) translateX(18px); opacity: 0; }
+  to { transform: translateY(0) translateX(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .pwa-install-prompt {
+    top: 84px;
+    right: 14px;
+    width: min(380px, calc(100vw - 28px));
+  }
+}
+
 @media (max-width: 360px) {
   .pwa-install-prompt {
-    left: 10px;
+    top: 76px;
     right: 10px;
-    bottom: 10px;
+    width: calc(100vw - 20px);
   }
 }

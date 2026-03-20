@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const auth = require('../middleware/auth');
+const requirePremium = require('../middleware/requirePremium');
 const {
     addReview,
     getAllRecipes,
@@ -66,7 +67,7 @@ router.get('/recommended', auth, getRecommendedRecipes);
 router.get('/:id', getRecipeById);
 
 // POST /api/recipes - Create new recipe (protected)
-router.post('/', auth, upload.single('image'), createRecipe);
+router.post('/', auth, requirePremium, upload.single('image'), createRecipe);
 
 // PUT /api/recipes/:id - Update recipe (protected)
 router.put('/:id', auth, upload.single('image'), updateRecipe);

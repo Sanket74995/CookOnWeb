@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Account.scss';
 import Loader from './Loader';
+import { API_BASE } from '../config';
 
-const AUTH_API = 'http://localhost:5000/api/auth';
-const RECIPE_API = 'http://localhost:5000/api/recipes';
+const AUTH_API = `${API_BASE}/api/auth`;
+const RECIPE_API = `${API_BASE}/api/recipes`;
 
 const Profile = () => {
   const navigate = useNavigate();

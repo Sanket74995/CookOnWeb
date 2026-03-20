@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/CollaborativeCooking.scss';
 import Loader from './Loader';
+import { API_BASE } from '../config';
+
+const COLLABORATION_API = `${API_BASE}/api/collaboration`;
 
 const CollaborativeCooking = () => {
   const { sessionId } = useParams();
@@ -40,14 +43,13 @@ const CollaborativeCooking = () => {
   const createNewSession = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/collaboration/sessions', {
+      const response = await fetch(`${COLLABORATION_API}/sessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          recipeId: 'sample-recipe-id', // In real app, this would come from props/params
           title: t('sample_collaborative_session')
         })
       });
@@ -66,7 +68,7 @@ const CollaborativeCooking = () => {
   const joinSession = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/collaboration/sessions/${id}/join`, {
+      const response = await fetch(`${COLLABORATION_API}/sessions/${id}/join`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -90,7 +92,7 @@ const CollaborativeCooking = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/collaboration/sessions/${sessionId}/messages`, {
+      const response = await fetch(`${COLLABORATION_API}/sessions/${sessionId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,7 +135,7 @@ const CollaborativeCooking = () => {
   const sendSystemMessage = async (content) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/collaboration/sessions/${sessionId}/messages`, {
+      await fetch(`${COLLABORATION_API}/sessions/${sessionId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

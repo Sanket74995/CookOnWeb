@@ -73,6 +73,9 @@ const Hero = () => {
                 } else {
                     setFavorites(prev => [...prev, recipeId]);
                 }
+            } else {
+                const data = await response.json().catch(() => ({}));
+                alert(data.message || 'Unable to save recipe');
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);

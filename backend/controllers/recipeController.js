@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
+const { createJsonReply, isDeepSeekEnabled } = require('../services/deepseekService');
 
 const DIETARY_FILTERS = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'high-protein', 'low-carb', 'diabetic-friendly', 'heart-healthy'];
 const INGREDIENT_EXCLUSIONS = {
@@ -251,6 +252,185 @@ const buildGeneratedRecipe = (ingredients = [], options = {}, sourceRecipes = []
         instructions,
         tags: [...new Set([...sourceTags, ...cleanedIngredients, ...(options.dietaryFilters || [])])].slice(0, 8)
     };
+};
+
+const normalizeIngredientObject = (ingredient, fallback = {}) => {
+    if (!ingredient || typeof ingredient !== 'object') {
+        return fallback;
+    }
+
+    return {
+        name: String(ingredient.name || fallback.name || '').trim(),
+        quantity: String(ingredient.quantity || fallback.quantity || '1').trim(),
+        unit: String(ingredient.unit || fallback.unit || '').trim()
+    };
+};
+
+const normalizeInstructionObject = (instruction, index, fallback = null) => {
+    if (typeof instruction === 'string') {
+        return {
+            step: index + 1,
+            description: instruction.trim()
+        };
+    }
+
+    if (instruction && typeof instruction === 'object') {
+        return {
+            step: normalizeNumber(instruction.step, index + 1),
+            description: String(instruction.description || '').trim()
+        };
+    }
+
+    return fallback;
+};
+
+const sanitizeGeneratedRecipe = (candidate, fallbackRecipe) => {
+    if (!candidate || typeof candidate !== 'object') {
+        return fallbackRecipe;
+    }
+
+    const fallbackIngredients = Array.isArray(fallbackRecipe.ingredients) ? fallbackRecipe.ingredients : [];
+    const fallbackInstructions = Array.isArray(fallbackRecipe.instructions) ? fallbackRecipe.instructions : [];
+
+    const ingredients = Array.isArray(candidate.ingredients)
+        ? candidate.ingredients
+            .map((ingredient, index) => normalizeIngredientObject(ingredient, fallbackIngredients[index] || {}))
+            .filter((ingredient) => ingredient.name)
+            .slice(0, 12)
+        : fallbackIngredients;
+
+    const instructions = Array.isArray(candidate.instructions)
+        ? candidate.instructions
+            .map((instruction, index) => normalizeInstructionObject(instruction, index))
+            .filter((instruction) => instruction?.description)
+            .slice(0, 8)
+        : fallbackInstructions;
+
+    const tags = Array.isArray(candidate.tags)
+        ? candidate.tags.map((tag) => String(tag).trim()).filter(Boolean).slice(0, 10)
+        : fallbackRecipe.tags;
+
+    return {
+        ...fallbackRecipe,
+        title: String(candidate.title || fallbackRecipe.title).trim().slice(0, 120) || fallbackRecipe.title,
+        description: String(candidate.description || fallbackRecipe.description).trim().slice(0, 500) || fallbackRecipe.description,
+        cuisine: String(candidate.cuisine || fallbackRecipe.cuisine || 'Flexible').trim() || fallbackRecipe.cuisine,
+        category: String(candidate.category || fallbackRecipe.category || 'main course').trim() || fallbackRecipe.category,
+        difficulty: String(candidate.difficulty || fallbackRecipe.difficulty || 'medium').trim().toLowerCase(),
+        prepTime: Math.max(0, normalizeNumber(candidate.prepTime, fallbackRecipe.prepTime || 10)),
+        cookTime: Math.max(0, normalizeNumber(candidate.cookTime, fallbackRecipe.cookTime || 20)),
+        servings: Math.max(1, normalizeNumber(candidate.servings, fallbackRecipe.servings || 2)),
+        ingredients: ingredients.length ? ingredients : fallbackIngredients,
+        instructions: instructions.length ? instructions : fallbackInstructions,
+        tags
+    };
+};
+
+const generateRecipeIdeaWithAI = async (ingredients = [], options = {}, sourceRecipes = []) => {
+    const fallbackRecipe = buildGeneratedRecipe(ingredients, options, sourceRecipes);
+
+    if (!isDeepSeekEnabled()) {
+        return fallbackRecipe;
+    }
+
+    const sourceContext = sourceRecipes.slice(0, 3).map((recipe) => ({
+        title: recipe.title,
+        cuisine: recipe.cuisine,
+        category: recipe.category,
+        tags: recipe.tags || [],
+        ingredients: (recipe.ingredients || []).slice(0, 8).map((item) => item.name)
+    }));
+
+    try {
+        const aiRecipe = await createJsonReply({
+            systemPrompt: [
+                'You are CookOnWeb\'s recipe generation assistant.',
+                'Return valid JSON only.',
+                'Generate one practical recipe idea using the provided ingredients and constraints.',
+                'Keep it realistic for a home cook and avoid markdown or commentary outside JSON.'
+            ].join(' '),
+            userPrompt: [
+                'Return JSON with this shape:',
+                '{"title":"","description":"","cuisine":"","category":"","difficulty":"","prepTime":0,"cookTime":0,"servings":0,"ingredients":[{"name":"","quantity":"","unit":""}],"instructions":[{"step":1,"description":""}],"tags":[""]}',
+                `Ingredients: ${JSON.stringify(ingredients)}`,
+                `Constraints: ${JSON.stringify(options)}`,
+                `Similar recipes from the app: ${JSON.stringify(sourceContext)}`,
+                'Use the available ingredients as the core of the recipe, allow only common pantry extras, and keep the recipe concise.'
+            ].join('\n'),
+            temperature: 0.5,
+            maxTokens: 1400
+        });
+
+        return sanitizeGeneratedRecipe(aiRecipe, fallbackRecipe);
+    } catch (error) {
+        console.error('DeepSeek recipe generation failed, using fallback:', error.message);
+        return fallbackRecipe;
+    }
+};
+
+const buildDefaultMatchReason = (recipe) => {
+    if (Array.isArray(recipe.recommendationReasons) && recipe.recommendationReasons.length) {
+        return recipe.recommendationReasons.join(', ');
+    }
+
+    return 'Recommended for your saved food profile.';
+};
+
+const enhanceRecommendationReasonsWithAI = async (recipes = [], foodProfile = {}) => {
+    if (!isDeepSeekEnabled() || !recipes.length) {
+        return recipes.map((recipe) => ({
+            ...recipe,
+            matchReason: recipe.matchReason || buildDefaultMatchReason(recipe)
+        }));
+    }
+
+    const recipeContext = recipes.slice(0, 12).map((recipe) => ({
+        id: String(recipe._id),
+        title: recipe.title,
+        cuisine: recipe.cuisine,
+        category: recipe.category,
+        difficulty: recipe.difficulty,
+        totalTime: normalizeNumber(recipe.prepTime, 0) + normalizeNumber(recipe.cookTime, 0),
+        tags: recipe.tags || [],
+        nutrition: recipe.nutrition || {},
+        recommendationReasons: recipe.recommendationReasons || []
+    }));
+
+    try {
+        const payload = await createJsonReply({
+            systemPrompt: [
+                'You are CookOnWeb\'s recommendation assistant.',
+                'Return valid JSON only.',
+                'For each recipe, write one short personalized match reason grounded in the provided user profile and recipe data.'
+            ].join(' '),
+            userPrompt: [
+                'Return JSON with this shape:',
+                '{"recommendations":[{"id":"","matchReason":""}]}',
+                `User profile: ${JSON.stringify(foodProfile)}`,
+                `Recipes: ${JSON.stringify(recipeContext)}`,
+                'Each matchReason should be 8 to 18 words and must stay faithful to the provided data.'
+            ].join('\n'),
+            temperature: 0.3,
+            maxTokens: 900
+        });
+
+        const matchReasonMap = new Map(
+            (payload?.recommendations || [])
+                .filter((item) => item?.id && item?.matchReason)
+                .map((item) => [String(item.id), String(item.matchReason).trim()])
+        );
+
+        return recipes.map((recipe) => ({
+            ...recipe,
+            matchReason: matchReasonMap.get(String(recipe._id)) || recipe.matchReason || buildDefaultMatchReason(recipe)
+        }));
+    } catch (error) {
+        console.error('DeepSeek recommendation enrichment failed, using fallback:', error.message);
+        return recipes.map((recipe) => ({
+            ...recipe,
+            matchReason: recipe.matchReason || buildDefaultMatchReason(recipe)
+        }));
+    }
 };
 
 const cleanupFile = async (filePath) => {
@@ -537,7 +717,7 @@ const getRecommendedRecipes = async (req, res) => {
         const foodProfile = user?.settings?.foodProfile || {};
         const recipes = await populateRecipeQuery(Recipe.find()).sort({ createdAt: -1 });
 
-        const recommended = recipes
+        const baseRecommended = recipes
             .map((recipe) => {
                 const result = scoreRecipeForProfile(recipe, foodProfile);
                 return {
@@ -553,6 +733,8 @@ const getRecommendedRecipes = async (req, res) => {
                 ...item.recipe.toObject(),
                 recommendationReasons: item.reasons
             }));
+
+        const recommended = await enhanceRecommendationReasonsWithAI(baseRecommended, foodProfile);
 
         res.json({
             foodProfile,
@@ -826,7 +1008,7 @@ const generateRecipeFromIngredients = async (req, res) => {
             .map((item) => item.recipe)
             .slice(0, 5);
 
-        const generatedRecipe = buildGeneratedRecipe(ingredients, {
+        const generatedRecipe = await generateRecipeIdeaWithAI(ingredients, {
             cuisine: req.body.cuisine,
             category: req.body.category,
             maxTime,
