@@ -2,12 +2,175 @@ const User = require('../models/User');
 const FamilyGroup = require('../models/FamilyGroup');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { z } = require('zod');
+
 const makeInviteCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+
+const logger = {
+  info: (message, data) => console.info('[AUTH]', message, data || ''),
+  warn: (message, data) => console.warn('[AUTH]', message, data || ''),
+  error: (message, data) => console.error('[AUTH]', message, data || '')
+};
+
+const registerSchema = z.object({
+  username: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1)
+});
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+});
+
+const SUBSCRIPTION_PLANS = {
+  free: {
+    id: 'free',
+    name: 'Free',
+    priceMonthly: 0,
+    priceYearly: 0,
+    trialDays: 0,
+    description: 'Good for exploring recipes, planning meals, and setting up your kitchen profile.',
+    audience: 'Best for casual home cooks getting started.',
+    badge: 'Starter',
+    spotlight: 'Plan your week, store pantry basics, and discover recipes before upgrading.',
+    features: [
+      'Browse public recipes',
+      'Weekly meal planner',
+      'Pantry inventory',
+      'Basic AI cooking help',
+      'Profile and nutrition settings'
+    ],
+    modules: [
+      { key: 'planner', label: 'Meal planner', value: 'Included' },
+      { key: 'pantry', label: 'Pantry tracker', value: 'Included' },
+      { key: 'ai', label: 'AI assistant', value: 'Limited' },
+      { key: 'collections', label: 'Recipe collections', value: 'Premium only' },
+      { key: 'family', label: 'Family groups', value: 'Premium only' },
+      { key: 'publishing', label: 'Publish recipes', value: 'Premium only' }
+    ],
+    highlights: [
+      'Weekly planning tools included',
+      'Personal pantry and nutrition profile',
+      'Great for exploring before upgrading'
+    ]
+  },
+  premium: {
+    id: 'premium',
+    name: 'Premium',
+    priceMonthly: 199,
+    priceYearly: 1990,
+    trialDays: 7,
+    description: 'Best for daily cooking, premium publishing, family planning, and deeper personalization.',
+    audience: 'Best for creators, families, and serious meal planners.',
+    badge: 'Most Popular',
+    spotlight: 'Unlock premium recipe publishing, shared planning, smarter organization, and faster support.',
+    features: [
+      'Unlimited AI chatbot help',
+      'Publish and manage your own recipes',
+      'Private and public recipe collections',
+      'Family groups and shared planning',
+      'Priority access to new cooking tools'
+    ],
+    modules: [
+      { key: 'planner', label: 'Meal planner', value: 'Included' },
+      { key: 'pantry', label: 'Pantry tracker', value: 'Included' },
+      { key: 'ai', label: 'AI assistant', value: 'Unlimited' },
+      { key: 'collections', label: 'Recipe collections', value: 'Unlimited' },
+      { key: 'family', label: 'Family groups', value: 'Included' },
+      { key: 'publishing', label: 'Publish recipes', value: 'Included' }
+    ],
+    highlights: [
+      'Create and publish recipes',
+      'Organize unlimited collections',
+      'Collaborate with family members',
+      'Priority support and early feature access'
+    ]
+  }
+};
+
+const normalizeSubscription = (subscription = {}) => {
+  const planId = SUBSCRIPTION_PLANS[subscription.plan] ? subscription.plan : 'free';
+  const status = String(subscription.status || 'active').trim().toLowerCase() || 'active';
+  const startedAt = subscription.startedAt || null;
+  const expiresAt = subscription.expiresAt || null;
+  const cancelledAt = subscription.cancelledAt || null;
+  const renewalAt = subscription.renewalAt || null;
+  const billingCycle = subscription.billingCycle || 'monthly';
+  const basePlan = SUBSCRIPTION_PLANS[planId];
+
+  return {
+    plan: planId,
+    planName: basePlan.name,
+    status,
+    billingCycle,
+    startedAt,
+    expiresAt,
+    renewalAt,
+    cancelledAt,
+    priceMonthly: basePlan.priceMonthly,
+    priceYearly: basePlan.priceYearly,
+    trialDays: basePlan.trialDays,
+    description: basePlan.description,
+    audience: basePlan.audience,
+    badge: basePlan.badge,
+    spotlight: basePlan.spotlight,
+    features: basePlan.features,
+    modules: basePlan.modules,
+    highlights: basePlan.highlights,
+    limits: {
+      aiChats: planId === 'premium' ? 'Unlimited' : 'Limited',
+      premiumRecipes: planId === 'premium',
+      plannerSync: true,
+      recipePublishing: planId === 'premium',
+      collections: planId === 'premium' ? 'Unlimited' : 'Locked',
+      familyGroups: planId === 'premium' ? 'Included' : 'Locked',
+      support: planId === 'premium' ? 'Priority' : 'Standard'
+    }
+  };
+};
+
+const buildSubscriptionPayload = (user) => ({
+  subscription: normalizeSubscription(user?.subscription || {}),
+  plans: Object.values(SUBSCRIPTION_PLANS),
+  premiumModules: [
+    {
+      id: 'recipe-publishing',
+      title: 'Recipe Publishing',
+      summary: 'Let creators publish and manage recipes directly from their profile.'
+    },
+    {
+      id: 'collections',
+      title: 'Collections',
+      summary: 'Save themed recipe boards for events, prep plans, and seasonal cooking.'
+    },
+    {
+      id: 'family-planner',
+      title: 'Family Planner',
+      summary: 'Share invite-based planning and group coordination for home cooking.'
+    }
+  ],
+  retention: {
+    annualSavings: SUBSCRIPTION_PLANS.premium.priceMonthly * 12 - SUBSCRIPTION_PLANS.premium.priceYearly,
+    promise: 'Cancel anytime. Premium access remains active until the current billing period ends.',
+    trialMessage: `${SUBSCRIPTION_PLANS.premium.trialDays}-day premium trial included in this mock flow.`
+  },
+  canUpgrade: normalizeSubscription(user?.subscription || {}).plan !== 'premium',
+  canCancel: normalizeSubscription(user?.subscription || {}).plan === 'premium'
+});
+
 
 // Register a new user
 const register = async (req, res) => {
   try {
-    const { username, email, password, firstName, lastName } = req.body;
+    const payload = registerSchema.safeParse(req.body);
+    if (!payload.success) {
+      return res.status(400).json({ message: 'Invalid input', errors: payload.error.errors });
+    }
+
+    const { username, email, password, firstName, lastName } = payload.data;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -54,7 +217,7 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    logger.error('Registration error:', error);
     res.status(500).json({ message: 'Server error during registration' });
   }
 };
@@ -62,7 +225,12 @@ const register = async (req, res) => {
 // Login user
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const payload = loginSchema.safeParse(req.body);
+    if (!payload.success) {
+      return res.status(400).json({ message: 'Invalid input', errors: payload.error.errors });
+    }
+
+    const { email, password } = payload.data;
 
     // Find user by email
     const user = await User.findOne({ email });
@@ -95,7 +263,7 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
   }
 };
@@ -105,7 +273,7 @@ const getFavorites = async (req, res) => {
     const user = await User.findById(req.userId).populate('favorites');
     res.json(user.favorites);
   } catch (error) {
-    console.error('Get favorites error:', error);
+    logger.error('Get favorites error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -120,7 +288,7 @@ const addFavorite = async (req, res) => {
     }
     res.json({ message: 'Added to favorites' });
   } catch (error) {
-    console.error('Add favorite error:', error);
+    logger.error('Add favorite error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -133,7 +301,7 @@ const removeFavorite = async (req, res) => {
     await user.save();
     res.json({ message: 'Removed from favorites' });
   } catch (error) {
-    console.error('Remove favorite error:', error);
+    logger.error('Remove favorite error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -145,7 +313,7 @@ const getProfile = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
-    console.error('Get profile error:', err);
+    logger.error('Get profile error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -163,7 +331,7 @@ const updateProfile = async (req, res) => {
 
     res.json({ message: 'Profile updated successfully', user: updatedUser });
   } catch (err) {
-    console.error('Update profile error:', err);
+    logger.error('Update profile error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -187,7 +355,7 @@ const changePassword = async (req, res) => {
 
     res.json({ message: 'Password changed successfully' });
   } catch (err) {
-    console.error('Change password error:', err);
+    logger.error('Change password error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -198,7 +366,7 @@ const getSettings = async (req, res) => {
     const user = await User.findById(req.userId).select('settings');
     res.json(user?.settings || {});
   } catch (err) {
-    console.error('Get settings error:', err);
+    logger.error('Get settings error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -215,7 +383,7 @@ const updateSettings = async (req, res) => {
 
     res.json({ message: 'Settings updated', settings: user.settings });
   } catch (err) {
-    console.error('Update settings error:', err);
+    logger.error('Update settings error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -225,7 +393,7 @@ const getPantry = async (req, res) => {
     const user = await User.findById(req.userId).select('pantry');
     res.json(user?.pantry || []);
   } catch (err) {
-    console.error('Get pantry error:', err);
+    logger.error('Get pantry error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -241,7 +409,7 @@ const updatePantry = async (req, res) => {
 
     res.json({ message: 'Pantry updated', pantry: user?.pantry || [] });
   } catch (err) {
-    console.error('Update pantry error:', err);
+    logger.error('Update pantry error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -254,7 +422,7 @@ const getFamilyGroups = async (req, res) => {
 
     res.json(groups);
   } catch (err) {
-    console.error('Get family groups error:', err);
+    logger.error('Get family groups error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -313,14 +481,7 @@ const getSubscription = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('subscription');
     if (!user) return res.status(404).json({ message: 'User not found' });
-
-    // if subscription not set, return default
-    const sub = user.subscription || {
-      plan: 'free',
-      status: 'active',
-    };
-
-    res.json(sub);
+    res.json(buildSubscriptionPayload(user));
   } catch (err) {
     console.error('Get subscription error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -337,17 +498,77 @@ const upgradeSubscription = async (req, res) => {
       plan: 'premium',
       status: 'active',
       startedAt: new Date(),
-      expiresAt: null, // or set 30 days later if you want
+      renewalAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      expiresAt: null,
+      cancelledAt: null,
+      billingCycle: 'monthly'
     };
 
     await user.save();
 
     res.json({
       message: 'Upgraded to premium successfully',
-      subscription: user.subscription,
+      ...buildSubscriptionPayload(user)
     });
   } catch (err) {
     console.error('Upgrade subscription error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const cancelSubscription = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (String(user.subscription?.plan || 'free') !== 'premium') {
+      return res.status(400).json({ message: 'Only premium subscriptions can be cancelled' });
+    }
+
+    user.subscription = {
+      ...user.subscription.toObject?.() || user.subscription,
+      status: 'cancelled',
+      cancelledAt: new Date(),
+      expiresAt: user.subscription?.renewalAt || null
+    };
+
+    await user.save();
+
+    res.json({
+      message: 'Subscription cancelled. Premium access stays active until the current period ends.',
+      ...buildSubscriptionPayload(user)
+    });
+  } catch (err) {
+    console.error('Cancel subscription error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const reactivateSubscription = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (String(user.subscription?.plan || 'free') !== 'premium') {
+      return res.status(400).json({ message: 'Only premium subscriptions can be reactivated' });
+    }
+
+    user.subscription = {
+      ...user.subscription.toObject?.() || user.subscription,
+      status: 'active',
+      cancelledAt: null,
+      expiresAt: null,
+      renewalAt: user.subscription?.renewalAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    };
+
+    await user.save();
+
+    res.json({
+      message: 'Subscription reactivated successfully',
+      ...buildSubscriptionPayload(user)
+    });
+  } catch (err) {
+    console.error('Reactivate subscription error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -385,4 +606,6 @@ module.exports = {
   joinFamilyGroup,
   getSubscription,
   upgradeSubscription,
+  cancelSubscription,
+  reactivateSubscription,
 };

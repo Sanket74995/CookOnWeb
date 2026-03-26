@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/NutritionAnalytics.scss';
+import Loader from './Loader';
+import { API_BASE } from '../config';
+
+const NUTRITION_API = `${API_BASE}/api/nutrition`;
 
 const NutritionAnalytics = () => {
   const { t } = useTranslation();
@@ -23,7 +27,7 @@ const NutritionAnalytics = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/nutrition/analytics?period=${selectedPeriod}`, {
+      const response = await fetch(`${NUTRITION_API}/analytics?period=${selectedPeriod}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -32,6 +36,9 @@ const NutritionAnalytics = () => {
       if (response.ok) {
         const data = await response.json();
         setNutritionData(data);
+        if (data.goals) {
+          setGoals((prev) => ({ ...prev, ...data.goals }));
+        }
       } else {
         // Mock data for demonstration
         setNutritionData(getMockNutritionData());
@@ -103,7 +110,7 @@ const NutritionAnalytics = () => {
   const updateGoals = async (newGoals) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/nutrition/goals', {
+      const response = await fetch(`${NUTRITION_API}/goals`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -111,19 +118,17 @@ const NutritionAnalytics = () => {
         },
         body: JSON.stringify(newGoals)
       });
-      setGoals(newGoals);
+      if (response.ok) {
+        const data = await response.json();
+        setGoals(data.goals || newGoals);
+      }
     } catch (error) {
       console.error('Error updating goals:', error);
     }
   };
 
   if (loading) {
-    return (
-      <div className="nutrition-loading">
-        <div className="loading-spinner"></div>
-        <p>{t('analyzing_nutrition_data')}</p>
-      </div>
-    );
+    return <Loader label={t('analyzing_nutrition_data')} variant="page" />;
   }
 
   return (

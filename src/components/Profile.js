@@ -1,17 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Account.scss';
+import Loader from './Loader';
+import { API_BASE } from '../config';
+import {
+  fetchSubscriptionDetails,
+  getStoredSubscriptionDetails,
+  isPremiumSubscription,
+  subscribeToSubscriptionChanges,
+} from '../utils/subscription';
 
-const AUTH_API = 'http://localhost:5000/api/auth';
-const RECIPE_API = 'http://localhost:5000/api/recipes';
+const AUTH_API = `${API_BASE}/api/auth`;
+const RECIPE_API = `${API_BASE}/api/recipes`;
 
 const Profile = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
+  const [accountUser, setAccountUser] = useState(null);
   const [myRecipes, setMyRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(true);
+  const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -20,17 +30,44 @@ const Profile = () => {
       return;
     }
 
-    const fetchProfile = async () => {
-      const res = await fetch(`${AUTH_API}/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setAccountUser(parsedUser);
         setForm({
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          email: data.email || '',
+          firstName: parsedUser.firstName || '',
+          lastName: parsedUser.lastName || '',
+          email: parsedUser.email || '',
         });
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+      }
+    }
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`${AUTH_API}/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          const nextUser = {
+            ...data,
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.email || '',
+          };
+          setAccountUser(nextUser);
+          setForm({
+            firstName: nextUser.firstName,
+            lastName: nextUser.lastName,
+            email: nextUser.email,
+          });
+          localStorage.setItem('user', JSON.stringify(nextUser));
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
       }
     };
 
@@ -52,6 +89,9 @@ const Profile = () => {
 
     fetchProfile();
     fetchMyRecipes();
+    fetchSubscriptionDetails().then(setSubscription).catch(() => null);
+
+    return subscribeToSubscriptionChanges(setSubscription);
   }, [navigate]);
 
   const handleChange = (e) => {
@@ -71,8 +111,15 @@ const Profile = () => {
     });
     const data = await res.json();
     if (res.ok) {
+      const updatedUser = data.user || form;
+      setAccountUser(updatedUser);
+      setForm({
+        firstName: updatedUser.firstName || '',
+        lastName: updatedUser.lastName || '',
+        email: updatedUser.email || '',
+      });
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       alert(t('profile_updated'));
-      localStorage.setItem('user', JSON.stringify(data.user));
     } else {
       alert(data.message || t('failed'));
     }
@@ -100,10 +147,19 @@ const Profile = () => {
     }
   };
 
+  const displayUser = useMemo(() => ({
+    firstName: form.firstName || accountUser?.firstName || '',
+    lastName: form.lastName || accountUser?.lastName || '',
+    email: form.email || accountUser?.email || '',
+  }), [accountUser, form.email, form.firstName, form.lastName]);
+
+  const displayName = [displayUser.firstName, displayUser.lastName].filter(Boolean).join(' ').trim() || 'User';
+  const displayEmail = displayUser.email || 'no-email@cookonweb.app';
+
   const initials =
-    (form.firstName?.[0] || '').toUpperCase() ||
-    (form.lastName?.[0] || '').toUpperCase() ||
-    'U';
+    (displayUser.firstName?.[0] || '').toUpperCase() ||
+    (displayUser.lastName?.[0] || '').toUpperCase() ||
+    (displayEmail?.[0] || 'U').toUpperCase();
 
   return (
     <div className="page-container">
@@ -160,6 +216,11 @@ const Profile = () => {
               <button type="button" className="btn-ghost" onClick={() => navigate('/add-recipe')}>
                 Add Recipe
               </button>
+              {!isPremiumSubscription(subscription) && (
+                <button type="button" className="btn-outlined" onClick={() => navigate('/subscription')}>
+                  Upgrade to Premium
+                </button>
+              )}
             </div>
           </form>
 
@@ -172,7 +233,7 @@ const Profile = () => {
             </div>
 
             {loadingRecipes ? (
-              <div className="dashboard-empty">Loading your recipes...</div>
+              <Loader label="Loading your recipes..." variant="card" size="sm" />
             ) : myRecipes.length === 0 ? (
               <div className="dashboard-empty">
                 You have not published any recipes yet.
@@ -229,10 +290,8 @@ const Profile = () => {
             <div className="account-summary">
               <div className="account-summary__avatar">{initials}</div>
               <div className="account-summary__info">
-                <div className="name">
-                  {form.firstName || 'User'} {form.lastName}
-                </div>
-                <div className="email">{form.email || 'no-email@cookonweb.app'}</div>
+                <div className="name">{displayName}</div>
+                <div className="email">{displayEmail}</div>
               </div>
             </div>
 
@@ -251,7 +310,24 @@ const Profile = () => {
                 <span>Status</span>
                 <span className="status-pill">Active</span>
               </li>
+              <li>
+                <span>Plan</span>
+                <span className="value">{subscription?.planName || 'Free'}</span>
+              </li>
             </ul>
+
+            <div className="subscription-note" style={{ marginTop: '1rem' }}>
+              {isPremiumSubscription(subscription)
+                ? 'Premium is active. You can publish recipes, build collections, and use family planning tools.'
+                : 'Free plan is active. Upgrade to unlock publishing, collections, and family planning.'}
+            </div>
+            {!isPremiumSubscription(subscription) && (
+              <div className="form-actions" style={{ marginTop: '1rem' }}>
+                <button type="button" className="btn-primary" onClick={() => navigate('/subscription')}>
+                  View Premium Plans
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

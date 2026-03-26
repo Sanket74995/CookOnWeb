@@ -25,31 +25,24 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker');
   event.waitUntil(
     caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('[SW] Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .catch((error) => {
-        console.error('[SW] Error caching static assets:', error);
-      })
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .catch(() => {})
   );
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
+          return Promise.resolve();
         })
       );
     })
@@ -90,7 +83,7 @@ async function handleApiRequest(request) {
       return networkResponse;
     }
   } catch (error) {
-    console.log('[SW] Network failed, trying cache for API:', request.url);
+    // keep silent for offline fallback
   }
 
   // Fallback to cache
@@ -117,25 +110,40 @@ async function handleApiRequest(request) {
   });
 }
 
-// Handle static requests with cache-first strategy
+// Handle static requests.
+// Documents use network-first to avoid showing an older app shell after deploys.
+// Other assets can still use cache-first for speed.
 async function handleStaticRequest(request) {
-  // Try cache first
+  if (request.destination === 'document') {
+    try {
+      const networkResponse = await fetch(request, { cache: 'no-store' });
+      if (networkResponse.ok) {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch (error) {
+      const cachedResponse = await caches.match(request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+    }
+  }
+
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
     return cachedResponse;
   }
 
   try {
-    // Try network
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      // Cache the response
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
   } catch (error) {
-    console.log('[SW] Network failed for static asset:', request.url);
+    // keep silent for static fallback
 
     // Return offline fallback for HTML pages
     if (request.destination === 'document') {
@@ -169,8 +177,6 @@ async function handleStaticRequest(request) {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync triggered:', event.tag);
-
   if (event.tag === 'background-sync') {
     event.waitUntil(doBackgroundSync());
   }
@@ -184,8 +190,6 @@ async function doBackgroundSync() {
 
 // Push notifications (for future meal reminders)
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push notification received');
-
   if (event.data) {
     const data = event.data.json();
     const options = {
@@ -204,8 +208,6 @@ self.addEventListener('push', (event) => {
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked');
-
   event.notification.close();
 
   event.waitUntil(

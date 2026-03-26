@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/Dashboard.scss';
+import Loader from './Loader';
+import {
+    fetchSubscriptionDetails,
+    getStoredSubscriptionDetails,
+    isPremiumSubscription,
+    subscribeToSubscriptionChanges,
+} from '../utils/subscription';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -17,6 +24,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [recentRecipes, setRecentRecipes] = useState([]);
     const [favoriteCuisines, setFavoriteCuisines] = useState([]);
+    const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
     const [cookingHabits, setCookingHabits] = useState({
         totalPrepTime: 0,
         totalCookTime: 0,
@@ -26,6 +34,8 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchDashboardData();
+        fetchSubscriptionDetails().then(setSubscription).catch(() => null);
+        return subscribeToSubscriptionChanges(setSubscription);
     }, []);
 
     const fetchDashboardData = async () => {
@@ -130,7 +140,11 @@ const Dashboard = () => {
     };
 
     if (loading || !stats) {
-        return <div className="dashboard-page"><div className="loading">{t('loading_dashboard')}</div></div>;
+        return (
+            <div className="dashboard-page">
+                <Loader label={t('loading_dashboard')} variant="section" />
+            </div>
+        );
     }
 
     return (
@@ -138,6 +152,20 @@ const Dashboard = () => {
             <div className="dashboard-header">
                 <h1>{t('your_cooking_dashboard')}</h1>
                 <p>{t('dashboard_subtitle')}</p>
+            </div>
+
+            <div className="dashboard-section">
+                <div className="dashboard-header">
+                    <h2>Subscription</h2>
+                    <button className="btn-ghost" type="button" onClick={() => navigate('/subscription')}>
+                        {isPremiumSubscription(subscription) ? 'Manage plan' : 'Upgrade'}
+                    </button>
+                </div>
+                <div className="dashboard-empty">
+                    {isPremiumSubscription(subscription)
+                        ? `Premium is active with ${subscription?.limits?.aiChats || 'Unlimited'} AI access, ${subscription?.limits?.collections || 'Unlimited'} collections, and recipe publishing enabled.`
+                        : 'You are on the Free plan. Upgrade to unlock recipe publishing, collections, family groups, and stronger AI access.'}
+                </div>
             </div>
 
             <div className="stats-grid">

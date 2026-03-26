@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/Login.scss';
+import { API_BASE } from '../config';
 
 const Login = () => {
     const { t } = useTranslation();
@@ -58,7 +59,7 @@ const Login = () => {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch(`${API_BASE}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

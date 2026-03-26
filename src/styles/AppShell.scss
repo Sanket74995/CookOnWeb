@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #f6efe6;
+  --bg-elevated: #fbf5ee;
+  --surface: rgba(255, 250, 244, 0.8);
+  --surface-strong: #fffdfa;
+  --surface-muted: #f5ede2;
+  --text: #1f2937;
+  --text-soft: #5f6b7a;
+  --text-muted: #8c96a5;
+  --line: rgba(133, 88, 43, 0.14);
+  --line-strong: rgba(133, 88, 43, 0.24);
+  --brand: #c56a1b;
+  --brand-strong: #9f4f11;
+  --accent: #2d8a57;
+  --danger: #d64545;
+  --shadow-sm: 0 10px 30px rgba(94, 55, 18, 0.08);
+  --shadow-md: 0 18px 48px rgba(94, 55, 18, 0.12);
+  --shadow-lg: 0 28px 80px rgba(94, 55, 18, 0.16);
+  --page-width: 1280px;
+  --nav-height: 84px;
+  --input-bg: rgba(255, 255, 255, 0.84);
+  --chip-bg: linear-gradient(135deg, #fff3e5, #eef8f2);
+  --hero-surface: rgba(255, 252, 248, 0.82);
+  --panel-soft: linear-gradient(135deg, #fff8ef, #ffffff);
+  --overlay: rgba(32, 24, 17, 0.32);
+}
+
+:root[data-theme='dark'] {
+  --bg: #0d1520;
+  --bg-elevated: #132032;
+  --surface: rgba(14, 23, 36, 0.76);
+  --surface-strong: #162233;
+  --surface-muted: #111d2d;
+  --text: #edf3fb;
+  --text-soft: #b7c2d1;
+  --text-muted: #7c8a9f;
+  --line: rgba(124, 146, 174, 0.18);
+  --line-strong: rgba(124, 146, 174, 0.3);
+  --brand: #ffab57;
+  --brand-strong: #ff8740;
+  --accent: #62c695;
+  --danger: #ff7b88;
+  --shadow-sm: 0 16px 40px rgba(2, 6, 23, 0.32);
+  --shadow-md: 0 24px 60px rgba(2, 6, 23, 0.4);
+  --shadow-lg: 0 34px 90px rgba(2, 6, 23, 0.5);
+  --input-bg: rgba(17, 29, 45, 0.94);
+  --chip-bg: linear-gradient(135deg, rgba(255, 171, 87, 0.12), rgba(98, 198, 149, 0.12));
+  --hero-surface: rgba(14, 23, 36, 0.82);
+  --panel-soft: linear-gradient(135deg, rgba(22, 34, 51, 0.95), rgba(17, 29, 45, 0.92));
+  --overlay: rgba(4, 8, 18, 0.56);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 223, 186, 0.72), transparent 34%),
+    radial-gradient(circle at top right, rgba(210, 247, 224, 0.5), transparent 28%),
+    linear-gradient(180deg, #fbf5ee 0%, #f6efe6 42%, #f4eadf 100%);
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+:root[data-theme='dark'] body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 149, 67, 0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(78, 201, 143, 0.12), transparent 24%),
+    linear-gradient(180deg, #09111b 0%, #0d1520 38%, #111b29 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 75%);
+  opacity: 0.25;
+}
+
+:root[data-theme='dark'] body::before {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  opacity: 0.4;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+input,
+select,
+textarea {
+  color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.App {
+  min-height: 100vh;
+}
+
+.app-content {
+  padding-top: calc(var(--nav-height) + 18px);
+}
+
+.recipes-container,
+.dashboard-page,
+.collections-page,
+.collection-detail-page,
+.recipe-detail-container {
+  width: min(calc(100% - 32px), var(--page-width));
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --nav-height: 74px;
+  }
+
+  .recipes-container,
+  .dashboard-page,
+  .collections-page,
+  .collection-detail-page,
+  .recipe-detail-container {
+    width: min(calc(100% - 20px), var(--page-width));
+  }
+}

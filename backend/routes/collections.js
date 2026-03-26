@@ -1,5 +1,6 @@
 const express = require('express');
 const auth = require('../middleware/auth');
+const requirePremium = require('../middleware/requirePremium');
 const {
     getUserCollections,
     getPublicCollections,
@@ -23,7 +24,7 @@ router.get('/public', getPublicCollections);
 router.get('/:id', auth, getCollectionById);
 
 // POST /api/collections - Create new collection
-router.post('/', auth, createCollection);
+router.post('/', auth, requirePremium, createCollection);
 
 // PUT /api/collections/:id - Update collection
 router.put('/:id', auth, updateCollection);
@@ -32,7 +33,7 @@ router.put('/:id', auth, updateCollection);
 router.delete('/:id', auth, deleteCollection);
 
 // POST /api/collections/:id/recipes - Add recipe to collection
-router.post('/:id/recipes', auth, addRecipeToCollection);
+router.post('/:id/recipes', auth, requirePremium, addRecipeToCollection);
 
 // DELETE /api/collections/:id/recipes/:recipeId - Remove recipe from collection
 router.delete('/:id/recipes/:recipeId', auth, removeRecipeFromCollection);

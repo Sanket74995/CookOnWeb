@@ -2,8 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import "../styles/AddRecipe.scss";
+import Loader from "./Loader";
+import { API_BASE } from "../config";
+import {
+  fetchSubscriptionDetails,
+  getPremiumFeatureMessage,
+  getStoredSubscriptionDetails,
+  isPremiumSubscription,
+  subscribeToSubscriptionChanges,
+} from "../utils/subscription";
 
-const API = "http://localhost:5000/api/recipes";
+const API = `${API_BASE}/api/recipes`;
 
 const emptyForm = {
   title: "",
@@ -33,6 +42,20 @@ const AddRecipe = () => {
   const [loading, setLoading] = useState(isEditMode);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
+  const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || isEditMode) {
+      return;
+    }
+
+    fetchSubscriptionDetails()
+      .then(setSubscription)
+      .catch((error) => console.error("Failed to load subscription:", error));
+
+    return subscribeToSubscriptionChanges(setSubscription);
+  }, [isEditMode]);
 
   useEffect(() => {
     if (!isEditMode) {
@@ -116,6 +139,11 @@ const AddRecipe = () => {
   const validateForm = () => {
     if (!localStorage.getItem("token")) {
       alert(t('please_log_in_before_saving_recipe'));
+      return false;
+    }
+
+    if (!isEditMode && !isPremiumSubscription(subscription)) {
+      alert(getPremiumFeatureMessage('Publishing recipes'));
       return false;
     }
 
@@ -203,23 +231,23 @@ const AddRecipe = () => {
         body: data,
       });
 
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(payload.message || "Failed to save recipe");
+	      const payload = await response.json().catch(() => ({}));
+	      if (!response.ok) {
+	        throw new Error(payload.message || "Failed to save recipe");
       }
 
       alert(isEditMode ? t('recipe_updated') : t('recipe_added'));
       navigate(isEditMode ? `/recipe/${id}` : "/profile");
     } catch (error) {
-      console.error("Save recipe request failed:", error);
-      alert(error.message || t('unable_save_recipe'));
-    } finally {
+	      console.error("Save recipe request failed:", error);
+	      alert(error.message || t('unable_save_recipe'));
+	    } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div className="page-container">{t('loading_recipe_editor')}</div>;
+    return <Loader label={t('loading_recipe_editor')} variant="page" />;
   }
 
   return (
@@ -243,8 +271,13 @@ const AddRecipe = () => {
           </div>
 
           <form className="add-recipe-form" onSubmit={handleSubmit}>
-            <div className="form-section">
-              <div className="form-section__title">{t('import_recipe_draft')}</div>
+	            <div className="form-section">
+              {!isEditMode && subscription && !isPremiumSubscription(subscription) && (
+                <div className="tip-box" style={{ marginBottom: '1rem' }}>
+                  Premium plan required to publish new recipes. You can upgrade from Subscription.
+                </div>
+              )}
+	              <div className="form-section__title">{t('import_recipe_draft')}</div>
               <div className="form-section__hint">
                 {t('paste_recipe_url_hint')}
               </div>

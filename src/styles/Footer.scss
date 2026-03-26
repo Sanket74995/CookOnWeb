@@ -1,9 +1,14 @@
 .footer {
-    background-color: var(--background-color);
-    padding: 20px 0;
+    width: min(calc(100% - 32px), var(--page-width));
+    margin: 0 auto 20px;
+    background: var(--surface);
+    padding: 22px 0;
     text-align: center;
-    box-shadow: 0 -3px 6px var(--shadow-color);
-    margin-top: auto;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    margin-top: 24px;
+    backdrop-filter: blur(12px);
 
     .footer-content {
         .footer-links {
@@ -13,28 +18,27 @@
 
             .footer-link {
                 margin: 0 15px;
-                color: var(--text-light);
-                text-decoration: none;
-                font-family: 'Lato', sans-serif;
+                color: var(--text-soft);
                 font-size: 0.9rem;
                 transition: color 0.3s ease;
 
                 &:hover {
-                    color: var(--primary-color);
+                    color: var(--brand);
                 }
             }
         }
 
         .footer-copyright {
-            color: var(--text-color);
+            color: var(--text);
             font-size: 0.8rem;
-            font-family: 'Lato', sans-serif;
         }
     }
 }
 
 @media screen and (max-width: 768px) {
     .footer {
+        width: calc(100% - 20px);
+
         .footer-content {
             .footer-links {
                 flex-direction: column;

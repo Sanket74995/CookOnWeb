@@ -3,6 +3,7 @@ const Recipe = require('../models/Recipe');
 const ChatLog = require('../models/ChatLog');
 const User = require('../models/User');
 const MealPlan = require('../models/MealPlan');
+const { createTextReply, isAIEnabled } = require('../services/deepseekService');
 
 const COMMON_INGREDIENTS = [
   'potato', 'aloo', 'rice', 'chawal', 'chicken', 'paneer', 'tomato', 'onion', 'garlic',
@@ -77,7 +78,6 @@ const SHOPPING_INTENTS = ['shopping list', 'grocery list', 'groceries', 'buy for
 const PLANNER_INTENTS = ['meal plan', 'plan my week', 'weekly plan', 'planner', 'schedule meals'];
 const SCALE_INTENTS = ['scale recipe', 'double recipe', 'halve recipe', 'half recipe', 'servings'];
 const GENERATE_INTENTS = ['generate recipe', 'create recipe', 'make recipe from', 'recipe from ingredients'];
-let ollamaBackoffUntil = 0;
 
 const safeNumber = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -740,17 +740,6 @@ const getLearningMessage = (signals, parsedQuery) => {
   return '';
 };
 
-const getOllamaConfig = () => ({
-  baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-  model: process.env.OLLAMA_MODEL || 'gemma3:1b'
-});
-
-const parseRetryDelayMs = (errorText) => {
-  const retryMatch = String(errorText || '').match(/"retryDelay":\s*"(\d+)s"/i);
-  if (!retryMatch) return 60_000;
-  return Number(retryMatch[1]) * 1000;
-};
-
 const summarizeSessionMemory = (sessionMemory = []) =>
   sessionMemory
     .slice(0, 4)
@@ -808,10 +797,8 @@ const buildLLMContext = ({
   };
 };
 
-const generateOllamaReply = async (context) => {
-  const { baseUrl, model } = getOllamaConfig();
-  if (!model) return null;
-  if (Date.now() < ollamaBackoffUntil) return null;
+const generateAIReply = async (context) => {
+  if (!isAIEnabled()) return null;
 
   const systemPrompt = [
     'You are CookOnWeb\'s recipe assistant.',
@@ -823,32 +810,12 @@ const generateOllamaReply = async (context) => {
     'Keep the answer concise, practical, and conversational.'
   ].join(' ');
 
-  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/api/generate`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model,
-      prompt: `${systemPrompt}\n\nApplication context:\n${JSON.stringify(context, null, 2)}`,
-      stream: false,
-      options: {
-        temperature: 0.7,
-        num_predict: 400
-      }
-    })
+  return createTextReply({
+    systemPrompt,
+    userPrompt: `Use this application context to answer the user's request. If the fallbackMessage already reads well, you can polish it, but do not contradict the JSON context.\n\nApplication context JSON:\n${JSON.stringify(context, null, 2)}`,
+    temperature: 0.5,
+    maxTokens: 500
   });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    if (response.status === 429 || response.status >= 500) {
-      ollamaBackoffUntil = Date.now() + parseRetryDelayMs(errorText);
-    }
-    throw new Error(`Ollama API error: ${errorText}`);
-  }
-
-  const data = await response.json();
-  return String(data?.response || '').trim() || null;
 };
 
 const getSessionMemory = async (sessionId) => {
@@ -1196,7 +1163,7 @@ const processQuery = async (req, res) => {
     responseMessage = localReply;
 
     try {
-      const llmReply = await generateOllamaReply(buildLLMContext({
+      const llmReply = await generateAIReply(buildLLMContext({
         userMessage: message,
         parsedQuery,
         recipes,
@@ -1213,9 +1180,7 @@ const processQuery = async (req, res) => {
         responseMessage = llmReply;
       }
     } catch (llmError) {
-      const label = llmError.message.includes('Ollama')
-        ? 'Ollama unavailable, using local fallback:'
-        : 'Local model reply generation failed, using local fallback:';
+      const label = 'AI reply generation failed, using local fallback:';
       console.error(label, llmError.message);
     }
 

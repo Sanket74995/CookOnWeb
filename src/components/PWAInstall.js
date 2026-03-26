@@ -18,7 +18,6 @@ const PWAInstall = () => {
 
     // Listen for successful installation
     const handleAppInstalled = () => {
-      console.log('PWA was installed');
       setShowInstall(false);
       setDeferredPrompt(null);
     };
@@ -51,9 +50,9 @@ const PWAInstall = () => {
     setShowInstall(false);
 
     if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+      setShowInstall(false);
     } else {
-      console.log('User dismissed the install prompt');
+      setShowInstall(false);
     }
   };
 

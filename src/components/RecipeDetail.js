@@ -3,6 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/RecipeDetail.scss';
 import VoiceAssistant from './VoiceAssistant';
+import Loader from './Loader';
+import { API_BASE } from '../config';
+
+const hasTranslatedIngredients = (items) =>
+    Array.isArray(items) &&
+    items.length > 0 &&
+    items.some((item) => String(item?.name || '').trim());
+
+const hasTranslatedInstructions = (items) =>
+    Array.isArray(items) &&
+    items.length > 0 &&
+    items.some((item) => String(item?.description || '').trim());
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -27,16 +39,16 @@ const RecipeDetail = () => {
     useEffect(() => {
         const fetchRecipe = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/recipes/${id}`);
+                const response = await fetch(`${API_BASE}/api/recipes/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setRecipe(data);
                     setDesiredServings(Number(data.servings || 1));
                 } else {
-                    console.error('Failed to fetch recipe');
+                    setRecipe(null);
                 }
             } catch (error) {
-                console.error('Error fetching recipe:', error);
+                setRecipe(null);
             } finally {
                 setLoading(false);
             }
@@ -47,43 +59,82 @@ const RecipeDetail = () => {
     useEffect(() => {
         if ('speechSynthesis' in window) {
             setSpeechSynthesis(window.speechSynthesis);
+            window.speechSynthesis.getVoices();
         }
     }, []);
 
+    const getSpeechLang = () => (currentLang === 'hi' ? 'hi-IN' : 'en-US');
+
+    const getPreferredVoice = () => {
+        if (!speechSynthesis || !('speechSynthesis' in window)) {
+            return null;
+        }
+
+        const voices = speechSynthesis.getVoices();
+        if (!voices.length) {
+            return null;
+        }
+
+        const preferredLang = getSpeechLang().toLowerCase();
+        const baseLang = preferredLang.split('-')[0];
+
+        return (
+            voices.find((voice) => String(voice.lang || '').toLowerCase() === preferredLang) ||
+            voices.find((voice) => String(voice.lang || '').toLowerCase().startsWith(baseLang)) ||
+            voices.find((voice) => String(voice.name || '').toLowerCase().includes(baseLang)) ||
+            null
+        );
+    };
+
+    const createUtterance = (text) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = getSpeechLang();
+        utterance.rate = currentLang === 'hi' ? 0.88 : 0.94;
+        utterance.pitch = 1;
+
+        const voice = getPreferredVoice();
+        if (voice) {
+            utterance.voice = voice;
+        }
+
+        return utterance;
+    };
+
     // Enhanced voice command handler
     const handleVoiceCommand = (command) => {
-        console.log('Recipe voice command:', command);
-
-        // Reading controls
         if (command.includes('start') || command.includes('begin') || command.includes('read')) {
             startReading();
+            return true;
         } else if (command.includes('pause') || command.includes('stop reading')) {
             pauseReading();
+            return true;
         } else if (command.includes('resume') || command.includes('continue')) {
             resumeReading();
+            return true;
         } else if (command.includes('stop') || command.includes('end')) {
             stopReading();
+            return true;
         } else if (command.includes('repeat') || command.includes('again')) {
             setCurrentStep((prev) => Math.max(prev - 1, 0));
             setWaitingForContinue(false);
             setTimeout(() => startReading(), 100);
+            return true;
         } else if (command.includes('next step') || command.includes('next')) {
             if (waitingForContinue) {
                 setWaitingForContinue(false);
                 speakNextInstruction();
             }
+            return true;
         } else if (command.includes('previous') || command.includes('back')) {
             setCurrentStep((prev) => Math.max(prev - 2, 0));
             setWaitingForContinue(false);
             setTimeout(() => startReading(), 100);
+            return true;
         }
-
-        // Timer controls
         else if (command.includes('skip timer') || command.includes('skip')) {
             skipTimer();
+            return true;
         }
-
-        // Servings adjustment
         else if (command.includes('servings') || command.includes('serves')) {
             const match = command.match(/(\d+)\s*(servings?|serves?)/i);
             if (match) {
@@ -92,36 +143,40 @@ const RecipeDetail = () => {
                     setDesiredServings(newServings);
                 }
             }
+            return true;
         }
-
-        // Recipe information
         else if (command.includes('ingredients') || command.includes('what do i need')) {
             speakIngredients();
+            return true;
         } else if (command.includes('nutrition') || command.includes('nutrients')) {
             speakNutrition();
+            return true;
         } else if (command.includes('time') || command.includes('how long')) {
             speakTimeInfo();
+            return true;
         }
-
-        // Navigation
         else if (command.includes('edit') || command.includes('modify')) {
             navigate(`/recipe/${id}/edit`);
+            return true;
         } else if (command.includes('back') || command.includes('return')) {
             navigate(-1);
+            return true;
         }
+
+        return false;
     };
 
     const speakIngredients = () => {
         if (!speechSynthesis || !recipe) return;
 
-        let text = 'Ingredients needed: ';
+        let text = `${i18n.t('ingredients')}: `;
         ingredients.forEach((ingredient, index) => {
             const scaledQty = formatScaledQuantity(ingredient.quantity);
             text += `${scaledQty || ''} ${ingredient.unit || ''} ${ingredient.name}`;
             if (index < ingredients.length - 1) text += ', ';
         });
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = createUtterance(text);
         speechSynthesis.speak(utterance);
     };
 
@@ -129,13 +184,13 @@ const RecipeDetail = () => {
         if (!speechSynthesis || !recipe) return;
 
         const nutrition = recipe.nutrition || {};
-        let text = 'Nutrition information per serving: ';
-        if (nutrition.calories) text += `${nutrition.calories} calories, `;
-        if (nutrition.protein) text += `${nutrition.protein} grams protein, `;
-        if (nutrition.carbs) text += `${nutrition.carbs} grams carbs, `;
-        if (nutrition.fat) text += `${nutrition.fat} grams fat.`;
+        let text = `${i18n.t('nutrition_information')}: `;
+        if (nutrition.calories) text += `${nutrition.calories} ${i18n.t('calories')}, `;
+        if (nutrition.protein) text += `${nutrition.protein} ${i18n.t('protein')}, `;
+        if (nutrition.carbs) text += `${nutrition.carbs} ${i18n.t('carbs')}, `;
+        if (nutrition.fat) text += `${nutrition.fat} ${i18n.t('fat')}.`;
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = createUtterance(text);
         speechSynthesis.speak(utterance);
     };
 
@@ -146,9 +201,9 @@ const RecipeDetail = () => {
         const cookTime = Number(recipe.cookTime || 0);
         const totalTime = prepTime + cookTime;
 
-        let text = `Preparation time: ${prepTime} minutes. Cooking time: ${cookTime} minutes. Total time: ${totalTime} minutes.`;
+        let text = `${i18n.t('prep_time')}: ${prepTime} ${i18n.t('minutes')}. ${i18n.t('cook_time')}: ${cookTime} ${i18n.t('minutes')}. ${i18n.t('total_cooking_time', { defaultValue: 'Total Cooking Time' })}: ${totalTime} ${i18n.t('minutes')}.`;
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = createUtterance(text);
         speechSynthesis.speak(utterance);
     };
 
@@ -171,7 +226,7 @@ const RecipeDetail = () => {
     }, [timerActive, timerSeconds]);
 
     if (loading) {
-        return <div className="recipe-detail-loading">Loading recipe...</div>;
+        return <Loader label="Loading recipe..." variant="page" />;
     }
 
     if (!recipe) {
@@ -186,13 +241,25 @@ const RecipeDetail = () => {
         ? recipe.translations[currentLang].description
         : recipe.description;
 
-    const localizedIngredients = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].ingredients
-        ? recipe.translations[currentLang].ingredients
-        : recipe.ingredients;
+    const translatedIngredients =
+        currentLang !== 'en' &&
+        recipe.translations &&
+        recipe.translations[currentLang] &&
+        hasTranslatedIngredients(recipe.translations[currentLang].ingredients)
+            ? recipe.translations[currentLang].ingredients
+            : null;
 
-    const localizedInstructions = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].instructions
-        ? recipe.translations[currentLang].instructions
-        : recipe.instructions;
+    const translatedInstructions =
+        currentLang !== 'en' &&
+        recipe.translations &&
+        recipe.translations[currentLang] &&
+        hasTranslatedInstructions(recipe.translations[currentLang].instructions)
+            ? recipe.translations[currentLang].instructions
+            : null;
+
+    const localizedIngredients = translatedIngredients || recipe.ingredients;
+
+    const localizedInstructions = translatedInstructions || recipe.instructions;
 
     const ingredients = Array.isArray(localizedIngredients) ? localizedIngredients : [];
     const instructions = Array.isArray(localizedInstructions) ? localizedInstructions : [];
@@ -234,13 +301,14 @@ const RecipeDetail = () => {
     };
 
     const parseTimeFromText = (text) => {
-        const timeRegex = /(\d+)\s*(minute|min|second|sec)s?/gi;
+        const timeRegex = /(\d+)\s*(minute|min|second|sec|मिनट|सेकंड)/gi;
         const matches = text.match(timeRegex);
         if (matches) {
             let totalSeconds = 0;
             matches.forEach((match) => {
                 const num = parseInt(match.match(/\d+/)[0], 10);
-                const unit = match.toLowerCase().includes('minute') || match.toLowerCase().includes('min') ? 60 : 1;
+                const normalized = match.toLowerCase();
+                const unit = normalized.includes('minute') || normalized.includes('min') || normalized.includes('मिनट') ? 60 : 1;
                 totalSeconds += num * unit;
             });
             return totalSeconds;
@@ -265,7 +333,7 @@ const RecipeDetail = () => {
         }
 
         const instruction = instructions[currentStep];
-        const utterance = new SpeechSynthesisUtterance(`Step ${instruction.step}: ${instruction.description}.`);
+        const utterance = createUtterance(`${i18n.t('step')} ${instruction.step}: ${instruction.description}.`);
 
         utterance.onend = () => {
             setIsReading(false);
@@ -291,12 +359,12 @@ const RecipeDetail = () => {
     const speakTitleAndIngredients = () => {
         if (!recipe) return;
 
-        let text = `Recipe: ${localizedTitle}. Ingredients: `;
+        let text = `${i18n.t('recipe')}: ${localizedTitle}. ${i18n.t('ingredients')}: `;
         ingredients.forEach((ingredient) => {
             text += `${ingredient.quantity || ''} ${ingredient.unit || ''} ${ingredient.name}. `;
         });
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = createUtterance(text);
         utterance.onend = () => {
             setCurrentStep(0);
             speakNextInstruction();
@@ -411,7 +479,7 @@ const RecipeDetail = () => {
 
         try {
             setSavingReview(true);
-            const response = await fetch(`http://localhost:5000/api/recipes/${id}/reviews`, {
+            const response = await fetch(`${API_BASE}/api/recipes/${id}/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -689,7 +757,11 @@ const RecipeDetail = () => {
                     </div>
                 </div>
             </div>
-            <VoiceAssistant onCommand={handleVoiceCommand} />
+            <VoiceAssistant
+                onCommand={handleVoiceCommand}
+                onReady={setVoiceAssistant}
+                onListeningChange={setVoiceListening}
+            />
         </div>
     );
 };

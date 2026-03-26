@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Hero.scss';
 import RecipeCard from './RecipeCard';
+import { API_BASE } from '../config';
+import Loader from './Loader';
 
 const Hero = () => {
     const { t } = useTranslation();
@@ -14,10 +16,10 @@ const Hero = () => {
     useEffect(() => {
         const fetchRecipes = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/recipes');
+                const response = await fetch(`${API_BASE}/api/recipes`);
                 if (response.ok) {
                     const data = await response.json();
-                    setRecipes(data); // Take all recipes
+                    setRecipes(data);
                 } else {
                     console.error('Failed to fetch recipes');
                 }
@@ -40,7 +42,7 @@ const Hero = () => {
     const fetchFavorites = async () => {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch('http://localhost:5000/api/auth/favorites', {
+            const response = await fetch(`${API_BASE}/api/auth/favorites`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.ok) {
@@ -57,7 +59,7 @@ const Hero = () => {
         if (!token) return;
 
         const isFav = favorites.includes(recipeId);
-        const url = `http://localhost:5000/api/auth/favorites/${recipeId}`;
+        const url = `${API_BASE}/api/auth/favorites/${recipeId}`;
         const method = isFav ? 'DELETE' : 'POST';
 
         try {
@@ -71,6 +73,9 @@ const Hero = () => {
                 } else {
                     setFavorites(prev => [...prev, recipeId]);
                 }
+            } else {
+                const data = await response.json().catch(() => ({}));
+                alert(data.message || 'Unable to save recipe');
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
@@ -78,40 +83,31 @@ const Hero = () => {
     };
 
     const handleRecipeClick = (recipeId) => {
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         if (token) {
-            // User is logged in, navigate to recipe detail page
             navigate(`/recipe/${recipeId}`);
         } else {
-            // User is not logged in, navigate to register page
             navigate('/register');
         }
     };
 
     const handleGetStarted = () => {
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         if (token) {
-            // User is logged in, navigate to recipes page
             navigate('/recipes');
         } else {
-            // User is not logged in, navigate to register page
             navigate('/register');
         }
     };
 
-    // Filter and group recipes by specific cuisines
     const recipesByCuisine = useMemo(() => {
         const targetCuisines = ['Indian', 'Italian', 'Japanese'];
         const grouped = {};
 
-        // Initialize the target cuisines
         targetCuisines.forEach(cuisine => {
             grouped[cuisine] = [];
         });
 
-        // Filter and group recipes
         recipes.forEach(recipe => {
             if (targetCuisines.includes(recipe.cuisine)) {
                 grouped[recipe.cuisine].push(recipe);
@@ -122,24 +118,7 @@ const Hero = () => {
     }, [recipes]);
 
     if (loading) {
-        return (
-            <div className="hero-loading">
-                <div className="hero">
-                    <div className="floating-icons">
-                        <span className="food-icon icon-1">🍕</span>
-                        <span className="food-icon icon-2">🥗</span>
-                        <span className="food-icon icon-3">🍩</span>
-                        <span className="food-icon icon-4">🍔</span>
-                        <span className="food-icon icon-5">🌮</span>
-                        <span className="food-icon icon-6">🍰</span>
-                    </div>
-
-                    <h1>{t('welcome')} <span className="highlight">CookOnWeb</span></h1>
-                    <p>{t('where_recipes_speak')}</p>
-                    <div className="hero-button-placeholder">Loading recipes...</div>
-                </div>
-            </div>
-        );
+        return <Loader label={t('loading_recipes')} variant="page" size="lg" />;
     }
 
     return (
@@ -183,7 +162,6 @@ const Hero = () => {
                     </section>
                 ))}
 
-                {/* See More Section */}
                 <div className="see-more-section">
                     <button
                         className="see-more-button"

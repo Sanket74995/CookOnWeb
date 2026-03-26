@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Recipes.scss';
 import RecipeCard from './RecipeCard';
+import { API_BASE } from '../config';
+import Loader from './Loader';
 
-const API = 'http://localhost:5000/api/recipes';
+const API = `${API_BASE}/api/recipes`;
+const AUTH_API = `${API_BASE}/api/auth`;
 const DEFAULT_FILTERS = {
     query: '',
     cuisine: '',
@@ -87,7 +90,7 @@ const Recipes = () => {
 
         const fetchFavorites = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/auth/favorites', {
+                const response = await fetch(`${AUTH_API}/favorites`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (response.ok) {
@@ -129,7 +132,7 @@ const Recipes = () => {
         if (!token) return;
 
         const isFav = favorites.includes(recipeId);
-        const url = `http://localhost:5000/api/auth/favorites/${recipeId}`;
+        const url = `${AUTH_API}/favorites/${recipeId}`;
         const method = isFav ? 'DELETE' : 'POST';
 
         try {
@@ -139,6 +142,9 @@ const Recipes = () => {
             });
             if (response.ok) {
                 setFavorites((prev) => isFav ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]);
+            } else {
+                const data = await response.json().catch(() => ({}));
+                alert(data.message || 'Unable to save recipe');
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
@@ -219,7 +225,7 @@ const Recipes = () => {
     };
 
     if (loading) {
-        return <div className="recipes-loading">{t('loading_recipes')}</div>;
+        return <Loader label={t('loading_recipes')} variant="page" />;
     }
 
     return (
@@ -231,9 +237,7 @@ const Recipes = () => {
 
             {localStorage.getItem('token') && recommended.length > 0 && (
                 <section className="cuisine-section">
-                    <h2>
-                        {t('recommended_for_you')}
-                    </h2>
+                    <h2>{t('recommended_for_you')}</h2>
                     <div className="recipes-empty" style={{ marginBottom: '20px', textAlign: 'left' }}>
                         {t('personalized_using_food_plan')}
                     </div>

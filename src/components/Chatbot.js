@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/Chatbot.scss';
+import { API_BASE } from '../config';
+
+const CHATBOT_API = `${API_BASE}/api/chatbot`;
 
 const commonQueries = [
     'Gym breakfast ideas',
@@ -55,7 +58,7 @@ const Chatbot = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await fetch('http://localhost:5000/api/chatbot/feedback', {
+            await fetch(`${CHATBOT_API}/feedback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,7 +82,7 @@ const Chatbot = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/chatbot/query', {
+            const response = await fetch(`${CHATBOT_API}/query`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -310,7 +313,15 @@ const Chatbot = () => {
                 onClick={() => setIsOpen((prev) => !prev)}
                 aria-label={isOpen ? 'Close chatbot' : 'Open chatbot'}
             >
-                <span className="chat-icon">Chat</span>
+                <span className="chatbot-toggle__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                        <path d="M12 3C6.477 3 2 7.03 2 12c0 2.208.894 4.23 2.382 5.794L3.4 21.6a1 1 0 0 0 1.228 1.228l3.806-.982A10.93 10.93 0 0 0 12 22c5.523 0 10-4.03 10-10S17.523 3 12 3Z" />
+                        <path d="M8 10.25a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm4 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm4 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Z" />
+                    </svg>
+                </span>
+                <span className="chatbot-toggle__label">
+                    {isOpen ? 'Close' : 'Ask AI'}
+                </span>
             </button>
         </div>
     );
