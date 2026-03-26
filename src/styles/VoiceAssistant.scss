@@ -48,6 +48,12 @@
       animation: pulse 1.5s infinite;
     }
 
+    &.is-disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      filter: grayscale(0.2);
+    }
+
     .voice-icon {
       width: 42px;
       height: 42px;
@@ -100,6 +106,21 @@
     backdrop-filter: blur(14px);
     border: 1px solid var(--line);
     box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &--reply {
+      background: linear-gradient(135deg, rgba(197, 106, 27, 0.12), var(--surface-strong));
+    }
+
+    .transcript-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
   }
 
   .voice-status {
@@ -112,6 +133,16 @@
     letter-spacing: 0.03em;
     animation: fadeIn 0.3s ease;
     box-shadow: 0 12px 24px rgba(68, 160, 141, 0.24);
+
+    &--thinking {
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.92), rgba(59, 130, 246, 0.92));
+      box-shadow: 0 12px 24px rgba(59, 130, 246, 0.22);
+    }
+
+    &--info {
+      background: linear-gradient(135deg, rgba(55, 65, 81, 0.94), rgba(107, 114, 128, 0.92));
+      box-shadow: 0 12px 24px rgba(31, 41, 55, 0.18);
+    }
   }
 }
 

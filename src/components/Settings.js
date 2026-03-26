@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import '../styles/Account.scss';
 import { applyTheme, getStoredTheme } from '../utils/theme';
 import { API_BASE } from '../config';
-import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from '../utils/subscription';
+import {
+  fetchSubscriptionDetails,
+  getPremiumFeatureMessage,
+  getStoredSubscriptionDetails,
+  isPremiumSubscription,
+  subscribeToSubscriptionChanges,
+} from '../utils/subscription';
 
 const defaultSettings = {
   language: 'en',
@@ -19,6 +26,7 @@ const defaultSettings = {
 };
 
 const Settings = () => {
+  const { i18n, t } = useTranslation();
   const [settings, setSettings] = useState(defaultSettings);
   const [saving, setSaving] = useState(false);
   const [pantry, setPantry] = useState([]);
@@ -26,7 +34,7 @@ const Settings = () => {
   const [familyGroups, setFamilyGroups] = useState([]);
   const [familyName, setFamilyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -50,6 +58,9 @@ const Settings = () => {
             },
           };
           setSettings(nextSettings);
+          if (nextSettings.language && nextSettings.language !== i18n.language) {
+            await i18n.changeLanguage(nextSettings.language);
+          }
           applyTheme(nextSettings.theme || getStoredTheme());
         }
       } catch (error) {
@@ -89,18 +100,25 @@ const Settings = () => {
 	    loadPantry();
 	    loadFamilyGroups();
       fetchSubscriptionDetails().then(setSubscription).catch(() => null);
-	  }, []);
+
+      return subscribeToSubscriptionChanges(setSubscription);
+	  }, [i18n]);
 
   const handleToggle = (key) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleChange = (e) => {
-    const nextSettings = { ...settings, [e.target.name]: e.target.value };
+    const { name, value } = e.target;
+    const nextSettings = { ...settings, [name]: value };
     setSettings(nextSettings);
 
-    if (e.target.name === 'theme') {
-      applyTheme(e.target.value);
+    if (name === 'theme') {
+      applyTheme(value);
+    }
+
+    if (name === 'language') {
+      i18n.changeLanguage(value);
     }
   };
 
@@ -132,7 +150,7 @@ const Settings = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Please log in first.');
+      alert(t('please_log_in_first', { defaultValue: 'Please log in first.' }));
       return;
     }
 
@@ -150,11 +168,14 @@ const Settings = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to save settings');
       }
+      if (settings.language && settings.language !== i18n.language) {
+        await i18n.changeLanguage(settings.language);
+      }
       applyTheme(settings.theme);
-      alert('Settings saved');
+      alert(t('settings_saved', { defaultValue: 'Settings saved' }));
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert(error.message || 'Unable to save settings');
+      alert(error.message || t('unable_save_settings', { defaultValue: 'Unable to save settings' }));
     } finally {
       setSaving(false);
     }
@@ -175,12 +196,12 @@ const Settings = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to save pantry');
+        throw new Error(data.message || t('failed_save_pantry', { defaultValue: 'Failed to save pantry' }));
       }
       setPantry(data.pantry || []);
     } catch (error) {
       console.error('Failed to save pantry:', error);
-      alert(error.message || 'Unable to save pantry');
+      alert(error.message || t('unable_save_pantry', { defaultValue: 'Unable to save pantry' }));
     }
   };
 
@@ -215,13 +236,13 @@ const Settings = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create family group');
+        throw new Error(data.message || t('failed_create_family_group', { defaultValue: 'Failed to create family group' }));
       }
       setFamilyGroups((prev) => [...prev, data.group]);
       setFamilyName('');
     } catch (error) {
       console.error('Failed to create family group:', error);
-      alert(error.message || 'Unable to create family group');
+      alert(error.message || t('unable_create_family_group', { defaultValue: 'Unable to create family group' }));
     }
   };
 
@@ -244,13 +265,13 @@ const Settings = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to join family group');
+        throw new Error(data.message || t('failed_join_family_group', { defaultValue: 'Failed to join family group' }));
       }
       setFamilyGroups((prev) => prev.some((group) => group._id === data.group._id) ? prev : [...prev, data.group]);
       setInviteCode('');
     } catch (error) {
       console.error('Failed to join family group:', error);
-      alert(error.message || 'Unable to join family group');
+      alert(error.message || t('unable_join_family_group', { defaultValue: 'Unable to join family group' }));
     }
   };
 
@@ -262,7 +283,7 @@ const Settings = () => {
             <div>
               <h2 className="account-header__title">Settings</h2>
               <p className="account-header__subtitle">
-                Customize your CookOnWeb experience and food plan.
+                {t('settings_subtitle', { defaultValue: 'Customize your CookOnWeb experience and food plan.' })}
               </p>
             </div>
           </div>
@@ -270,26 +291,26 @@ const Settings = () => {
           <form className="account-form" onSubmit={handleSave}>
             <div className="form-row">
               <div className="form-group">
-                <label>Language</label>
+                <label>{t('language', { defaultValue: 'Language' })}</label>
                 <select
                   name="language"
                   value={settings.language}
                   onChange={handleChange}
                 >
-                  <option value="en">English</option>
-                  <option value="hi">Hindi</option>
+                  <option value="en">{t('language_english')}</option>
+                  <option value="hi">{t('language_hindi')}</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Theme</label>
+                <label>{t('theme', { defaultValue: 'Theme' })}</label>
                 <select
                   name="theme"
                   value={settings.theme}
                   onChange={handleChange}
                 >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
+                  <option value="light">{t('theme_light', { defaultValue: 'Light' })}</option>
+                  <option value="dark">{t('theme_dark', { defaultValue: 'Dark' })}</option>
                 </select>
               </div>
             </div>
@@ -297,9 +318,9 @@ const Settings = () => {
             <div className="settings-toggle-group">
               <div className="toggle-row">
                 <div>
-                  <div className="label">Email notifications</div>
+                  <div className="label">{t('email_notifications', { defaultValue: 'Email notifications' })}</div>
                   <div className="description">
-                    Get important updates about your account and recipes.
+                    {t('email_notifications_desc', { defaultValue: 'Get important updates about your account and recipes.' })}
                   </div>
                 </div>
                 <div
@@ -310,9 +331,9 @@ const Settings = () => {
 
               <div className="toggle-row">
                 <div>
-                  <div className="label">Recipe suggestions</div>
+                  <div className="label">{t('recipe_suggestions', { defaultValue: 'Recipe suggestions' })}</div>
                   <div className="description">
-                    Receive personalized recipe ideas based on your food plan.
+                    {t('recipe_suggestions_desc', { defaultValue: 'Receive personalized recipe ideas based on your food plan.' })}
                   </div>
                 </div>
                 <div
@@ -324,110 +345,110 @@ const Settings = () => {
 
             <div className="dashboard-section">
               <div className="dashboard-header">
-                <h3>Food Plan Profile</h3>
+                <h3>{t('food_plan_profile', { defaultValue: 'Food Plan Profile' })}</h3>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Primary goal</label>
+                  <label>{t('primary_goal', { defaultValue: 'Primary goal' })}</label>
                   <select
                     name="goal"
                     value={settings.foodProfile.goal}
                     onChange={handleFoodProfileChange}
                   >
-                    <option value="balanced">Balanced</option>
-                    <option value="gym">Gym / High Protein</option>
-                    <option value="weight-loss">Weight Loss</option>
-                    <option value="diabetic">Diabetic Friendly</option>
-                    <option value="heart-healthy">Heart Healthy</option>
-                    <option value="pcos-friendly">PCOS Friendly</option>
-                    <option value="low-sodium">Kidney / Low Sodium</option>
-                    <option value="kids-lunchbox">Kids Lunchbox</option>
+                    <option value="balanced">{t('goal_balanced', { defaultValue: 'Balanced' })}</option>
+                    <option value="gym">{t('goal_gym', { defaultValue: 'Gym / High Protein' })}</option>
+                    <option value="weight-loss">{t('goal_weight_loss', { defaultValue: 'Weight Loss' })}</option>
+                    <option value="diabetic">{t('goal_diabetic', { defaultValue: 'Diabetic Friendly' })}</option>
+                    <option value="heart-healthy">{t('goal_heart_healthy', { defaultValue: 'Heart Healthy' })}</option>
+                    <option value="pcos-friendly">{t('goal_pcos', { defaultValue: 'PCOS Friendly' })}</option>
+                    <option value="low-sodium">{t('goal_low_sodium', { defaultValue: 'Kidney / Low Sodium' })}</option>
+                    <option value="kids-lunchbox">{t('goal_kids_lunchbox', { defaultValue: 'Kids Lunchbox' })}</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label>Daily calorie target</label>
+                  <label>{t('daily_calorie_target', { defaultValue: 'Daily calorie target' })}</label>
                   <input
                     type="number"
                     name="calorieTarget"
                     value={settings.foodProfile.calorieTarget}
                     onChange={handleFoodProfileChange}
-                    placeholder="e.g. 2200"
+                    placeholder={t('daily_calorie_target_placeholder', { defaultValue: 'e.g. 2200' })}
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label>Health conditions</label>
+                <label>{t('health_conditions', { defaultValue: 'Health conditions' })}</label>
                 <input
                   value={settings.foodProfile.conditions.join(', ')}
                   onChange={(e) => handleCsvFoodField('conditions', e.target.value)}
-                  placeholder="e.g. diabetic, vegetarian"
+                  placeholder={t('health_conditions_placeholder', { defaultValue: 'e.g. diabetic, vegetarian' })}
                 />
-                <div className="field-hint">Comma separated values.</div>
+                <div className="field-hint">{t('comma_separated_values', { defaultValue: 'Comma separated values.' })}</div>
               </div>
 
               <div className="form-group">
-                <label>Preferred cuisines</label>
+                <label>{t('preferred_cuisines', { defaultValue: 'Preferred cuisines' })}</label>
                 <input
                   value={settings.foodProfile.preferredCuisines.join(', ')}
                   onChange={(e) => handleCsvFoodField('preferredCuisines', e.target.value)}
-                  placeholder="e.g. Indian, Mediterranean"
+                  placeholder={t('preferred_cuisines_placeholder', { defaultValue: 'e.g. Indian, Mediterranean' })}
                 />
               </div>
 
               <div className="form-group">
-                <label>Avoid ingredients</label>
+                <label>{t('avoid_ingredients', { defaultValue: 'Avoid ingredients' })}</label>
                 <input
                   value={settings.foodProfile.avoidIngredients.join(', ')}
                   onChange={(e) => handleCsvFoodField('avoidIngredients', e.target.value)}
-                  placeholder="e.g. sugar, butter, white bread"
+                  placeholder={t('avoid_ingredients_placeholder', { defaultValue: 'e.g. sugar, butter, white bread' })}
                 />
               </div>
             </div>
 
             <div className="form-actions" style={{ marginTop: '1rem' }}>
               <button type="submit" className="btn-primary" disabled={saving}>
-                {saving ? 'Saving...' : 'Save Settings'}
+                {saving ? t('saving') : t('save_settings', { defaultValue: 'Save Settings' })}
               </button>
             </div>
           </form>
 
           <div className="dashboard-section">
             <div className="dashboard-header">
-              <h3>Pantry Inventory</h3>
+              <h3>{t('pantry_inventory', { defaultValue: 'Pantry Inventory' })}</h3>
             </div>
             <div className="form-row">
               <div className="form-group">
                 <input
                   value={pantryDraft.name}
                   onChange={(e) => setPantryDraft((prev) => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ingredient name"
+                  placeholder={t('ingredient_name', { defaultValue: 'Ingredient name' })}
                 />
               </div>
               <div className="form-group">
                 <input
                   value={pantryDraft.quantity}
                   onChange={(e) => setPantryDraft((prev) => ({ ...prev, quantity: e.target.value }))}
-                  placeholder="Quantity"
+                  placeholder={t('quantity', { defaultValue: 'Quantity' })}
                 />
               </div>
               <div className="form-group">
                 <input
                   value={pantryDraft.unit}
                   onChange={(e) => setPantryDraft((prev) => ({ ...prev, unit: e.target.value }))}
-                  placeholder="Unit"
+                  placeholder={t('unit', { defaultValue: 'Unit' })}
                 />
               </div>
             </div>
             <div className="form-actions" style={{ marginTop: '0.5rem' }}>
               <button type="button" className="btn-primary" onClick={addPantryItem}>
-                Add Pantry Item
+                {t('add_pantry_item', { defaultValue: 'Add Pantry Item' })}
               </button>
             </div>
             {pantry.length === 0 ? (
-              <div className="dashboard-empty">No pantry items yet.</div>
+              <div className="dashboard-empty">{t('no_pantry_items_yet', { defaultValue: 'No pantry items yet.' })}</div>
             ) : (
               <div className="dashboard-recipes">
                 {pantry.map((item, index) => (
@@ -439,7 +460,7 @@ const Settings = () => {
                       </div>
                       <div className="dashboard-recipe-actions">
                         <button type="button" className="btn-ghost btn-ghost--danger" onClick={() => removePantryItem(index)}>
-                          Remove
+                          {t('remove', { defaultValue: 'Remove' })}
                         </button>
                       </div>
                     </div>
@@ -451,29 +472,29 @@ const Settings = () => {
 
 	          <div className="dashboard-section">
 	            <div className="dashboard-header">
-	              <h3>Family / Shared Planner</h3>
+	              <h3>{t('family_shared_planner', { defaultValue: 'Family / Shared Planner' })}</h3>
 	            </div>
               {!isPremiumSubscription(subscription) && (
-                <div className="dashboard-empty">Premium plan required to create or join family groups.</div>
+                <div className="dashboard-empty">{t('premium_required_family_groups', { defaultValue: 'Premium plan required to create or join family groups.' })}</div>
               )}
 	            <div className="form-row">
 	              <div className="form-group">
-	                <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder="Create family group" />
+	                <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder={t('create_family_group', { defaultValue: 'Create family group' })} />
 	              </div>
 	              <div className="form-group">
-	                <button type="button" className="btn-primary" onClick={createFamilyGroup} disabled={!isPremiumSubscription(subscription)}>Create Group</button>
+	                <button type="button" className="btn-primary" onClick={createFamilyGroup} disabled={!isPremiumSubscription(subscription)}>{t('create_group', { defaultValue: 'Create Group' })}</button>
 	              </div>
 	            </div>
 	            <div className="form-row">
 	              <div className="form-group">
-	                <input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Join with invite code" />
+	                <input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder={t('join_with_invite_code', { defaultValue: 'Join with invite code' })} />
 	              </div>
 	              <div className="form-group">
-	                <button type="button" className="btn-outlined" onClick={joinFamilyGroup} disabled={!isPremiumSubscription(subscription)}>Join Group</button>
+	                <button type="button" className="btn-outlined" onClick={joinFamilyGroup} disabled={!isPremiumSubscription(subscription)}>{t('join_group', { defaultValue: 'Join Group' })}</button>
 	              </div>
 	            </div>
             {familyGroups.length === 0 ? (
-              <div className="dashboard-empty">No family groups yet.</div>
+              <div className="dashboard-empty">{t('no_family_groups_yet', { defaultValue: 'No family groups yet.' })}</div>
             ) : (
               <div className="dashboard-recipes">
                 {familyGroups.map((group) => (
@@ -481,9 +502,9 @@ const Settings = () => {
                     <div className="dashboard-recipe-card__body">
                       <div>
                         <h4>{group.name}</h4>
-                        <p>Invite code: {group.inviteCode}</p>
+                        <p>{t('invite_code', { defaultValue: 'Invite code' })}: {group.inviteCode}</p>
                         <div className="dashboard-recipe-meta">
-                          <span>{group.members?.length || 0} members</span>
+                          <span>{group.members?.length || 0} {t('members', { defaultValue: 'members' })}</span>
                         </div>
                       </div>
                     </div>

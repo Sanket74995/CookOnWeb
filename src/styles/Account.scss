@@ -311,6 +311,24 @@
   line-height: 1.6;
 }
 
+.subscription-badge-line {
+  display: inline-flex;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(197, 106, 27, 0.14);
+  color: var(--brand);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.subscription-spotlight {
+  margin-top: 0.75rem;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .subscription-price-pill {
   white-space: nowrap;
   padding: 0.7rem 1rem;
@@ -399,6 +417,73 @@
 
 .subscription-plan-card__footer {
   margin-top: 1rem;
+}
+
+.subscription-section {
+  margin-top: 1.4rem;
+}
+
+.subscription-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.subscription-highlight-card {
+  padding: 1rem;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+
+  strong {
+    display: block;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  p {
+    margin-top: 0.45rem;
+    color: var(--text-soft);
+    line-height: 1.5;
+    font-size: 0.9rem;
+  }
+}
+
+.subscription-module-list,
+.subscription-plan-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.subscription-module-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0.95rem;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text-soft);
+
+  .value {
+    color: var(--text);
+    font-weight: 700;
+    text-align: right;
+  }
+}
+
+.subscription-note,
+.subscription-card-note {
+  margin-top: 0.85rem;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.subscription-card-badge {
+  margin-top: 0.85rem;
 }
 
 .settings-toggle-group {
@@ -559,6 +644,10 @@
   }
 
   .subscription-plan-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .subscription-highlight-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

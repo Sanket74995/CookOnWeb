@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
-const { createJsonReply, isDeepSeekEnabled } = require('../services/deepseekService');
+const { createJsonReply, isAIEnabled } = require('../services/deepseekService');
 
 const DIETARY_FILTERS = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'high-protein', 'low-carb', 'diabetic-friendly', 'heart-healthy'];
 const INGREDIENT_EXCLUSIONS = {
@@ -329,7 +329,7 @@ const sanitizeGeneratedRecipe = (candidate, fallbackRecipe) => {
 const generateRecipeIdeaWithAI = async (ingredients = [], options = {}, sourceRecipes = []) => {
     const fallbackRecipe = buildGeneratedRecipe(ingredients, options, sourceRecipes);
 
-    if (!isDeepSeekEnabled()) {
+    if (!isAIEnabled()) {
         return fallbackRecipe;
     }
 
@@ -363,7 +363,7 @@ const generateRecipeIdeaWithAI = async (ingredients = [], options = {}, sourceRe
 
         return sanitizeGeneratedRecipe(aiRecipe, fallbackRecipe);
     } catch (error) {
-        console.error('DeepSeek recipe generation failed, using fallback:', error.message);
+        console.error('AI recipe generation failed, using fallback:', error.message);
         return fallbackRecipe;
     }
 };
@@ -377,7 +377,7 @@ const buildDefaultMatchReason = (recipe) => {
 };
 
 const enhanceRecommendationReasonsWithAI = async (recipes = [], foodProfile = {}) => {
-    if (!isDeepSeekEnabled() || !recipes.length) {
+    if (!isAIEnabled() || !recipes.length) {
         return recipes.map((recipe) => ({
             ...recipe,
             matchReason: recipe.matchReason || buildDefaultMatchReason(recipe)
@@ -425,7 +425,7 @@ const enhanceRecommendationReasonsWithAI = async (recipes = [], foodProfile = {}
             matchReason: matchReasonMap.get(String(recipe._id)) || recipe.matchReason || buildDefaultMatchReason(recipe)
         }));
     } catch (error) {
-        console.error('DeepSeek recommendation enrichment failed, using fallback:', error.message);
+        console.error('AI recommendation enrichment failed, using fallback:', error.message);
         return recipes.map((recipe) => ({
             ...recipe,
             matchReason: recipe.matchReason || buildDefaultMatchReason(recipe)

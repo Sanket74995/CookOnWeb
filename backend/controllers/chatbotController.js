@@ -3,7 +3,7 @@ const Recipe = require('../models/Recipe');
 const ChatLog = require('../models/ChatLog');
 const User = require('../models/User');
 const MealPlan = require('../models/MealPlan');
-const { createTextReply, isDeepSeekEnabled } = require('../services/deepseekService');
+const { createTextReply, isAIEnabled } = require('../services/deepseekService');
 
 const COMMON_INGREDIENTS = [
   'potato', 'aloo', 'rice', 'chawal', 'chicken', 'paneer', 'tomato', 'onion', 'garlic',
@@ -797,8 +797,8 @@ const buildLLMContext = ({
   };
 };
 
-const generateDeepSeekReply = async (context) => {
-  if (!isDeepSeekEnabled()) return null;
+const generateAIReply = async (context) => {
+  if (!isAIEnabled()) return null;
 
   const systemPrompt = [
     'You are CookOnWeb\'s recipe assistant.',
@@ -1163,7 +1163,7 @@ const processQuery = async (req, res) => {
     responseMessage = localReply;
 
     try {
-      const llmReply = await generateDeepSeekReply(buildLLMContext({
+      const llmReply = await generateAIReply(buildLLMContext({
         userMessage: message,
         parsedQuery,
         recipes,
@@ -1180,9 +1180,7 @@ const processQuery = async (req, res) => {
         responseMessage = llmReply;
       }
     } catch (llmError) {
-      const label = llmError.message.includes('DeepSeek')
-        ? 'DeepSeek unavailable, using local fallback:'
-        : 'AI reply generation failed, using local fallback:';
+      const label = 'AI reply generation failed, using local fallback:';
       console.error(label, llmError.message);
     }
 

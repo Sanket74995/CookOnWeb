@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from "./Sidebar";
 import './../styles/Navbar.scss';
+import { clearStoredSubscriptionDetails } from '../utils/subscription';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +53,7 @@ const Navbar = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        clearStoredSubscriptionDetails();
         setUser(null);
         setIsProfileOpen(false);
         navigate('/');

@@ -4,7 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/Collections.scss';
 import Loader from './Loader';
-import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from '../utils/subscription';
+import {
+    fetchSubscriptionDetails,
+    getPremiumFeatureMessage,
+    getStoredSubscriptionDetails,
+    isPremiumSubscription,
+    subscribeToSubscriptionChanges,
+} from '../utils/subscription';
 
 const Collections = () => {
     const navigate = useNavigate();
@@ -19,11 +25,12 @@ const Collections = () => {
         tags: ''
     });
     const [saving, setSaving] = useState(false);
-    const [subscription, setSubscription] = useState(null);
+    const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
 
     useEffect(() => {
         fetchCollections();
         fetchSubscriptionDetails().then(setSubscription).catch(() => null);
+        return subscribeToSubscriptionChanges(setSubscription);
     }, []);
 
     const fetchCollections = async () => {

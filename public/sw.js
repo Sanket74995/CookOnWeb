@@ -110,19 +110,34 @@ async function handleApiRequest(request) {
   });
 }
 
-// Handle static requests with cache-first strategy
+// Handle static requests.
+// Documents use network-first to avoid showing an older app shell after deploys.
+// Other assets can still use cache-first for speed.
 async function handleStaticRequest(request) {
-  // Try cache first
+  if (request.destination === 'document') {
+    try {
+      const networkResponse = await fetch(request, { cache: 'no-store' });
+      if (networkResponse.ok) {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch (error) {
+      const cachedResponse = await caches.match(request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+    }
+  }
+
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
     return cachedResponse;
   }
 
   try {
-    // Try network
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      // Cache the response
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
     }

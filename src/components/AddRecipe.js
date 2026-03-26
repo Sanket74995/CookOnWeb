@@ -4,7 +4,13 @@ import { useTranslation } from 'react-i18next';
 import "../styles/AddRecipe.scss";
 import Loader from "./Loader";
 import { API_BASE } from "../config";
-import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from "../utils/subscription";
+import {
+  fetchSubscriptionDetails,
+  getPremiumFeatureMessage,
+  getStoredSubscriptionDetails,
+  isPremiumSubscription,
+  subscribeToSubscriptionChanges,
+} from "../utils/subscription";
 
 const API = `${API_BASE}/api/recipes`;
 
@@ -36,7 +42,7 @@ const AddRecipe = () => {
   const [loading, setLoading] = useState(isEditMode);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -47,6 +53,8 @@ const AddRecipe = () => {
     fetchSubscriptionDetails()
       .then(setSubscription)
       .catch((error) => console.error("Failed to load subscription:", error));
+
+    return subscribeToSubscriptionChanges(setSubscription);
   }, [isEditMode]);
 
   useEffect(() => {

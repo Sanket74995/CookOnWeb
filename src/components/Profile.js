@@ -4,6 +4,12 @@ import { useTranslation } from 'react-i18next';
 import '../styles/Account.scss';
 import Loader from './Loader';
 import { API_BASE } from '../config';
+import {
+  fetchSubscriptionDetails,
+  getStoredSubscriptionDetails,
+  isPremiumSubscription,
+  subscribeToSubscriptionChanges,
+} from '../utils/subscription';
 
 const AUTH_API = `${API_BASE}/api/auth`;
 const RECIPE_API = `${API_BASE}/api/recipes`;
@@ -15,6 +21,7 @@ const Profile = () => {
   const [accountUser, setAccountUser] = useState(null);
   const [myRecipes, setMyRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(true);
+  const [subscription, setSubscription] = useState(() => getStoredSubscriptionDetails());
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -82,6 +89,9 @@ const Profile = () => {
 
     fetchProfile();
     fetchMyRecipes();
+    fetchSubscriptionDetails().then(setSubscription).catch(() => null);
+
+    return subscribeToSubscriptionChanges(setSubscription);
   }, [navigate]);
 
   const handleChange = (e) => {
@@ -206,6 +216,11 @@ const Profile = () => {
               <button type="button" className="btn-ghost" onClick={() => navigate('/add-recipe')}>
                 Add Recipe
               </button>
+              {!isPremiumSubscription(subscription) && (
+                <button type="button" className="btn-outlined" onClick={() => navigate('/subscription')}>
+                  Upgrade to Premium
+                </button>
+              )}
             </div>
           </form>
 
@@ -295,7 +310,24 @@ const Profile = () => {
                 <span>Status</span>
                 <span className="status-pill">Active</span>
               </li>
+              <li>
+                <span>Plan</span>
+                <span className="value">{subscription?.planName || 'Free'}</span>
+              </li>
             </ul>
+
+            <div className="subscription-note" style={{ marginTop: '1rem' }}>
+              {isPremiumSubscription(subscription)
+                ? 'Premium is active. You can publish recipes, build collections, and use family planning tools.'
+                : 'Free plan is active. Upgrade to unlock publishing, collections, and family planning.'}
+            </div>
+            {!isPremiumSubscription(subscription) && (
+              <div className="form-actions" style={{ marginTop: '1rem' }}>
+                <button type="button" className="btn-primary" onClick={() => navigate('/subscription')}>
+                  View Premium Plans
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

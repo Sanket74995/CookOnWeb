@@ -30,24 +30,63 @@ const SUBSCRIPTION_PLANS = {
     id: 'free',
     name: 'Free',
     priceMonthly: 0,
-    description: 'Good for exploring recipes and core planning tools.',
+    priceYearly: 0,
+    trialDays: 0,
+    description: 'Good for exploring recipes, planning meals, and setting up your kitchen profile.',
+    audience: 'Best for casual home cooks getting started.',
+    badge: 'Starter',
+    spotlight: 'Plan your week, store pantry basics, and discover recipes before upgrading.',
     features: [
-      'Browse and save recipes',
+      'Browse public recipes',
       'Weekly meal planner',
-      'Basic AI help',
-      'Collections and favorites'
+      'Pantry inventory',
+      'Basic AI cooking help',
+      'Profile and nutrition settings'
+    ],
+    modules: [
+      { key: 'planner', label: 'Meal planner', value: 'Included' },
+      { key: 'pantry', label: 'Pantry tracker', value: 'Included' },
+      { key: 'ai', label: 'AI assistant', value: 'Limited' },
+      { key: 'collections', label: 'Recipe collections', value: 'Premium only' },
+      { key: 'family', label: 'Family groups', value: 'Premium only' },
+      { key: 'publishing', label: 'Publish recipes', value: 'Premium only' }
+    ],
+    highlights: [
+      'Weekly planning tools included',
+      'Personal pantry and nutrition profile',
+      'Great for exploring before upgrading'
     ]
   },
   premium: {
     id: 'premium',
     name: 'Premium',
     priceMonthly: 199,
-    description: 'Best for daily cooking, planning, and AI-powered help.',
+    priceYearly: 1990,
+    trialDays: 7,
+    description: 'Best for daily cooking, premium publishing, family planning, and deeper personalization.',
+    audience: 'Best for creators, families, and serious meal planners.',
+    badge: 'Most Popular',
+    spotlight: 'Unlock premium recipe publishing, shared planning, smarter organization, and faster support.',
     features: [
       'Unlimited AI chatbot help',
-      'Smarter recipe ideas from pantry',
-      'Priority access to new features',
-      'Full planner and profile personalization'
+      'Publish and manage your own recipes',
+      'Private and public recipe collections',
+      'Family groups and shared planning',
+      'Priority access to new cooking tools'
+    ],
+    modules: [
+      { key: 'planner', label: 'Meal planner', value: 'Included' },
+      { key: 'pantry', label: 'Pantry tracker', value: 'Included' },
+      { key: 'ai', label: 'AI assistant', value: 'Unlimited' },
+      { key: 'collections', label: 'Recipe collections', value: 'Unlimited' },
+      { key: 'family', label: 'Family groups', value: 'Included' },
+      { key: 'publishing', label: 'Publish recipes', value: 'Included' }
+    ],
+    highlights: [
+      'Create and publish recipes',
+      'Organize unlimited collections',
+      'Collaborate with family members',
+      'Priority support and early feature access'
     ]
   }
 };
@@ -72,12 +111,22 @@ const normalizeSubscription = (subscription = {}) => {
     renewalAt,
     cancelledAt,
     priceMonthly: basePlan.priceMonthly,
+    priceYearly: basePlan.priceYearly,
+    trialDays: basePlan.trialDays,
     description: basePlan.description,
+    audience: basePlan.audience,
+    badge: basePlan.badge,
+    spotlight: basePlan.spotlight,
     features: basePlan.features,
+    modules: basePlan.modules,
+    highlights: basePlan.highlights,
     limits: {
       aiChats: planId === 'premium' ? 'Unlimited' : 'Limited',
       premiumRecipes: planId === 'premium',
       plannerSync: true,
+      recipePublishing: planId === 'premium',
+      collections: planId === 'premium' ? 'Unlimited' : 'Locked',
+      familyGroups: planId === 'premium' ? 'Included' : 'Locked',
       support: planId === 'premium' ? 'Priority' : 'Standard'
     }
   };
@@ -86,6 +135,28 @@ const normalizeSubscription = (subscription = {}) => {
 const buildSubscriptionPayload = (user) => ({
   subscription: normalizeSubscription(user?.subscription || {}),
   plans: Object.values(SUBSCRIPTION_PLANS),
+  premiumModules: [
+    {
+      id: 'recipe-publishing',
+      title: 'Recipe Publishing',
+      summary: 'Let creators publish and manage recipes directly from their profile.'
+    },
+    {
+      id: 'collections',
+      title: 'Collections',
+      summary: 'Save themed recipe boards for events, prep plans, and seasonal cooking.'
+    },
+    {
+      id: 'family-planner',
+      title: 'Family Planner',
+      summary: 'Share invite-based planning and group coordination for home cooking.'
+    }
+  ],
+  retention: {
+    annualSavings: SUBSCRIPTION_PLANS.premium.priceMonthly * 12 - SUBSCRIPTION_PLANS.premium.priceYearly,
+    promise: 'Cancel anytime. Premium access remains active until the current billing period ends.',
+    trialMessage: `${SUBSCRIPTION_PLANS.premium.trialDays}-day premium trial included in this mock flow.`
+  },
   canUpgrade: normalizeSubscription(user?.subscription || {}).plan !== 'premium',
   canCancel: normalizeSubscription(user?.subscription || {}).plan === 'premium'
 });

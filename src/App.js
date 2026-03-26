@@ -104,7 +104,10 @@ function App() {
   const handleVoiceCommand = (command) => {
     if (command.includes('scan') || command.includes('barcode') || command.includes('camera')) {
       setShowBarcodeScanner(true);
+      return true;
     }
+
+    return false;
   };
 
   return (
