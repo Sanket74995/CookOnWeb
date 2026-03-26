@@ -15,9 +15,10 @@
 .DS_Store
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+backend/.env
+backend/.env.local
+backend/.env.*.local
 
 # local backend dependencies + generated artifacts
 backend/node_modules/

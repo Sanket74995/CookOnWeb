@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const connectDB = require('./DB');
 
+// Routes
 const authRoutes = require('./routes/auth');
 const recipeRoutes = require('./routes/recipes');
 const chatbotRoutes = require('./routes/chatbot');
@@ -17,6 +18,7 @@ const collaborationRoutes = require('./routes/collaboration');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Rate Limiter
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 120,
@@ -25,6 +27,7 @@ const limiter = rateLimit({
     message: { error: 'Too many requests; please try again later.' }
 });
 
+// Logger
 const logger = {
     info: (message, data) => {
         if (process.env.NODE_ENV !== 'test') console.info('[INFO]', message, data || '');
@@ -33,9 +36,15 @@ const logger = {
     error: (message, data) => console.error('[ERROR]', message, data || '')
 };
 
-// Security middleware
+// 🔐 Security Middleware
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:3000' }));
+
+// ✅ FIXED CORS (important for deployment)
+app.use(cors({
+    origin: "*",
+    credentials: true
+}));
+
 app.use(limiter);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
@@ -56,17 +65,18 @@ app.get('/', (req, res) => {
     res.json({ message: 'Welcome to the CookOnWeb API!' });
 });
 
-// Start server unless running tests
+// 🔥 Start Server
 if (process.env.NODE_ENV !== 'test') {
     connectDB()
         .then(() => {
-            logger.info('Connected to MongoDB');
+            logger.info('✅ Connected to MongoDB');
+
             app.listen(PORT, () => {
-                logger.info(`Server is running on http://localhost:${PORT}`);
+                logger.info(`🚀 Server running on port ${PORT}`);
             });
         })
         .catch((error) => {
-            logger.error('MongoDB connection error', error);
+            console.error('❌ FULL ERROR:', error); // important for Render logs
             process.exit(1);
         });
 }

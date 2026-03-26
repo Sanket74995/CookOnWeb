@@ -21,13 +21,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "seed-recipes": "node backend/scripts/seedRecipes.js",
-    "dev:backend": "cd backend && node index.js",
-    "dev": "concurrently \"npm run dev:backend\" \"npm start\""
+    "dev:backend": "cd backend && node index.js"
   },
   "eslintConfig": {
     "extends": [
