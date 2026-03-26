@@ -21,8 +21,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node backend/index.js",
+    "start:frontend": "react-scripts start",
+    "dev": "nodemon backend/index.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "seed-recipes": "node backend/scripts/seedRecipes.js",
