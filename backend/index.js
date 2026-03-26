@@ -27,7 +27,7 @@ const limiter = rateLimit({
 
 const logger = {
     info: (message, data) => {
-        process.env.NODE_ENV === 'test' ? null : console.info('[INFO]', message, data || '');
+        if (process.env.NODE_ENV !== 'test') console.info('[INFO]', message, data || '');
     },
     warn: (message, data) => console.warn('[WARN]', message, data || ''),
     error: (message, data) => console.error('[ERROR]', message, data || '')
