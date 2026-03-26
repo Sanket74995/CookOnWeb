@@ -1,70 +1,145 @@
-# Getting Started with Create React App
+# CookOnWeb
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack cooking application with recipe management, meal planning, AI recommendations, and collaborative cooking features.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- User authentication and profiles
+- Recipe creation and management
+- Meal planning
+- AI-powered recipe recommendations
+- Collaborative cooking sessions
+- Nutrition analytics
+- Voice assistant
+- Barcode scanner for ingredients
+- Collections for organizing recipes
+- Multi-language support (English and Hindi)
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React.js, Sass, i18next for internationalization
+- **Backend**: Node.js, Express.js, MongoDB with Mongoose
+- **AI**: DeepSeek API integration
+- **Authentication**: JWT
+- **Deployment**: Ready for static hosting (frontend) and server hosting (backend)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v16 or higher)
+- MongoDB (local or cloud instance)
+- npm or yarn
 
-### `npm run build`
+### Backend Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Create a `.env` file in the backend directory with the following variables:
+   ```
+   PORT=5000
+   MONGODB_URI=mongodb://127.0.0.1:27017/cookonweb
+   JWT_SECRET=your_jwt_secret_here
+   FRONTEND_ORIGIN=http://localhost:3000
+   DEEPSEEK_API_KEY=your_deepseek_api_key
+   ```
 
-### `npm run eject`
+4. Start the backend server:
+   ```bash
+   npm start
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Frontend Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Navigate to the root directory:
+   ```bash
+   cd ..
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-## Learn More
+The app will be available at `http://localhost:3000`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Building for Production
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Frontend Build
 
-### Code Splitting
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+This creates a `build` folder with the production-ready files.
 
-### Analyzing the Bundle Size
+### Backend Production
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Set `NODE_ENV=production` in your environment variables.
 
-### Making a Progressive Web App
+## Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Frontend Deployment
 
-### Advanced Configuration
+The built frontend can be deployed to any static hosting service like:
+- Vercel
+- Netlify
+- GitHub Pages
+- AWS S3 + CloudFront
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Backend Deployment
 
-### Deployment
+Deploy the backend to a server or cloud platform like:
+- Heroku
+- DigitalOcean
+- AWS EC2
+- Railway
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Make sure to set the `FRONTEND_ORIGIN` environment variable to your frontend's URL in production.
 
-### `npm run build` fails to minify
+### Database
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Use MongoDB Atlas for cloud database or set up MongoDB on your server.
+
+## API Endpoints
+
+- `/api/auth` - Authentication
+- `/api/recipes` - Recipe management
+- `/api/meal-plans` - Meal planning
+- `/api/chatbot` - AI chatbot
+- `/api/collections` - Recipe collections
+- `/api/nutrition` - Nutrition analytics
+- `/api/collaboration` - Collaborative cooking
+
+## Testing
+
+Run backend tests:
+```bash
+cd backend
+npm test
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
+
+## License
+
+ISC
