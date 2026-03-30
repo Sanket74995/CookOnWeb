@@ -833,6 +833,53 @@ const formatList = (items = [], limit = 3) =>
     .slice(0, limit)
     .join(', ');
 
+const buildBuiltinAssistantHint = (signals = null) => {
+  const goal = String(signals?.foodProfile?.goal || '').replace(/-/g, ' ').trim();
+  const preferredCuisine = signals?.foodProfile?.preferredCuisines?.[0];
+  const topTag = signals?.topTags?.[0];
+
+  const suggestions = [
+    'quick Indian breakfast',
+    'high-protein vegetarian dinner',
+    'recipes with paneer, onion, tomato',
+    'kids lunchbox ideas',
+    'make my shopping list'
+  ];
+
+  if (goal) {
+    suggestions.unshift(`${goal} meal ideas`);
+  }
+
+  if (preferredCuisine) {
+    suggestions.unshift(`${preferredCuisine} dinner ideas`);
+  }
+
+  if (topTag) {
+    suggestions.unshift(`${topTag} recipes`);
+  }
+
+  return `Try asking: ${suggestions.slice(0, 4).map((item) => `"${item}"`).join(', ')}.`;
+};
+
+const buildNoMatchReply = (parsedQuery, signals = null) => {
+  const helpers = {
+    ingredients: `I couldn't find a strong recipe match for ${formatList(parsedQuery.ingredients || [], 3)} yet.`,
+    dietary: `I couldn't find enough ${parsedQuery.dietary} matches right now.`,
+    cuisine: `I couldn't find enough ${parsedQuery.cuisine} recipes right now.`,
+    category: `I couldn't find enough ${parsedQuery.category} recipes right now.`,
+    specific_recipe: `I couldn't find a close match for ${parsedQuery.recipeName} yet.`,
+    preference: `I couldn't find strong matches for ${formatList(parsedQuery.preferenceTags || [], 3)} right now.`,
+    shopping_list: 'I could not find a saved meal plan yet to build a shopping list from.',
+    meal_plan: 'I could not create a meal plan yet.',
+    scale_recipe: 'Tell me which recipe to scale, for example: "scale paneer curry to 4 servings".',
+    generate_recipe: 'Tell me two or three ingredients and I can generate a simple recipe idea from them.',
+    random: 'I can still help using the built-in recipe search even without an AI provider.',
+    unknown: 'I can still help using the built-in recipe search even without an AI provider.'
+  };
+
+  return `${helpers[parsedQuery.type] || helpers.unknown} ${buildBuiltinAssistantHint(signals)}`.trim();
+};
+
 const buildRecipeReason = (recipe, parsedQuery, signals) => {
   const reasons = [];
   const totalTime = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
@@ -934,7 +981,7 @@ const buildAssistantReply = ({
     return `${introByType[parsedQuery.type] || fallbackMessage || 'Here are some suggestions.'}\n\n${summary}${learningMessage ? `\n\n${learningMessage}` : ''}${memoryHint ? `\n\n${memoryHint}` : ''}`.trim();
   }
 
-  return fallbackMessage || "I couldn't find a strong match yet, but try giving me a main ingredient, cuisine, meal type, or health goal.";
+  return fallbackMessage || buildNoMatchReply(parsedQuery, signals);
 };
 
 const createWeeklyMealPlan = async (user, signals) => {
@@ -994,6 +1041,8 @@ const processQuery = async (req, res) => {
     const sessionMemory = await getSessionMemory(sessionId);
     const query = message.toLowerCase().trim();
     const parsedQuery = parseUserQuery(query);
+    const aiEnabled = isAIEnabled();
+    let assistantMode = aiEnabled ? 'ai' : 'builtin';
 
     let recipes = [];
     let responseMessage = '';
@@ -1033,6 +1082,7 @@ const processQuery = async (req, res) => {
         recipes: [],
         queryType: parsedQuery.type,
         logId: chatLog._id,
+        assistantMode: aiEnabled ? 'ai' : 'builtin',
         learnedFrom: {
           source: null,
           foodProfileGoal: null,
@@ -1178,10 +1228,12 @@ const processQuery = async (req, res) => {
 
       if (llmReply) {
         responseMessage = llmReply;
+        assistantMode = 'ai';
       }
     } catch (llmError) {
       const label = 'AI reply generation failed, using local fallback:';
       console.error(label, llmError.message);
+      assistantMode = 'builtin';
     }
 
     const chatLog = await ChatLog.create({
@@ -1202,6 +1254,7 @@ const processQuery = async (req, res) => {
       mealPlan,
       scalePreview,
       queryType: parsedQuery.type,
+      assistantMode,
       logId: chatLog._id,
       learnedFrom: {
         source: parsedQuery.queryGoals?.[0] ? 'query' : signals.foodProfile?.goal ? 'food-plan' : signals.topTags.length ? 'likes' : null,

@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/RecipeCard.scss';
+import { getLocalizedField } from '../utils/recipeLocalization';
 
 const RecipeCard = ({ recipe, isFavorited = false, onToggleFavorite }) => {
     const navigate = useNavigate();
@@ -20,13 +21,8 @@ const RecipeCard = ({ recipe, isFavorited = false, onToggleFavorite }) => {
         }
     };
 
-    const title = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].title
-        ? recipe.translations[currentLang].title
-        : recipe.title;
-
-    const description = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].description
-        ? recipe.translations[currentLang].description
-        : recipe.description;
+    const title = getLocalizedField(recipe, currentLang, 'title');
+    const description = getLocalizedField(recipe, currentLang, 'description');
 
     return (
         <div className="recipe-card">

@@ -135,10 +135,10 @@ const addMessage = async (req, res) => {
         }
 
         const message = {
-            sender: req.body.type === 'system' ? null : req.userId,
+            sender: req.userId,
             senderName: participant.name,
             content: String(req.body.content || '').trim(),
-            type: req.body.type === 'system' ? 'system' : 'text',
+            type: 'text',
             timestamp: new Date()
         };
 

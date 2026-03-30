@@ -30,10 +30,19 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            setUser(JSON.parse(userData));
-        }
+        const syncUser = () => {
+            const userData = localStorage.getItem('user');
+            setUser(userData ? JSON.parse(userData) : null);
+        };
+
+        syncUser();
+        window.addEventListener('storage', syncUser);
+        window.addEventListener('focus', syncUser);
+
+        return () => {
+            window.removeEventListener('storage', syncUser);
+            window.removeEventListener('focus', syncUser);
+        };
     }, []);
 
     useEffect(() => {
@@ -59,8 +68,10 @@ const Navbar = () => {
         navigate('/');
     };
 
-    const navItems = [
-        { id: 1, key: 'home', label: t('home'), href: '/' },
+    const publicNavItems = [
+        { id: 1, key: 'home', label: t('home'), href: '/' }
+    ];
+    const protectedNavItems = [
         { id: 2, key: 'recipes', label: t('recipes'), href: '/recipes' },
         { id: 3, key: 'add_recipe', label: t('add_recipe'), href: '/add-recipe' },
         { id: 4, key: 'planner', label: t('planner'), href: '/planner' },
@@ -70,6 +81,7 @@ const Navbar = () => {
         { id: 8, key: 'nutrition', label: t('nutrition'), href: '/nutrition' },
         { id: 9, key: 'dashboard', label: t('dashboard'), href: '/dashboard' }
     ];
+    const navItems = user ? [...publicNavItems, ...protectedNavItems] : publicNavItems;
 
     return (
         <>
@@ -91,7 +103,7 @@ const Navbar = () => {
                     </Link>
                 </div>
                 <div className="navbar-right">
-                    {user && (
+                    {user ? (
                         <div className={`profile-container ${isProfileOpen ? 'open' : ''}`}>
                             <button
                                 className="profile-icon"
@@ -134,6 +146,10 @@ const Navbar = () => {
                                 </div>
                             )}
                         </div>
+                    ) : (
+                        <button className="profile-icon" onClick={() => navigate('/login')} aria-label="Login">
+                            <FontAwesomeIcon icon={faUserCircle} size="lg" />
+                        </button>
                     )}
                 </div>
             </div>

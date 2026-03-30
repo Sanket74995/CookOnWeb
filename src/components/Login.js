@@ -38,12 +38,8 @@ const Login = () => {
             newErrors.email = t('email_invalid');
         }
 
-        // Password: min 8 chars, at least one uppercase, one lowercase, one number, one special char
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!formData.password) {
             newErrors.password = t('password_required');
-        } else if (!passwordRegex.test(formData.password)) {
-            newErrors.password = t('password_strength');
         }
 
         return newErrors;

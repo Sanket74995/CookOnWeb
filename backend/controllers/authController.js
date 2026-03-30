@@ -3,6 +3,7 @@ const FamilyGroup = require('../models/FamilyGroup');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
+const { getJwtSecret } = require('../utils/jwt');
 
 const makeInviteCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 
@@ -23,6 +24,17 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8)
+});
+
+const profileSchema = z.object({
+  firstName: z.string().trim().min(1).max(50),
+  lastName: z.string().trim().min(1).max(50),
+  email: z.string().trim().email()
+});
+
+const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(8)
 });
 
 const SUBSCRIPTION_PLANS = {
@@ -155,7 +167,7 @@ const buildSubscriptionPayload = (user) => ({
   retention: {
     annualSavings: SUBSCRIPTION_PLANS.premium.priceMonthly * 12 - SUBSCRIPTION_PLANS.premium.priceYearly,
     promise: 'Cancel anytime. Premium access remains active until the current billing period ends.',
-    trialMessage: `${SUBSCRIPTION_PLANS.premium.trialDays}-day premium trial included in this mock flow.`
+    trialMessage: `${SUBSCRIPTION_PLANS.premium.trialDays}-day premium trial included in this demo flow.`
   },
   canUpgrade: normalizeSubscription(user?.subscription || {}).plan !== 'premium',
   canCancel: normalizeSubscription(user?.subscription || {}).plan === 'premium'
@@ -201,7 +213,7 @@ const register = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: newUser._id },
-      process.env.JWT_SECRET || 'your-secret-key',
+      getJwtSecret(),
       { expiresIn: '24h' }
     );
 
@@ -247,7 +259,7 @@ const login = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
+      getJwtSecret(),
       { expiresIn: '24h' }
     );
 
@@ -321,12 +333,26 @@ const getProfile = async (req, res) => {
 // ✅ NEW: PUT /api/auth/me
 const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, email } = req.body;
+    const payload = profileSchema.safeParse(req.body);
+    if (!payload.success) {
+      return res.status(400).json({ message: 'Invalid input', errors: payload.error.errors });
+    }
+
+    const { firstName, lastName, email } = payload.data;
+
+    const existingUser = await User.findOne({
+      email,
+      _id: { $ne: req.userId }
+    }).select('_id');
+
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already in use' });
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       req.userId,
       { firstName, lastName, email },
-      { new: true }
+      { new: true, runValidators: true }
     ).select('-password');
 
     res.json({ message: 'Profile updated successfully', user: updatedUser });
@@ -339,7 +365,12 @@ const updateProfile = async (req, res) => {
 // ✅ NEW: POST /api/auth/change-password
 const changePassword = async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    const payload = passwordChangeSchema.safeParse(req.body);
+    if (!payload.success) {
+      return res.status(400).json({ message: 'Invalid input', errors: payload.error.errors });
+    }
+
+    const { currentPassword, newPassword } = payload.data;
 
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -347,6 +378,10 @@ const changePassword = async (req, res) => {
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'New password must be different from current password' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -488,7 +523,7 @@ const getSubscription = async (req, res) => {
   }
 };
 
-// Simple upgrade to premium (mock, no real payment)
+// Demo upgrade to premium (no real payment)
 const upgradeSubscription = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -507,7 +542,7 @@ const upgradeSubscription = async (req, res) => {
     await user.save();
 
     res.json({
-      message: 'Upgraded to premium successfully',
+      message: 'Premium demo activated successfully',
       ...buildSubscriptionPayload(user)
     });
   } catch (err) {
@@ -535,7 +570,7 @@ const cancelSubscription = async (req, res) => {
     await user.save();
 
     res.json({
-      message: 'Subscription cancelled. Premium access stays active until the current period ends.',
+      message: 'Premium demo cancelled. Access stays active until the current period ends.',
       ...buildSubscriptionPayload(user)
     });
   } catch (err) {
@@ -564,7 +599,7 @@ const reactivateSubscription = async (req, res) => {
     await user.save();
 
     res.json({
-      message: 'Subscription reactivated successfully',
+      message: 'Premium demo reactivated successfully',
       ...buildSubscriptionPayload(user)
     });
   } catch (err) {
@@ -573,21 +608,6 @@ const reactivateSubscription = async (req, res) => {
   }
 };
 
-// 🔥 Single export object (no exports.* below this)
-module.exports = {
-  register,
-  login,
-  getFavorites,
-  addFavorite,
-  removeFavorite,
-  getProfile,
-  updateProfile,
-  changePassword,
-  getSettings,
-  updateSettings,
-  getSubscription,
-  upgradeSubscription, // 👈 add this
-};
 module.exports = {
   register,
   login,

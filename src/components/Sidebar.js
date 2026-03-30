@@ -74,18 +74,20 @@ const Sidebar = ({ isOpen, toggleSidebar, navItems }) => {
                         </Link>
                     </li>
                 ))}
-                <li key="settings">
-                    <Link
-                        to="/settings"
-                        className={location.pathname === "/settings" ? "active" : ""}
-                        onClick={toggleSidebar}
-                    >
-                        <span className="icon-wrapper">
-                            {getIcon('settings')}
-                        </span>
-                        {t('settings')}
-                    </Link>
-                </li>
+                {navItems.some((item) => item.href !== '/') && (
+                    <li key="settings">
+                        <Link
+                            to="/settings"
+                            className={location.pathname === "/settings" ? "active" : ""}
+                            onClick={toggleSidebar}
+                        >
+                            <span className="icon-wrapper">
+                                {getIcon('settings')}
+                            </span>
+                            {t('settings')}
+                        </Link>
+                    </li>
+                )}
             </ul>
 
             <div className="sidebar-footer">

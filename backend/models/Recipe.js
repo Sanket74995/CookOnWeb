@@ -77,6 +77,10 @@ const recipeSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    isPublic: {
+        type: Boolean,
+        default: true
+    },
     cuisine: {
         type: String,
         required: true,

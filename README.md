@@ -69,12 +69,17 @@ A full-stack cooking application with recipe management, meal planning, AI recom
    npm install
    ```
 
-3. Start the development server:
+3. Start the frontend development server:
    ```bash
    npm start
    ```
 
 The app will be available at `http://localhost:3000`.
+
+4. To run frontend and backend together from the project root:
+   ```bash
+   npm run dev
+   ```
 
 ## Building for Production
 

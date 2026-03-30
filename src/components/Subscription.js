@@ -132,15 +132,15 @@ const Subscription = () => {
             <div>
               <h2 className="account-header__title">Subscription</h2>
               <p className="account-header__subtitle">
-                Manage your current plan, premium access, and mock billing state.
+                Demo subscription controls for premium access and feature previews.
               </p>
             </div>
           </div>
 
           <div className="subscription-hero">
             <div>
-              <div className="account-meta">
-                Current plan: <span>{subscription?.planName || 'Free'}</span>
+                <div className="account-meta">
+                Demo plan: <span>{subscription?.planName || 'Free'}</span>
               </div>
               {subscription?.badge && <div className="subscription-badge-line">{subscription.badge}</div>}
               <h3 className="subscription-plan-title">
@@ -251,7 +251,7 @@ const Subscription = () => {
                 onClick={() => runSubscriptionAction('upgrade', 'Upgraded successfully')}
                 disabled={actionLoading === 'upgrade'}
               >
-                {actionLoading === 'upgrade' ? 'Upgrading...' : 'Upgrade to Premium'}
+                {actionLoading === 'upgrade' ? 'Activating demo...' : 'Activate Premium Demo'}
               </button>
             )}
 
@@ -261,7 +261,7 @@ const Subscription = () => {
                 onClick={() => runSubscriptionAction('cancel', 'Subscription cancelled')}
                 disabled={actionLoading === 'cancel'}
               >
-                {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Premium'}
+                {actionLoading === 'cancel' ? 'Cancelling demo...' : 'Cancel Premium Demo'}
               </button>
             )}
 
@@ -271,7 +271,7 @@ const Subscription = () => {
                 onClick={() => runSubscriptionAction('reactivate', 'Subscription reactivated')}
                 disabled={actionLoading === 'reactivate'}
               >
-                {actionLoading === 'reactivate' ? 'Reactivating...' : 'Reactivate Premium'}
+                {actionLoading === 'reactivate' ? 'Reactivating demo...' : 'Reactivate Premium Demo'}
               </button>
             )}
           </div>

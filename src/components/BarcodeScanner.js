@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/BarcodeScanner.scss';
 import Loader from './Loader';
@@ -98,9 +97,6 @@ const BarcodeScanner = ({ onScan, onClose }) => {
       const productData = await fetchProductInfo(barcode);
       setProductInfo(productData);
 
-      if (onScan) {
-        onScan({ barcode, product: productData });
-      }
     } catch (err) {
       console.error('Error fetching product info:', err);
       setError(t('failed_fetch_product_info'));
@@ -166,17 +162,14 @@ const BarcodeScanner = ({ onScan, onClose }) => {
   };
 
   const addToPantry = () => {
-    if (productInfo) {
-      // In a real app, you'd save to user's pantry
-      alert(t('added_to_pantry', { name: productInfo.name }));
-      onClose && onClose();
+    if (productInfo && onScan) {
+      onScan({ barcode: scannedCode, product: productInfo, destination: 'pantry' });
     }
   };
 
   const addToShoppingList = () => {
     if (productInfo) {
-      // In a real app, you'd add to shopping list
-      alert(t('added_to_shopping_list', { name: productInfo.name }));
+      alert(t('shopping_list_not_ready', { defaultValue: `${productInfo.name} scanned. Shopping list sync is not available yet.` }));
       onClose && onClose();
     }
   };

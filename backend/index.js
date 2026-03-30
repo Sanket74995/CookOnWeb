@@ -3,8 +3,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 const connectDB = require('./DB');
+const { getJwtSecret } = require('./utils/jwt');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -17,6 +19,11 @@ const collaborationRoutes = require('./routes/collaboration');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const uploadDir = path.join(__dirname, 'uploads');
+const allowedOrigins = String(process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
 // Rate Limiter
 const limiter = rateLimit({
@@ -41,7 +48,13 @@ app.use(helmet());
 
 // ✅ FIXED CORS (important for deployment)
 app.use(cors({
-    origin: "*",
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
 }));
 
@@ -58,7 +71,7 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/collaboration', collaborationRoutes);
 app.use('/api/chatbot/admin', require('./routes/chatbotAdmin'));
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(uploadDir));
 
 // Basic route
 app.get('/', (req, res) => {
@@ -69,6 +82,7 @@ app.get('/', (req, res) => {
 if (process.env.NODE_ENV !== 'test') {
     connectDB()
         .then(() => {
+            getJwtSecret();
             logger.info('✅ Connected to MongoDB');
 
             app.listen(PORT, () => {

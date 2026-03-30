@@ -13150,586 +13150,63 @@ const sampleRecipes = [
         ],
         "translations": {
             "hi": {
-                "title": "??? ????? ???? ???",
-                "description": "??? ????, ???, ????? ?? ???????? ?? ??? ???-?????? ?????? ?? ???????? ?? ??? ???",
+                "title": "चीज़ कॉर्न वेजी रोल",
+                "description": "नरम रोटी, चीज़, कॉर्न और सब्जियों से बना बच्चों के टिफिन के लिए स्वादिष्ट रोल",
                 "ingredients": [
                     {
-                        "name": "????? ?? ????",
-                        "quantity": "2",
-                        "unit": "???"
-                    },
-                    {
-                        "name": "???? ?????",
-                        "quantity": "1/2",
-                        "unit": "??"
-                    },
-                    {
-                        "name": "??????? ???? ??? ???",
-                        "quantity": "1/3",
-                        "unit": "??"
-                    },
-                    {
-                        "name": "????? ?????",
-                        "quantity": "1/4",
-                        "unit": "??"
-                    },
-                    {
-                        "name": "????",
-                        "quantity": "1/4",
-                        "unit": "??"
-                    },
-                    {
-                        "name": "?????",
-                        "quantity": "1",
-                        "unit": "???? ?????"
-                    }
-                ],
-                "instructions": [
-                    {
-                        "step": 1,
-                        "description": "????? ??? ????? ?? ???????? ?? ????? ?? ?????"
-                    },
-                    {
-                        "step": 2,
-                        "description": "???? ?? ?????? ???? ?? ??? ?? ??????? ???? ??? ??? ?????"
-                    },
-                    {
-                        "step": 3,
-                        "description": "??? ?? ???? ?????? ?? ??? ?? ????? ?? ???? ???"
-                    },
-                    {
-                        "step": 4,
-                        "description": "??????? ??? ????? ?? ????? ???? ?? ???? ?? ?????? ?? ??? ????"
-                    }
-                ]
-            }
-        }
-    },
-    {
-        "title": "Aloo Paratha",
-        "description": "Flaky whole wheat flatbread stuffed with spiced mashed potatoes",
-        "image": "https://images.unsplash.com/photo-1570803194953-f0c7eda7b4af?w=400&h=300&fit=crop",
-        "video": "https://www.youtube.com/embed/0Z7R6OR9V0M",
-        "cuisine": "Indian",
-        "category": "breakfast",
-        "difficulty": "easy",
-        "prepTime": 15,
-        "cookTime": 20,
-        "servings": 4,
-        "ingredients": [
-            {
-                "name": "Whole wheat flour",
-                "quantity": "2",
-                "unit": "cups"
-            },
-            {
-                "name": "Boiled potatoes",
-                "quantity": "3",
-                "unit": "medium"
-            },
-            {
-                "name": "Green chilies",
-                "quantity": "2",
-                "unit": "pieces"
-            },
-            {
-                "name": "Coriander leaves",
-                "quantity": "2",
-                "unit": "tbsp"
-            },
-            {
-                "name": "Cumin powder",
-                "quantity": "1",
-                "unit": "tsp"
-            },
-            {
-                "name": "Garam masala",
-                "quantity": "1/2",
-                "unit": "tsp"
-            },
-            {
-                "name": "Salt",
-                "quantity": "1",
-                "unit": "tsp"
-            },
-            {
-                "name": "Oil",
-                "quantity": "2",
-                "unit": "tbsp"
-            }
-        ],
-        "instructions": [
-            {
-                "step": 1,
-                "description": "Knead dough with flour, salt, and water; rest for 10 minutes"
-            },
-            {
-                "step": 2,
-                "description": "Mash potatoes and mix with spices, chilies, and coriander"
-            },
-            {
-                "step": 3,
-                "description": "Divide dough and stuffing into equal portions"
-            },
-            {
-                "step": 4,
-                "description": "Roll a dough ball, place stuffing, seal and roll gently"
-            },
-            {
-                "step": 5,
-                "description": "Cook paratha on a hot tawa with oil until golden on both sides"
-            },
-            {
-                "step": 6,
-                "description": "Serve hot with yogurt or pickle"
-            }
-        ],
-        "nutrition": {
-            "calories": 280,
-            "protein": 6,
-            "carbs": 44,
-            "fat": 10
-        },
-        "tags": [
-            "indian",
-            "breakfast",
-            "vegetarian",
-            "comfort",
-            "kids"
-        ],
-        "translations": {
-            "hi": {
-                "title": "आलू पराठा",
-                "description": "मसालेदार मैश्ड आलू से भरा कुरकुरा गेहूं का पराठा",
-                "ingredients": [
-                    {
-                        "name": "गेहूं का आटा",
-                        "quantity": "2",
-                        "unit": "कप"
-                    },
-                    {
-                        "name": "उबले आलू",
-                        "quantity": "3",
-                        "unit": "मध्यम"
-                    },
-                    {
-                        "name": "हरी मिर्च",
+                        "name": "गेहूं की रोटी",
                         "quantity": "2",
                         "unit": "पीस"
                     },
                     {
-                        "name": "धनिया पत्ता",
-                        "quantity": "2",
-                        "unit": "टेबलस्पून"
-                    },
-                    {
-                        "name": "जीरा पाउडर",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "गरम मसाला",
+                        "name": "स्वीट कॉर्न",
                         "quantity": "1/2",
-                        "unit": "टीस्पून"
+                        "unit": "कप"
                     },
                     {
-                        "name": "नमक",
+                        "name": "कद्दूकस किया हुआ चीज़",
+                        "quantity": "1/3",
+                        "unit": "कप"
+                    },
+                    {
+                        "name": "शिमला मिर्च",
+                        "quantity": "1/4",
+                        "unit": "कप"
+                    },
+                    {
+                        "name": "गाजर",
+                        "quantity": "1/4",
+                        "unit": "कप"
+                    },
+                    {
+                        "name": "मक्खन",
                         "quantity": "1",
                         "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "तेल",
-                        "quantity": "2",
-                        "unit": "टेबलस्पून"
                     }
                 ],
                 "instructions": [
                     {
                         "step": 1,
-                        "description": "आटा, नमक और पानी से आटा गूंधकर 10 मिनट के लिए रख दें"
+                        "description": "मक्खन में कॉर्न और सब्जियों को हल्का सा भून लें"
                     },
                     {
                         "step": 2,
-                        "description": "आलू मैश करें और मसाले, मिर्च, धनिया मिलाएं"
+                        "description": "रोटियों पर फिलिंग रखें और ऊपर से कद्दूकस किया हुआ चीज़ डालें"
                     },
                     {
                         "step": 3,
-                        "description": "आटे और भरावन को समान भागों में बाँटें"
+                        "description": "रोल को कसकर लपेटें और तवे पर हल्का सा सेंक लें"
                     },
                     {
                         "step": 4,
-                        "description": "एक आटे की लोई बेलें, भरावन रखें, सील करें और धीरे से बेलें"
-                    },
-                    {
-                        "step": 5,
-                        "description": "गरम तवे पर तेल के साथ दोनों तरफ सुनहरा होने तक सेंकें"
-                    },
-                    {
-                        "step": 6,
-                        "description": "दही या अचार के साथ गरम परोसें"
+                        "description": "टुकड़ों में काटकर गरम या सामान्य तापमान पर पैक करें"
                     }
                 ]
             }
         }
     },
-    {
-        "title": "Matar Paneer",
-        "description": "Cottage cheese and green peas simmered in a spiced tomato gravy",
-        "image": "https://images.unsplash.com/photo-1531239552236-0b6b8b35f449?w=400&h=300&fit=crop",
-        "video": "https://www.youtube.com/embed/4gkjZQ5zJNA",
-        "cuisine": "Indian",
-        "category": "main course",
-        "difficulty": "medium",
-        "prepTime": 15,
-        "cookTime": 25,
-        "servings": 4,
-        "ingredients": [
-            {
-                "name": "Paneer",
-                "quantity": "250",
-                "unit": "g"
-            },
-            {
-                "name": "Green peas",
-                "quantity": "1",
-                "unit": "cup"
-            },
-            {
-                "name": "Onion",
-                "quantity": "1",
-                "unit": "large"
-            },
-            {
-                "name": "Tomato",
-                "quantity": "2",
-                "unit": "medium"
-            },
-            {
-                "name": "Ginger garlic paste",
-                "quantity": "1",
-                "unit": "tbsp"
-            },
-            {
-                "name": "Turmeric",
-                "quantity": "1/2",
-                "unit": "tsp"
-            },
-            {
-                "name": "Cumin",
-                "quantity": "1",
-                "unit": "tsp"
-            },
-            {
-                "name": "Coriander",
-                "quantity": "1",
-                "unit": "tsp"
-            },
-            {
-                "name": "Garam masala",
-                "quantity": "1/2",
-                "unit": "tsp"
-            },
-            {
-                "name": "Oil",
-                "quantity": "2",
-                "unit": "tbsp"
-            },
-            {
-                "name": "Salt",
-                "quantity": "1",
-                "unit": "tsp"
-            }
-        ],
-        "instructions": [
-            {
-                "step": 1,
-                "description": "Heat oil, sauté onions until translucent"
-            },
-            {
-                "step": 2,
-                "description": "Add ginger garlic paste and cook briefly"
-            },
-            {
-                "step": 3,
-                "description": "Add tomatoes and cook until soft"
-            },
-            {
-                "step": 4,
-                "description": "Add spices, peas, and water; simmer 10 mins"
-            },
-            {
-                "step": 5,
-                "description": "Add paneer cubes and cook 5 mins more"
-            },
-            {
-                "step": 6,
-                "description": "Sprinkle garam masala and garnish with coriander"
-            }
-        ],
-        "nutrition": {
-            "calories": 320,
-            "protein": 18,
-            "carbs": 15,
-            "fat": 18
-        },
-        "tags": [
-            "indian",
-            "vegetarian",
-            "paneer",
-            "main",
-            "healthy"
-        ],
-        "translations": {
-            "hi": {
-                "title": "मटर पनीर",
-                "description": "मसालेदार टमाटर ग्रेवी में पकाया हुआ पनीर और मटर",
-                "ingredients": [
-                    {
-                        "name": "पनीर",
-                        "quantity": "250",
-                        "unit": "ग"
-                    },
-                    {
-                        "name": "हरी मटर",
-                        "quantity": "1",
-                        "unit": "कप"
-                    },
-                    {
-                        "name": "प्याज",
-                        "quantity": "1",
-                        "unit": "बड़ा"
-                    },
-                    {
-                        "name": "टमाटर",
-                        "quantity": "2",
-                        "unit": "मध्यम"
-                    },
-                    {
-                        "name": "अदरक-लहसुन पेस्ट",
-                        "quantity": "1",
-                        "unit": "टेबलस्पून"
-                    },
-                    {
-                        "name": "हल्दी",
-                        "quantity": "1/2",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "जीरा",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "धनिया पाउडर",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "गरम मसाला",
-                        "quantity": "1/2",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "तेल",
-                        "quantity": "2",
-                        "unit": "टेबलस्पून"
-                    },
-                    {
-                        "name": "नमक",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    }
-                ],
-                "instructions": [
-                    {
-                        "step": 1,
-                        "description": "तेल गरम करें, प्याज को पारदर्शी होने तक भूनें"
-                    },
-                    {
-                        "step": 2,
-                        "description": "अदरक-लहसुन पेस्ट डालें और हल्का भूनें"
-                    },
-                    {
-                        "step": 3,
-                        "description": "टमाटर डालें और नरम होने तक पकाएं"
-                    },
-                    {
-                        "step": 4,
-                        "description": "मसाले, मटर और पानी डालें; 10 मिनट तक धीमी आँच पर सिमर करें"
-                    },
-                    {
-                        "step": 5,
-                        "description": "पनीर के टुकड़े डालें और 5 मिनट तक पकाएं"
-                    },
-                    {
-                        "step": 6,
-                        "description": "गरम मसाला छिड़कें और धनिया से सजाएँ"
-                    }
-                ]
-            }
-        }
-    },
-    {
-        "title": "Paneer Tikka",
-        "description": "Grilled paneer cubes marinated in yogurt and Indian spices",
-        "image": "https://images.unsplash.com/photo-1599785209707-e5bd90878ace?w=400&h=300&fit=crop",
-        "video": "https://www.youtube.com/embed/F4tp7j7O2QY",
-        "cuisine": "Indian",
-        "category": "appetizer",
-        "difficulty": "medium",
-        "prepTime": 20,
-        "cookTime": 15,
-        "servings": 4,
-        "ingredients": [
-            {
-                "name": "Paneer",
-                "quantity": "250",
-                "unit": "g"
-            },
-            {
-                "name": "Yogurt",
-                "quantity": "1/2",
-                "unit": "cup"
-            },
-            {
-                "name": "Ginger garlic paste",
-                "quantity": "1",
-                "unit": "tbsp"
-            },
-            {
-                "name": "Red chili powder",
-                "quantity": "1",
-                "unit": "tsp"
-            },
-            {
-                "name": "Turmeric",
-                "quantity": "1/2",
-                "unit": "tsp"
-            },
-            {
-                "name": "Garam masala",
-                "quantity": "1",
-                "unit": "tsp"
-            },
-            {
-                "name": "Lemon juice",
-                "quantity": "1",
-                "unit": "tbsp"
-            },
-            {
-                "name": "Oil",
-                "quantity": "1",
-                "unit": "tbsp"
-            },
-            {
-                "name": "Salt",
-                "quantity": "1",
-                "unit": "tsp"
-            }
-        ],
-        "instructions": [
-            {
-                "step": 1,
-                "description": "Mix marinade ingredients and coat paneer cubes"
-            },
-            {
-                "step": 2,
-                "description": "Let marinate for 30 minutes"
-            },
-            {
-                "step": 3,
-                "description": "Thread paneer on skewers and grill or bake until charred"
-            },
-            {
-                "step": 4,
-                "description": "Serve with onion rings and mint chutney"
-            }
-        ],
-        "nutrition": {
-            "calories": 280,
-            "protein": 16,
-            "carbs": 8,
-            "fat": 18
-        },
-        "tags": [
-            "indian",
-            "starter",
-            "vegetarian",
-            "grilled",
-            "healthy"
-        ],
-        "translations": {
-            "hi": {
-                "title": "पनीर टिक्का",
-                "description": "दही और भारतीय मसालों में मेरिनेट किया हुआ ग्रिल्ड पनीर",
-                "ingredients": [
-                    {
-                        "name": "पनीर",
-                        "quantity": "250",
-                        "unit": "ग"
-                    },
-                    {
-                        "name": "दही",
-                        "quantity": "1/2",
-                        "unit": "कप"
-                    },
-                    {
-                        "name": "अदरक-लहसुन पेस्ट",
-                        "quantity": "1",
-                        "unit": "टेबलस्पून"
-                    },
-                    {
-                        "name": "लाल मिर्च पाउडर",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "हल्दी",
-                        "quantity": "1/2",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "गरम मसाला",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    },
-                    {
-                        "name": "नींबू का रस",
-                        "quantity": "1",
-                        "unit": "टेबलस्पून"
-                    },
-                    {
-                        "name": "तेल",
-                        "quantity": "1",
-                        "unit": "टेबलस्पून"
-                    },
-                    {
-                        "name": "नमक",
-                        "quantity": "1",
-                        "unit": "टीस्पून"
-                    }
-                ],
-                "instructions": [
-                    {
-                        "step": 1,
-                        "description": " मेरिनेड बनाकर पनीर पर अच्छे से लगाएं"
-                    },
-                    {
-                        "step": 2,
-                        "description": "30 मिनट के लिए मेरिनेट होने दें"
-                    },
-                    {
-                        "step": 3,
-                        "description": "पनीर को सींचे पर डालें और ग्रिल या बेक करें"
-                    },
-                    {
-                        "step": 4,
-                        "description": "प्याज़ और हरी चटनी के साथ परोसें"
-                    }
-                ]
-            }
-        }
-    }
+
+
 ];
 
 module.exports = sampleRecipes;

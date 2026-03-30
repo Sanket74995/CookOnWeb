@@ -5,16 +5,7 @@ import '../styles/RecipeDetail.scss';
 import VoiceAssistant from './VoiceAssistant';
 import Loader from './Loader';
 import { API_BASE } from '../config';
-
-const hasTranslatedIngredients = (items) =>
-    Array.isArray(items) &&
-    items.length > 0 &&
-    items.some((item) => String(item?.name || '').trim());
-
-const hasTranslatedInstructions = (items) =>
-    Array.isArray(items) &&
-    items.length > 0 &&
-    items.some((item) => String(item?.description || '').trim());
+import { getLocalizedField, hasUsableLocalizedItems } from '../utils/recipeLocalization';
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -233,19 +224,14 @@ const RecipeDetail = () => {
         return <div className="recipe-detail-error">Recipe not found</div>;
     }
 
-    const localizedTitle = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].title
-        ? recipe.translations[currentLang].title
-        : recipe.title;
-
-    const localizedDescription = currentLang !== 'en' && recipe.translations && recipe.translations[currentLang] && recipe.translations[currentLang].description
-        ? recipe.translations[currentLang].description
-        : recipe.description;
+    const localizedTitle = getLocalizedField(recipe, currentLang, 'title');
+    const localizedDescription = getLocalizedField(recipe, currentLang, 'description');
 
     const translatedIngredients =
         currentLang !== 'en' &&
         recipe.translations &&
         recipe.translations[currentLang] &&
-        hasTranslatedIngredients(recipe.translations[currentLang].ingredients)
+        hasUsableLocalizedItems(recipe.translations[currentLang].ingredients, 'name')
             ? recipe.translations[currentLang].ingredients
             : null;
 
@@ -253,7 +239,7 @@ const RecipeDetail = () => {
         currentLang !== 'en' &&
         recipe.translations &&
         recipe.translations[currentLang] &&
-        hasTranslatedInstructions(recipe.translations[currentLang].instructions)
+        hasUsableLocalizedItems(recipe.translations[currentLang].instructions, 'description')
             ? recipe.translations[currentLang].instructions
             : null;
 

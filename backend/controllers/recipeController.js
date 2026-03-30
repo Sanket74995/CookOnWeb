@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const net = require('net');
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
 const { createJsonReply, isAIEnabled } = require('../services/deepseekService');
@@ -205,6 +206,62 @@ const extractYouTubeVideoId = (url) => {
 
     const embedMatch = value.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{6,})/);
     return embedMatch ? embedMatch[1] : '';
+};
+
+const isPrivateIpv4 = (hostname) => {
+    const octets = hostname.split('.').map(Number);
+    if (octets.length !== 4 || octets.some((value) => !Number.isInteger(value) || value < 0 || value > 255)) {
+        return false;
+    }
+
+    if (octets[0] === 10 || octets[0] === 127) return true;
+    if (octets[0] === 169 && octets[1] === 254) return true;
+    if (octets[0] === 192 && octets[1] === 168) return true;
+    if (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) return true;
+    return false;
+};
+
+const isBlockedHostname = (hostname) => {
+    const normalized = String(hostname || '').trim().toLowerCase();
+    if (!normalized) return true;
+
+    if (['localhost', '0.0.0.0', '::1'].includes(normalized)) {
+        return true;
+    }
+
+    if (normalized.endsWith('.local') || normalized.endsWith('.internal')) {
+        return true;
+    }
+
+    if (net.isIP(normalized) === 4) {
+        return isPrivateIpv4(normalized);
+    }
+
+    if (net.isIP(normalized) === 6) {
+        return normalized.startsWith('fc') || normalized.startsWith('fd') || normalized === '::1';
+    }
+
+    return false;
+};
+
+const assertSafeImportUrl = (value) => {
+    let parsedUrl;
+
+    try {
+        parsedUrl = new URL(String(value || '').trim());
+    } catch (error) {
+        throw new Error('Recipe URL must be a valid absolute URL');
+    }
+
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        throw new Error('Only http and https recipe URLs are supported');
+    }
+
+    if (isBlockedHostname(parsedUrl.hostname)) {
+        throw new Error('That URL host is not allowed');
+    }
+
+    return parsedUrl.toString();
 };
 
 const buildGeneratedRecipe = (ingredients = [], options = {}, sourceRecipes = []) => {
@@ -1029,7 +1086,7 @@ const generateRecipeFromIngredients = async (req, res) => {
 
 const importRecipeFromUrl = async (req, res) => {
     try {
-        const sourceUrl = String(req.body.url || '').trim();
+        const sourceUrl = assertSafeImportUrl(req.body.url);
         if (!sourceUrl) {
             return res.status(400).json({ message: 'Recipe URL is required' });
         }
@@ -1092,7 +1149,10 @@ const importRecipeFromUrl = async (req, res) => {
         });
     } catch (error) {
         console.error('Import recipe error:', error);
-        return res.status(500).json({ message: error.message || 'Server error while importing recipe' });
+        const statusCode = /valid absolute URL|Only http and https|not allowed|required/i.test(String(error.message || ''))
+            ? 400
+            : 500;
+        return res.status(statusCode).json({ message: error.message || 'Server error while importing recipe' });
     }
 };
 

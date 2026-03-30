@@ -69,12 +69,12 @@ const createCollection = async (req, res) => {
                 _id: { $in: recipes },
                 $or: [
                     { author: req.userId },
-                    { 'reviews.0': { $exists: true } } // Public recipes with reviews
+                    { isPublic: true }
                 ]
             });
 
             const validRecipeIds = existingRecipes.map(r => r._id.toString());
-            const filteredRecipes = recipes.filter(id => validRecipeIds.includes(id));
+            req.body.recipes = recipes.filter(id => validRecipeIds.includes(id));
         }
 
         const collection = new Collection({
@@ -83,7 +83,7 @@ const createCollection = async (req, res) => {
             author: req.userId,
             isPublic: isPublic || false,
             tags: tags || [],
-            recipes: recipes || []
+            recipes: req.body.recipes || []
         });
 
         await collection.save();
@@ -140,7 +140,7 @@ const updateCollection = async (req, res) => {
                     _id: { $in: recipes },
                     $or: [
                         { author: req.userId },
-                        { 'reviews.0': { $exists: true } }
+                        { isPublic: true }
                     ]
                 });
 
@@ -206,8 +206,12 @@ const addRecipeToCollection = async (req, res) => {
             return res.status(403).json({ message: 'Access denied' });
         }
 
+        if (recipe.author.toString() !== req.userId && !recipe.isPublic) {
+            return res.status(403).json({ message: 'This recipe cannot be added to the collection' });
+        }
+
         // Check if recipe is already in collection
-        if (collection.recipes.includes(recipeId)) {
+        if (collection.recipes.some((id) => id.toString() === recipeId)) {
             return res.status(400).json({ message: 'Recipe already in collection' });
         }
 
