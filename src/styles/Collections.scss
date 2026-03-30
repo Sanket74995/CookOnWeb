@@ -1,220 +1,327 @@
 .collections-page {
-    margin: 0 auto;
-    padding: 28px 0 72px;
+  margin: 0 auto;
+  padding: 28px 0 72px;
 
-    .collections-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
+  .collections-hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px;
+    border-radius: 28px;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(circle at top right, rgba(255, 166, 92, 0.22), transparent 32%),
+      linear-gradient(160deg, var(--surface-strong), rgba(255, 248, 236, 0.9));
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
 
-        h1 {
-            color: var(--text);
-            margin: 0;
-        }
+    h1 {
+      margin: 6px 0 10px;
+      color: var(--text);
+    }
+  }
 
-        .create-collection-btn {
-            background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 16px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 14px 28px rgba(197, 106, 27, 0.2);
+  .collections-eyebrow {
+    margin: 0;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
 
-            &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 18px 34px rgba(197, 106, 27, 0.24);
-            }
-        }
+  .collections-copy {
+    margin: 0;
+    max-width: 700px;
+    color: var(--text-soft);
+    line-height: 1.6;
+  }
+
+  .create-collection-btn,
+  .open-btn,
+  .form-actions button {
+    background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(197, 106, 27, 0.2);
+  }
+
+  .collections-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+
+    article {
+      padding: 18px 20px;
+      border-radius: 22px;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .create-collection-form {
-        background: var(--surface-strong);
-        padding: 20px;
-        border-radius: 24px;
-        margin-bottom: 30px;
+    strong {
+      color: var(--text);
+      font-size: 1.7rem;
+    }
+
+    span {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+  }
+
+  .collections-banner,
+  .collections-status {
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--surface-strong);
+    color: var(--text-soft);
+  }
+
+  .collections-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--input-bg);
+      color: var(--text);
+    }
+  }
+
+  .collections-filters {
+    display: flex;
+    gap: 10px;
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--text-soft);
+      padding: 10px 14px;
+      cursor: pointer;
+
+      &.active {
+        background: rgba(255, 166, 92, 0.14);
+        color: var(--brand);
+        border-color: rgba(255, 166, 92, 0.28);
+      }
+    }
+  }
+
+  .create-collection-form {
+    background: var(--surface-strong);
+    padding: 22px;
+    border-radius: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
         border: 1px solid var(--line);
-        box-shadow: var(--shadow-sm);
-
-        .form-group {
-            margin-bottom: 15px;
-
-            label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: 500;
-                color: var(--text);
-            }
-
-            input, textarea {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid var(--line);
-                border-radius: 14px;
-                font-size: 14px;
-                background: var(--input-bg);
-
-                &:focus {
-                    outline: none;
-                    border-color: rgba(197, 106, 27, 0.34);
-                }
-            }
-
-            textarea {
-                resize: vertical;
-                min-height: 80px;
-            }
-
-            &.checkbox-group {
-                display: flex;
-                align-items: center;
-
-                label {
-                    display: flex;
-                    align-items: center;
-                    margin: 0;
-                    cursor: pointer;
-
-                    input {
-                        width: auto;
-                        margin-right: 8px;
-                    }
-                }
-            }
-        }
-
-        .form-actions {
-            text-align: right;
-
-            button {
-                background: linear-gradient(135deg, var(--accent), #217349);
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 14px;
-                cursor: pointer;
-                font-size: 14px;
-            }
-        }
+        border-radius: 16px;
+        background: var(--input-bg);
+        color: var(--text);
+      }
     }
 
-    .collections-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 20px;
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            background: var(--surface-strong);
-            border-radius: 20px;
-            border: 2px dashed rgba(133, 88, 43, 0.18);
-
-            h3, p {
-                color: var(--text-soft);
-            }
-        }
-
-        .collection-card {
-            background: var(--surface-strong);
-            border-radius: 24px;
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid var(--line);
-
-            &:hover {
-                transform: translateY(-4px);
-                box-shadow: var(--shadow-md);
-            }
-
-            .collection-header {
-                padding: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-
-                h3 {
-                    margin: 0;
-                    color: var(--text);
-                    flex: 1;
-                    margin-right: 10px;
-                }
-
-                .collection-actions {
-                    display: flex;
-                    gap: 8px;
-
-                    button {
-                        padding: 6px 12px;
-                        border: none;
-                        border-radius: 12px;
-                        cursor: pointer;
-                        font-size: 12px;
-
-                        &.edit-btn {
-                            background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-                            color: white;
-                        }
-
-                        &.delete-btn {
-                            background: #e74c3c;
-                            color: white;
-                        }
-                    }
-                }
-            }
-
-            .collection-description {
-                padding: 0 20px;
-                color: var(--text-soft);
-                font-size: 14px;
-                margin-bottom: 15px;
-            }
-
-            .collection-meta {
-                padding: 0 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 12px;
-                color: var(--text-muted);
-                margin-bottom: 15px;
-
-                .public-badge {
-                    background: var(--accent);
-                    color: white;
-                    padding: 2px 6px;
-                    border-radius: 8px;
-                    font-size: 10px;
-                }
-            }
-
-            .collection-tags {
-                padding: 0 20px;
-                margin-bottom: 15px;
-
-                .tag {
-                    display: inline-block;
-                    background: var(--chip-bg);
-                    color: var(--brand);
-                    padding: 2px 8px;
-                    border-radius: 12px;
-                    font-size: 12px;
-                    margin-right: 5px;
-                    margin-bottom: 5px;
-                }
-            }
-        }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .loading {
-        text-align: center;
-        padding: 60px;
-        color: var(--text-soft);
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
     }
+  }
+
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .collection-card {
+    background: var(--surface-strong);
+    border-radius: 26px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  .collection-card__top,
+  .collection-card__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .collection-card__top h3 {
+    margin: 10px 0 0;
+    color: var(--text);
+  }
+
+  .collection-chip-row,
+  .collection-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .visibility-chip,
+  .recipe-count-chip,
+  .tag {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+  }
+
+  .visibility-chip.is-public {
+    background: rgba(46, 160, 96, 0.14);
+    color: var(--accent);
+  }
+
+  .visibility-chip.is-private,
+  .recipe-count-chip,
+  .tag {
+    background: var(--chip-bg);
+    color: var(--text-soft);
+  }
+
+  .collection-description {
+    margin: 0;
+    color: var(--text-soft);
+    line-height: 1.6;
+  }
+
+  .collection-preview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .preview-recipe {
+    border: none;
+    background: var(--panel-soft);
+    border-radius: 18px;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text);
+    text-align: left;
+
+    img,
+    .preview-fallback {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255, 166, 92, 0.2), rgba(71, 150, 125, 0.16));
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    span {
+      display: block;
+      padding: 10px;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+  }
+
+  .preview-empty {
+    grid-column: 1 / -1;
+    padding: 22px;
+    border-radius: 18px;
+    background: var(--panel-soft);
+    color: var(--text-soft);
+    text-align: center;
+  }
+
+  .delete-btn {
+    border: none;
+    background: rgba(214, 79, 79, 0.12);
+    color: var(--danger);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  .collection-card__footer span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding-top: 10px;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 56px 24px;
+    background: var(--surface-strong);
+    border-radius: 24px;
+    border: 1px dashed rgba(133, 88, 43, 0.24);
+    color: var(--text-soft);
+  }
+}
+
+@media (max-width: 900px) {
+  .collections-page {
+    .collections-hero,
+    .collections-toolbar {
+      flex-direction: column;
+    }
+
+    .collections-stats,
+    .create-collection-form .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
 }

@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { API_BASE } from '../config';
 import '../styles/CollectionDetail.scss';
 import Loader from './Loader';
 import { fetchSubscriptionDetails, getPremiumFeatureMessage, isPremiumSubscription } from '../utils/subscription';
 
+const getImageSrc = (image) => {
+    const value = String(image || '').trim();
+    if (!value) return '';
+    return value.startsWith('http://') || value.startsWith('https://') ? value : `${API_BASE}${value}`;
+};
+
 const CollectionDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { t } = useTranslation();
     const [collection, setCollection] = useState(null);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
@@ -23,6 +27,8 @@ const CollectionDetail = () => {
     const [availableRecipes, setAvailableRecipes] = useState([]);
     const [showAddRecipes, setShowAddRecipes] = useState(false);
     const [subscription, setSubscription] = useState(null);
+    const [recipeSearch, setRecipeSearch] = useState('');
+    const [statusMessage, setStatusMessage] = useState('');
 
     useEffect(() => {
         fetchCollection();
@@ -35,23 +41,22 @@ const CollectionDetail = () => {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE}/api/collections/${id}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setCollection(data);
-                setEditForm({
-                    name: data.name,
-                    description: data.description,
-                    isPublic: data.isPublic,
-                    tags: data.tags
-                });
-            } else {
-                console.error('Failed to fetch collection');
-                navigate('/collections');
+            if (!response.ok) {
+                throw new Error('Failed to fetch collection');
             }
+
+            const data = await response.json();
+            setCollection(data);
+            setEditForm({
+                name: data.name,
+                description: data.description,
+                isPublic: data.isPublic,
+                tags: data.tags
+            });
         } catch (error) {
             console.error('Error fetching collection:', error);
             navigate('/collections');
@@ -65,14 +70,16 @@ const CollectionDetail = () => {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE}/api/recipes`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setAvailableRecipes(Array.isArray(data) ? data : (data.recipes || []));
+            if (!response.ok) {
+                return;
             }
+
+            const data = await response.json();
+            setAvailableRecipes(Array.isArray(data) ? data : (data.recipes || []));
         } catch (error) {
             console.error('Error fetching recipes:', error);
         }
@@ -81,6 +88,7 @@ const CollectionDetail = () => {
     const handleUpdateCollection = async (e) => {
         e.preventDefault();
         setSaving(true);
+        setStatusMessage('');
 
         try {
             const token = localStorage.getItem('token');
@@ -88,20 +96,22 @@ const CollectionDetail = () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(editForm)
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setCollection(data.collection);
-                setEditing(false);
-            } else {
-                console.error('Failed to update collection');
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to update collection');
             }
+
+            setCollection(data.collection);
+            setEditing(false);
+            setStatusMessage('Collection updated.');
         } catch (error) {
             console.error('Error updating collection:', error);
+            setStatusMessage(error.message || 'Unable to update collection.');
         } finally {
             setSaving(false);
         }
@@ -119,19 +129,21 @@ const CollectionDetail = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({ recipeId })
             });
 
-            if (response.ok) {
-                fetchCollection(); // Refresh collection data
-                setShowAddRecipes(false);
-            } else {
-                console.error('Failed to add recipe');
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to add recipe');
             }
+
+            await fetchCollection();
+            setStatusMessage('Recipe added to collection.');
         } catch (error) {
             console.error('Error adding recipe:', error);
+            setStatusMessage(error.message || 'Unable to add recipe.');
         }
     };
 
@@ -143,19 +155,45 @@ const CollectionDetail = () => {
             const response = await fetch(`${API_BASE}/api/collections/${id}/recipes/${recipeId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
 
-            if (response.ok) {
-                fetchCollection(); // Refresh collection data
-            } else {
-                console.error('Failed to remove recipe');
+            if (!response.ok) {
+                throw new Error('Failed to remove recipe');
             }
+
+            await fetchCollection();
+            setStatusMessage('Recipe removed from collection.');
         } catch (error) {
             console.error('Error removing recipe:', error);
+            setStatusMessage('Unable to remove recipe.');
         }
     };
+
+    const handleCopyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setStatusMessage('Collection link copied.');
+        } catch (error) {
+            setStatusMessage('Unable to copy collection link.');
+        }
+    };
+
+    const collectionRecipeIds = useMemo(() => collection?.recipes.map((recipe) => recipe._id) || [], [collection]);
+
+    const recipesToAdd = useMemo(() => {
+        return availableRecipes
+            .filter((recipe) => !collectionRecipeIds.includes(recipe._id))
+            .filter((recipe) => {
+                const haystack = `${recipe.title} ${recipe.cuisine} ${recipe.category} ${(recipe.tags || []).join(' ')}`.toLowerCase();
+                return haystack.includes(recipeSearch.trim().toLowerCase());
+            });
+    }, [availableRecipes, collectionRecipeIds, recipeSearch]);
+
+    const averageCookTime = collection?.recipes?.length
+        ? Math.round(collection.recipes.reduce((sum, recipe) => sum + Number(recipe.cookTime || 0) + Number(recipe.prepTime || 0), 0) / collection.recipes.length)
+        : 0;
 
     if (loading) {
         return (
@@ -169,43 +207,72 @@ const CollectionDetail = () => {
         return <div className="collection-detail-page"><div className="error">Collection not found</div></div>;
     }
 
-    const collectionRecipeIds = collection.recipes.map(r => r._id);
-    const recipesToAdd = availableRecipes.filter(recipe => !collectionRecipeIds.includes(recipe._id));
-
     return (
         <div className="collection-detail-page">
-            <div className="collection-header">
+            <section className="collection-hero">
                 <button className="back-btn" onClick={() => navigate('/collections')}>
-                    ← Back to Collections
+                    Back to Collections
                 </button>
 
-                <div className="header-actions">
-                    <button className="edit-btn" onClick={() => setEditing(!editing)}>
-                        {editing ? 'Cancel' : 'Edit Collection'}
-                    </button>
-                    <button className="add-recipes-btn" onClick={() => setShowAddRecipes(!showAddRecipes)}>
-                        {showAddRecipes ? 'Cancel' : 'Add Recipes'}
-                    </button>
+                <div className="collection-hero__content">
+                    <div>
+                        <div className="hero-chip-row">
+                            <span className={`visibility-chip ${collection.isPublic ? 'is-public' : 'is-private'}`}>
+                                {collection.isPublic ? 'Public' : 'Private'}
+                            </span>
+                            <span className="meta-chip">{collection.recipes.length} recipes</span>
+                            <span className="meta-chip">Avg time {averageCookTime} min</span>
+                        </div>
+                        <h1>{collection.name}</h1>
+                        <p>{collection.description || 'Use this board to collect recipes for a theme, event, health goal, or cooking experiment.'}</p>
+                    </div>
+
+                    <div className="header-actions">
+                        <button className="ghost-btn" onClick={handleCopyLink}>Copy Link</button>
+                        <button className="edit-btn" onClick={() => setEditing((prev) => !prev)}>
+                            {editing ? 'Close Editor' : 'Edit Collection'}
+                        </button>
+                        <button className="add-recipes-btn" onClick={() => setShowAddRecipes((prev) => !prev)}>
+                            {showAddRecipes ? 'Hide Recipe Library' : 'Add Recipes'}
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            {statusMessage && <div className="detail-status">{statusMessage}</div>}
 
             {!isPremiumSubscription(subscription) && (
-                <div className="empty-state">
-                    <p>Premium plan required to add recipes into collections.</p>
+                <div className="detail-banner">
+                    Premium plan required to add new recipes into collections.
                 </div>
             )}
 
-            {editing ? (
+            {editing && (
                 <form className="edit-collection-form" onSubmit={handleUpdateCollection}>
-                    <div className="form-group">
-                        <label htmlFor="name">Collection Name *</label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={editForm.name}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                            required
-                        />
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label htmlFor="name">Collection Name *</label>
+                            <input
+                                type="text"
+                                id="name"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="tags">Tags</label>
+                            <input
+                                type="text"
+                                id="tags"
+                                value={editForm.tags.join(', ')}
+                                onChange={(e) => setEditForm((prev) => ({
+                                    ...prev,
+                                    tags: e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean)
+                                }))}
+                            />
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -213,21 +280,8 @@ const CollectionDetail = () => {
                         <textarea
                             id="description"
                             value={editForm.description}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                            onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
                             rows="3"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="tags">Tags (comma-separated)</label>
-                        <input
-                            type="text"
-                            id="tags"
-                            value={editForm.tags.join(', ')}
-                            onChange={(e) => setEditForm(prev => ({
-                                ...prev,
-                                tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)
-                            }))}
                         />
                     </div>
 
@@ -236,7 +290,7 @@ const CollectionDetail = () => {
                             <input
                                 type="checkbox"
                                 checked={editForm.isPublic}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, isPublic: e.target.checked }))}
+                                onChange={(e) => setEditForm((prev) => ({ ...prev, isPublic: e.target.checked }))}
                             />
                             Make this collection public
                         </label>
@@ -248,57 +302,64 @@ const CollectionDetail = () => {
                         </button>
                     </div>
                 </form>
-            ) : (
-                <div className="collection-info">
-                    <h1>{collection.name}</h1>
-                    {collection.description && <p className="description">{collection.description}</p>}
-
-                    <div className="collection-meta">
-                        <span>{collection.recipes.length} recipes</span>
-                        {collection.isPublic && <span className="public-badge">Public</span>}
-                        <span>Created {new Date(collection.createdAt).toLocaleDateString()}</span>
-                    </div>
-
-                    {collection.tags.length > 0 && (
-                        <div className="collection-tags">
-                            {collection.tags.map((tag, index) => (
-                                <span key={index} className="tag">#{tag}</span>
-                            ))}
-                        </div>
-                    )}
-                </div>
             )}
 
             {showAddRecipes && (
-                <div className="add-recipes-section">
-                    <h3>Add Recipes to Collection</h3>
+                <section className="add-recipes-section">
+                    <div className="section-header">
+                        <div>
+                            <h3>Add Recipes to Collection</h3>
+                            <p>Search your recipe library and add what belongs in this board.</p>
+                        </div>
+                        <input
+                            type="text"
+                            value={recipeSearch}
+                            onChange={(e) => setRecipeSearch(e.target.value)}
+                            placeholder="Search recipe library"
+                        />
+                    </div>
+
                     {recipesToAdd.length === 0 ? (
-                        <p>No more recipes available to add.</p>
+                        <p className="empty-copy">No more recipes match this search.</p>
                     ) : (
-                        <div className="recipes-grid">
-                            {recipesToAdd.map(recipe => (
-                                <div key={recipe._id} className="recipe-card">
-                                    <img src={`${API_BASE}${recipe.image}`} alt={recipe.title} />
-                                    <div className="recipe-info">
+                        <div className="recipe-library-grid">
+                            {recipesToAdd.slice(0, 18).map((recipe) => (
+                                <article key={recipe._id} className="library-card">
+                                    {recipe.image ? (
+                                        <img src={getImageSrc(recipe.image)} alt={recipe.title} />
+                                    ) : (
+                                        <div className="image-fallback">{recipe.title.charAt(0)}</div>
+                                    )}
+                                    <div className="library-card__body">
                                         <h4>{recipe.title}</h4>
-                                        <p>{recipe.cuisine} • {recipe.category}</p>
-                                        <div className="rating">★ {recipe.rating?.average?.toFixed(1) || 'N/A'}</div>
+                                        <p>{recipe.cuisine} · {recipe.category}</p>
+                                        <button className="add-btn" onClick={() => handleAddRecipe(recipe._id)}>
+                                            Add to Collection
+                                        </button>
                                     </div>
-                                    <button
-                                        className="add-btn"
-                                        onClick={() => handleAddRecipe(recipe._id)}
-                                    >
-                                        Add
-                                    </button>
-                                </div>
+                                </article>
                             ))}
                         </div>
                     )}
-                </div>
+                </section>
             )}
 
-            <div className="recipes-section">
-                <h2>Recipes in this Collection</h2>
+            <section className="recipes-section">
+                <div className="section-header">
+                    <div>
+                        <h2>Recipes in this Collection</h2>
+                        <p>Open, compare, and trim your saved lineup.</p>
+                    </div>
+                </div>
+
+                {collection.tags.length > 0 && (
+                    <div className="collection-tags">
+                        {collection.tags.map((tag) => (
+                            <span key={tag} className="tag">#{tag}</span>
+                        ))}
+                    </div>
+                )}
+
                 {collection.recipes.length === 0 ? (
                     <div className="empty-state">
                         <p>No recipes in this collection yet.</p>
@@ -306,37 +367,34 @@ const CollectionDetail = () => {
                     </div>
                 ) : (
                     <div className="recipes-grid">
-                        {collection.recipes.map(recipe => (
-                            <div key={recipe._id} className="recipe-card">
-                                <img src={`${API_BASE}${recipe.image}`} alt={recipe.title} />
+                        {collection.recipes.map((recipe) => (
+                            <article key={recipe._id} className="recipe-card">
+                                {recipe.image ? (
+                                    <img src={getImageSrc(recipe.image)} alt={recipe.title} />
+                                ) : (
+                                    <div className="image-fallback">{recipe.title.charAt(0)}</div>
+                                )}
                                 <div className="recipe-info">
                                     <h4>{recipe.title}</h4>
-                                    <p>{recipe.cuisine} • {recipe.category}</p>
-                                    <div className="rating">★ {recipe.rating?.average?.toFixed(1) || 'N/A'}</div>
+                                    <p>{recipe.cuisine} · {recipe.category}</p>
                                     <div className="recipe-times">
-                                        <span>Prep: {recipe.prepTime}min</span>
-                                        <span>Cook: {recipe.cookTime}min</span>
+                                        <span>{recipe.prepTime} min prep</span>
+                                        <span>{recipe.cookTime} min cook</span>
                                     </div>
                                 </div>
                                 <div className="card-actions">
-                                    <button
-                                        className="view-btn"
-                                        onClick={() => navigate(`/recipe/${recipe._id}`)}
-                                    >
+                                    <button className="view-btn" onClick={() => navigate(`/recipe/${recipe._id}`)}>
                                         View
                                     </button>
-                                    <button
-                                        className="remove-btn"
-                                        onClick={() => handleRemoveRecipe(recipe._id)}
-                                    >
+                                    <button className="remove-btn" onClick={() => handleRemoveRecipe(recipe._id)}>
                                         Remove
                                     </button>
                                 </div>
-                            </div>
+                            </article>
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 };

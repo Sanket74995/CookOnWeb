@@ -30,6 +30,25 @@ const serializeSession = (session, currentUserId) => ({
     isHost: String(session.host) === String(currentUserId)
 });
 
+const getSession = async (req, res) => {
+    try {
+        const session = await populateSession(CollaborationSession.findById(req.params.id));
+        if (!session) {
+            return res.status(404).json({ message: 'Session not found' });
+        }
+
+        const existing = session.participants.find((participant) => String(participant.user) === String(req.userId));
+        if (!existing) {
+            return res.status(403).json({ message: 'Join the session first' });
+        }
+
+        return res.json(serializeSession(session, req.userId));
+    } catch (error) {
+        console.error('Get collaboration session error:', error);
+        return res.status(500).json({ message: 'Server error while fetching collaboration session' });
+    }
+};
+
 const createSession = async (req, res) => {
     try {
         const user = await User.findById(req.userId).select('firstName lastName username email');
@@ -164,6 +183,7 @@ const addMessage = async (req, res) => {
 };
 
 module.exports = {
+    getSession,
     createSession,
     joinSession,
     addMessage
