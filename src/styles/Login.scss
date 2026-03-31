@@ -36,6 +36,16 @@
         margin-bottom: 40px;
         font-size: 1.1rem;
     }
+
+    .session-message {
+        margin-bottom: 20px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(197, 106, 27, 0.1);
+        border: 1px solid rgba(197, 106, 27, 0.2);
+        color: var(--text);
+        text-align: center;
+    }
 }
 
 .login-form {
@@ -179,6 +189,11 @@
             linear-gradient(160deg, rgba(18, 29, 44, 0.96), rgba(13, 21, 32, 0.94));
         border-color: rgba(124, 146, 174, 0.2);
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+
+        .session-message {
+            background: rgba(255, 171, 87, 0.12);
+            border-color: rgba(255, 171, 87, 0.2);
+        }
     }
 
     .login-form {

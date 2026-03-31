@@ -3,6 +3,9 @@ const Recipe = require('../models/Recipe');
 const User = require('../models/User');
 const sampleRecipes = require('../data/sampleRecipes');
 
+const shouldResetRecipes = () =>
+    process.argv.includes('--reset') || String(process.env.RESET_RECIPES || '').toLowerCase() === 'true';
+
 const seedRecipes = async () => {
     try {
         // Connect to MongoDB
@@ -24,18 +27,38 @@ const seedRecipes = async () => {
             console.log('Created default user for recipes');
         }
 
-        // Clear existing recipes
-        await Recipe.deleteMany({});
-        console.log('Cleared existing recipes');
+        const resetRecipes = shouldResetRecipes();
 
-        // Add sample recipes with the user as author
-        const recipesWithAuthor = sampleRecipes.map(recipe => ({
-            ...recipe,
-            author: user._id
-        }));
+        if (resetRecipes) {
+            await Recipe.deleteMany({});
+            console.log('Cleared existing recipes because reset mode is enabled');
 
-        await Recipe.insertMany(recipesWithAuthor);
-        console.log(`Added ${sampleRecipes.length} sample recipes`);
+            const recipesWithAuthor = sampleRecipes.map(recipe => ({
+                ...recipe,
+                author: user._id
+            }));
+
+            await Recipe.insertMany(recipesWithAuthor);
+            console.log(`Added ${sampleRecipes.length} sample recipes`);
+        } else {
+            const sampleTitles = sampleRecipes.map((recipe) => recipe.title);
+            const existingRecipes = await Recipe.find({ title: { $in: sampleTitles } }).select('title');
+            const existingTitles = new Set(existingRecipes.map((recipe) => recipe.title));
+
+            const recipesToInsert = sampleRecipes
+                .filter((recipe) => !existingTitles.has(recipe.title))
+                .map((recipe) => ({
+                    ...recipe,
+                    author: user._id
+                }));
+
+            if (recipesToInsert.length) {
+                await Recipe.insertMany(recipesToInsert);
+            }
+
+            console.log(`Preserved existing recipes and added ${recipesToInsert.length} missing sample recipes`);
+            console.log('Use --reset or RESET_RECIPES=true if you want to replace all recipes');
+        }
 
         console.log('Recipe seeding completed successfully!');
         process.exit(0);

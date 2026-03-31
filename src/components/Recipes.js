@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/Recipes.scss';
@@ -26,6 +26,60 @@ const formatCuisineLabel = (value) => {
         .split(/\s+/)
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+};
+
+const CustomDropdown = ({ label, value, options, onChange, placeholder }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const selectedOption = options.find((option) => option.value === value);
+    const buttonLabel = selectedOption?.label || placeholder;
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (!dropdownRef.current?.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, []);
+
+    return (
+        <div className={`custom-dropdown ${isOpen ? 'is-open' : ''}`} ref={dropdownRef}>
+            <button
+                type="button"
+                className="dropdown-button"
+                aria-haspopup="listbox"
+                aria-expanded={isOpen}
+                aria-label={label}
+                onClick={() => setIsOpen((prev) => !prev)}
+            >
+                <span>{buttonLabel}</span>
+                <span className="dropdown-chevron" aria-hidden="true">⌄</span>
+            </button>
+
+            {isOpen && (
+                <div className="dropdown-menu" role="listbox" aria-label={label}>
+                    {options.map((option) => (
+                        <button
+                            key={`${label}-${option.value || 'empty'}`}
+                            type="button"
+                            role="option"
+                            className={`dropdown-option ${option.value === value ? 'is-selected' : ''}`}
+                            aria-selected={option.value === value}
+                            onClick={() => {
+                                onChange(option.value);
+                                setIsOpen(false);
+                            }}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 };
 
 const Recipes = () => {
@@ -162,6 +216,63 @@ const Recipes = () => {
             .map((value) => formatCuisineLabel(value))
             .sort(),
         [recipes]
+    );
+
+    const cuisineOptions = useMemo(
+        () => [
+            { value: '', label: t('all_cuisines') },
+            ...cuisines.map((cuisine) => ({ value: cuisine, label: cuisine }))
+        ],
+        [cuisines, t]
+    );
+
+    const difficultyOptions = useMemo(
+        () => [
+            { value: '', label: t('all_levels') },
+            { value: 'easy', label: t('easy') },
+            { value: 'medium', label: t('medium') },
+            { value: 'hard', label: t('hard') }
+        ],
+        [t]
+    );
+
+    const dietaryOptions = useMemo(
+        () => [
+            { value: '', label: t('all_dietary_styles') },
+            ...DIETARY_OPTIONS.map((option) => ({ value: option, label: option }))
+        ],
+        [t]
+    );
+
+    const maxTimeOptions = useMemo(
+        () => [
+            { value: '', label: t('any_time') },
+            { value: '15', label: `15 ${t('min')}` },
+            { value: '30', label: `30 ${t('min')}` },
+            { value: '45', label: `45 ${t('min')}` },
+            { value: '60', label: `60 ${t('min')}` }
+        ],
+        [t]
+    );
+
+    const minRatingOptions = useMemo(
+        () => [
+            { value: '', label: t('any_rating') },
+            { value: '4', label: '4+' },
+            { value: '3', label: '3+' },
+            { value: '2', label: '2+' }
+        ],
+        [t]
+    );
+
+    const sortOptions = useMemo(
+        () => [
+            { value: 'latest', label: t('latest') },
+            { value: 'rating', label: t('top_rated') },
+            { value: 'popular', label: t('most_reviewed') },
+            { value: 'time', label: t('quickest') }
+        ],
+        [t]
     );
 
     const groupedRecipes = useMemo(() => {
@@ -314,63 +425,68 @@ const Recipes = () => {
 
                 <div className="filter-item">
                     <label>{t('cuisine_filter')}</label>
-                    <select value={filters.cuisine} onChange={(e) => updateFilter('cuisine', e.target.value)}>
-                        <option value="">{t('all_cuisines')}</option>
-                        {cuisines.map((cuisine) => (
-                            <option key={cuisine} value={cuisine}>{cuisine}</option>
-                        ))}
-                    </select>
+                    <CustomDropdown
+                        label={t('cuisine_filter')}
+                        value={filters.cuisine}
+                        options={cuisineOptions}
+                        placeholder={t('all_cuisines')}
+                        onChange={(nextValue) => updateFilter('cuisine', nextValue)}
+                    />
                 </div>
 
                 <div className="filter-item">
                     <label>{t('difficulty_filter')}</label>
-                    <select value={filters.difficulty} onChange={(e) => updateFilter('difficulty', e.target.value)}>
-                        <option value="">{t('all_levels')}</option>
-                        <option value="easy">{t('easy')}</option>
-                        <option value="medium">{t('medium')}</option>
-                        <option value="hard">{t('hard')}</option>
-                    </select>
+                    <CustomDropdown
+                        label={t('difficulty_filter')}
+                        value={filters.difficulty}
+                        options={difficultyOptions}
+                        placeholder={t('all_levels')}
+                        onChange={(nextValue) => updateFilter('difficulty', nextValue)}
+                    />
                 </div>
 
                 <div className="filter-item">
                     <label>{t('dietary_filter')}</label>
-                    <select value={filters.dietary} onChange={(e) => updateFilter('dietary', e.target.value)}>
-                        <option value="">{t('all_dietary_styles')}</option>
-                        {DIETARY_OPTIONS.map((option) => (
-                            <option key={option} value={option}>{option}</option>
-                        ))}
-                    </select>
+                    <CustomDropdown
+                        label={t('dietary_filter')}
+                        value={filters.dietary}
+                        options={dietaryOptions}
+                        placeholder={t('all_dietary_styles')}
+                        onChange={(nextValue) => updateFilter('dietary', nextValue)}
+                    />
                 </div>
 
                 <div className="filter-item">
                     <label>{t('max_total_time')}</label>
-                    <select value={filters.maxTime} onChange={(e) => updateFilter('maxTime', e.target.value)}>
-                        <option value="">{t('any_time')}</option>
-                        <option value="15">15 {t('min')}</option>
-                        <option value="30">30 {t('min')}</option>
-                        <option value="45">45 {t('min')}</option>
-                        <option value="60">60 {t('min')}</option>
-                    </select>
+                    <CustomDropdown
+                        label={t('max_total_time')}
+                        value={filters.maxTime}
+                        options={maxTimeOptions}
+                        placeholder={t('any_time')}
+                        onChange={(nextValue) => updateFilter('maxTime', nextValue)}
+                    />
                 </div>
 
                 <div className="filter-item">
                     <label>{t('min_rating')}</label>
-                    <select value={filters.minRating} onChange={(e) => updateFilter('minRating', e.target.value)}>
-                        <option value="">{t('any_rating')}</option>
-                        <option value="4">4+</option>
-                        <option value="3">3+</option>
-                        <option value="2">2+</option>
-                    </select>
+                    <CustomDropdown
+                        label={t('min_rating')}
+                        value={filters.minRating}
+                        options={minRatingOptions}
+                        placeholder={t('any_rating')}
+                        onChange={(nextValue) => updateFilter('minRating', nextValue)}
+                    />
                 </div>
 
                 <div className="filter-item">
                     <label>{t('sort_by')}</label>
-                    <select value={filters.sort} onChange={(e) => updateFilter('sort', e.target.value)}>
-                        <option value="latest">{t('latest')}</option>
-                        <option value="rating">{t('top_rated')}</option>
-                        <option value="popular">{t('most_reviewed')}</option>
-                        <option value="time">{t('quickest')}</option>
-                    </select>
+                    <CustomDropdown
+                        label={t('sort_by')}
+                        value={filters.sort}
+                        options={sortOptions}
+                        placeholder={t('latest')}
+                        onChange={(nextValue) => updateFilter('sort', nextValue)}
+                    />
                 </div>
 
                 {localStorage.getItem('token') && (

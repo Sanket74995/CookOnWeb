@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from "./Sidebar";
 import './../styles/Navbar.scss';
-import { clearStoredSubscriptionDetails } from '../utils/subscription';
+import { clearAuthSession, resetAuthExpiryState } from '../utils/auth';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -60,9 +60,8 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        clearStoredSubscriptionDetails();
+        clearAuthSession();
+        resetAuthExpiryState();
         setUser(null);
         setIsProfileOpen(false);
         navigate('/');

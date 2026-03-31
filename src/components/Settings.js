@@ -25,9 +25,17 @@ const defaultSettings = {
   },
 };
 
+const createDefaultSettings = () => ({
+  ...defaultSettings,
+  theme: getStoredTheme(),
+  foodProfile: {
+    ...defaultSettings.foodProfile,
+  },
+});
+
 const Settings = () => {
   const { i18n, t } = useTranslation();
-  const [settings, setSettings] = useState(defaultSettings);
+  const [settings, setSettings] = useState(createDefaultSettings);
   const [saving, setSaving] = useState(false);
   const [pantry, setPantry] = useState([]);
   const [pantryDraft, setPantryDraft] = useState({ name: '', quantity: '', unit: '', category: 'general' });
@@ -49,9 +57,14 @@ const Settings = () => {
         });
         const data = await response.json();
         if (response.ok) {
+          const storedTheme = getStoredTheme();
+          const resolvedTheme = data.theme && data.theme !== defaultSettings.theme
+            ? data.theme
+            : storedTheme;
           const nextSettings = {
-            ...defaultSettings,
+            ...createDefaultSettings(),
             ...data,
+            theme: resolvedTheme,
             foodProfile: {
               ...defaultSettings.foodProfile,
               ...(data.foodProfile || {}),
@@ -61,7 +74,7 @@ const Settings = () => {
           if (nextSettings.language && nextSettings.language !== i18n.language) {
             await i18n.changeLanguage(nextSettings.language);
           }
-          applyTheme(nextSettings.theme || getStoredTheme());
+          applyTheme(resolvedTheme);
         }
       } catch (error) {
         console.error('Failed to load settings:', error);

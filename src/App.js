@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n'; // Import the i18n configuration
 import Navbar from "./components/Navbar";
@@ -26,16 +26,55 @@ import AIRecommendations from './components/AIRecommendations';
 import CollaborativeCooking from './components/CollaborativeCooking';
 import NutritionAnalytics from './components/NutritionAnalytics';
 import { applyTheme, getStoredTheme } from './utils/theme';
+import {
+  AUTH_EXPIRED_EVENT,
+  clearAuthSession,
+  getAuthFailureMessage,
+  getSessionExpiredMessage,
+  isTokenExpired,
+  notifyAuthExpired,
+} from './utils/auth';
 import { API_BASE } from './config';
 
 const RequireAuth = ({ children }) => {
+  const location = useLocation();
   const token = localStorage.getItem('token');
+
+  if (token && isTokenExpired(token)) {
+    clearAuthSession();
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ message: getSessionExpiredMessage(), from: location.pathname }}
+      />
+    );
+  }
+
   return token ? children : <Navigate to="/login" replace />;
 };
 
 function AppContent({ showBarcodeScanner, setShowBarcodeScanner, handleBarcodeScan, handleVoiceCommand }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isRecipeDetailPage = /^\/recipe\/[^/]+$/.test(location.pathname);
+
+  useEffect(() => {
+    const handleAuthExpired = (event) => {
+      const message = event.detail?.message || getSessionExpiredMessage();
+      alert(message);
+      navigate('/login', {
+        replace: true,
+        state: {
+          message,
+          from: location.pathname
+        }
+      });
+    };
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+  }, [location.pathname, navigate]);
 
   return (
     <div className="App">
@@ -99,6 +138,29 @@ function App() {
     return () => {
       window.removeEventListener('cookonweb-theme-change', handleThemeChange);
       window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
+  useEffect(() => {
+    const originalFetch = window.fetch.bind(window);
+
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+
+      if (response.status === 401 && localStorage.getItem('token')) {
+        try {
+          const payload = await response.clone().json();
+          notifyAuthExpired(getAuthFailureMessage(payload));
+        } catch (error) {
+          notifyAuthExpired(getSessionExpiredMessage());
+        }
+      }
+
+      return response;
+    };
+
+    return () => {
+      window.fetch = originalFetch;
     };
   }, []);
 

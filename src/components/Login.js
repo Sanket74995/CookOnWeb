@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import '../styles/Login.scss';
 import { API_BASE } from '../config';
+import { resetAuthExpiryState } from '../utils/auth';
 
 const Login = () => {
     const { t } = useTranslation();
+    const location = useLocation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -12,6 +15,12 @@ const Login = () => {
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [sessionMessage, setSessionMessage] = useState(location.state?.message || '');
+
+    useEffect(() => {
+        setSessionMessage(location.state?.message || '');
+    }, [location.state]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -65,6 +74,7 @@ const Login = () => {
 
             const data = await response.json();
             if (response.ok) {
+                resetAuthExpiryState();
                 // Store token and user data
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
@@ -87,6 +97,7 @@ const Login = () => {
             <div className="login-wrapper">
                 <h2>{t('welcome')}</h2>
                 <p className="login-subtitle">{t('login_subtitle')}</p>
+                {sessionMessage && <div className="session-message">{sessionMessage}</div>}
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
