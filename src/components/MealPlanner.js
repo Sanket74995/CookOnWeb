@@ -50,6 +50,7 @@ const MealPlanner = () => {
   const [familyGroupId, setFamilyGroupId] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [plannerDataVersion, setPlannerDataVersion] = useState(0);
 
   const weekDays = useMemo(() => getWeekDays(weekStart), [weekStart]);
 
@@ -108,6 +109,7 @@ const MealPlanner = () => {
           throw new Error(data.message || 'Failed to load meal plan');
         }
         setPlanEntries(data.entries || []);
+        setPlannerDataVersion((prev) => prev + 1);
       } catch (error) {
         console.error('Failed to load meal plan:', error);
       } finally {
@@ -141,7 +143,7 @@ const MealPlanner = () => {
     };
 
     loadShoppingList();
-  }, [planEntries, token, weekStart, familyGroupId]);
+  }, [token, weekStart, familyGroupId, plannerDataVersion]);
 
   useEffect(() => {
     if (!token) return;
@@ -163,7 +165,7 @@ const MealPlanner = () => {
     };
 
     loadNutrition();
-  }, [token, weekStart, familyGroupId, planEntries]);
+  }, [token, weekStart, familyGroupId, plannerDataVersion]);
 
   const getCellEntry = (date, mealType) =>
     planEntries.find((entry) => entry.date === date && entry.mealType === mealType) || emptyCell;
@@ -216,6 +218,7 @@ const MealPlanner = () => {
         throw new Error(data.message || 'Failed to save meal plan');
       }
       setPlanEntries(data.entries || []);
+      setPlannerDataVersion((prev) => prev + 1);
       alert(t('meal_plan_saved'));
     } catch (error) {
       console.error('Failed to save meal plan:', error);

@@ -20,18 +20,27 @@ const collaborationRoutes = require('./routes/collaboration');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const uploadDir = path.join(__dirname, 'uploads');
+const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = String(process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-// Rate Limiter
-const limiter = rateLimit({
+// Keep production protected without throttling normal local development usage.
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 120,
+    max: isProduction ? Number(process.env.API_RATE_LIMIT_MAX || 1000) : Number(process.env.API_RATE_LIMIT_MAX || 5000),
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many requests; please try again later.' }
+    skip: () => !isProduction,
+    handler: (req, res) => {
+        logger.warn('Rate limit exceeded', {
+            method: req.method,
+            path: req.originalUrl,
+            ip: req.ip
+        });
+        res.status(429).json({ error: 'Too many requests; please try again later.' });
+    }
 });
 
 // Logger
@@ -58,7 +67,7 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(limiter);
+app.use('/api', apiLimiter);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -78,6 +87,22 @@ app.get('/', (req, res) => {
     res.json({ message: 'Welcome to the CookOnWeb API!' });
 });
 
+const startServer = () => {
+    const server = app.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`);
+    });
+
+    server.on('error', (error) => {
+        if (error.code === 'EADDRINUSE') {
+            logger.error(`Port ${PORT} is already in use. Stop the other backend process or start this one with a different PORT.`);
+            process.exit(1);
+        }
+
+        logger.error('Server failed to start', error);
+        process.exit(1);
+    });
+};
+
 // 🔥 Start Server
 if (process.env.NODE_ENV !== 'test') {
     connectDB()
@@ -85,9 +110,9 @@ if (process.env.NODE_ENV !== 'test') {
             getJwtSecret();
             logger.info('✅ Connected to MongoDB');
 
-            app.listen(PORT, () => {
+            startServer(); /*
                 logger.info(`🚀 Server running on port ${PORT}`);
-            });
+            }); */
         })
         .catch((error) => {
             console.error('❌ FULL ERROR:', error); // important for Render logs
