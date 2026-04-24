@@ -38,6 +38,18 @@ const logger = {
     error: (message, data) => console.error('[ERROR]', message, data || '')
 };
 
+const getErrorMessage = (error) => {
+    if (!error) {
+        return 'Unknown startup error';
+    }
+
+    if (typeof error === 'string') {
+        return error;
+    }
+
+    return error.message || 'Unknown startup error';
+};
+
 // Keep production protected without throttling normal local development usage.
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -101,8 +113,15 @@ if (isVercel) {
             await ensureAppReady();
             next();
         } catch (error) {
-            logger.error('Failed to initialize application', error);
-            res.status(500).json({ error: 'Server initialization failed.' });
+            const errorMessage = getErrorMessage(error);
+            logger.error('Failed to initialize application', {
+                message: errorMessage,
+                stack: error && error.stack ? error.stack : undefined
+            });
+            res.status(500).json({
+                error: 'Server initialization failed.',
+                details: errorMessage
+            });
         }
     });
 }
