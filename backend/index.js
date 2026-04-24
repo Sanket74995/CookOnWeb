@@ -73,18 +73,6 @@ const ensureAppReady = async () => {
     return appReadyPromise;
 };
 
-if (isVercel) {
-    app.use(async (req, res, next) => {
-        try {
-            await ensureAppReady();
-            next();
-        } catch (error) {
-            logger.error('Failed to initialize application', error);
-            res.status(500).json({ error: 'Server initialization failed.' });
-        }
-    });
-}
-
 app.use(helmet());
 
 const corsOptions = {
@@ -106,6 +94,18 @@ app.options('*', cors(corsOptions));
 app.use('/api', apiLimiter);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+if (isVercel) {
+    app.use(async (req, res, next) => {
+        try {
+            await ensureAppReady();
+            next();
+        } catch (error) {
+            logger.error('Failed to initialize application', error);
+            res.status(500).json({ error: 'Server initialization failed.' });
+        }
+    });
+}
 
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
