@@ -21,10 +21,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const uploadDir = path.join(__dirname, 'uploads');
 const isProduction = process.env.NODE_ENV === 'production';
+const isVercel = process.env.VERCEL === '1';
 const allowedOrigins = String(process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+
+// Logger
+const logger = {
+    info: (message, data) => {
+        if (process.env.NODE_ENV !== 'test') console.info('[INFO]', message, data || '');
+    },
+    warn: (message, data) => console.warn('[WARN]', message, data || ''),
+    error: (message, data) => console.error('[ERROR]', message, data || '')
+};
 
 // Keep production protected without throttling normal local development usage.
 const apiLimiter = rateLimit({
@@ -43,19 +53,38 @@ const apiLimiter = rateLimit({
     }
 });
 
-// Logger
-const logger = {
-    info: (message, data) => {
-        if (process.env.NODE_ENV !== 'test') console.info('[INFO]', message, data || '');
-    },
-    warn: (message, data) => console.warn('[WARN]', message, data || ''),
-    error: (message, data) => console.error('[ERROR]', message, data || '')
+let appReadyPromise = null;
+
+const ensureAppReady = async () => {
+    if (!appReadyPromise) {
+        appReadyPromise = connectDB()
+            .then(() => {
+                getJwtSecret();
+                logger.info('Connected to MongoDB');
+            })
+            .catch((error) => {
+                appReadyPromise = null;
+                throw error;
+            });
+    }
+
+    return appReadyPromise;
 };
 
-// 🔐 Security Middleware
+if (isVercel) {
+    app.use(async (req, res, next) => {
+        try {
+            await ensureAppReady();
+            next();
+        } catch (error) {
+            logger.error('Failed to initialize application', error);
+            res.status(500).json({ error: 'Server initialization failed.' });
+        }
+    });
+}
+
 app.use(helmet());
 
-// ✅ FIXED CORS (important for deployment)
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
@@ -71,7 +100,6 @@ app.use('/api', apiLimiter);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/meal-plans', mealPlanRoutes);
@@ -82,7 +110,6 @@ app.use('/api/collaboration', collaborationRoutes);
 app.use('/api/chatbot/admin', require('./routes/chatbotAdmin'));
 app.use('/uploads', express.static(uploadDir));
 
-// Basic route
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to the CookOnWeb API!' });
 });
@@ -103,19 +130,13 @@ const startServer = () => {
     });
 };
 
-// 🔥 Start Server
-if (process.env.NODE_ENV !== 'test') {
-    connectDB()
+if (process.env.NODE_ENV !== 'test' && !isVercel) {
+    ensureAppReady()
         .then(() => {
-            getJwtSecret();
-            logger.info('✅ Connected to MongoDB');
-
-            startServer(); /*
-                logger.info(`🚀 Server running on port ${PORT}`);
-            }); */
+            startServer();
         })
         .catch((error) => {
-            console.error('❌ FULL ERROR:', error); // important for Render logs
+            console.error('Full startup error:', error);
             process.exit(1);
         });
 }
